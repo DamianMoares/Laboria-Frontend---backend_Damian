@@ -11,8 +11,13 @@ const errorHandler = require('./src/middleware/errorHandler');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware básico
-app.use(cors()); // Permitir requests del frontend
+// Middleware CORS mejorado
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://damianmoares.github.io'], // Orígenes permitidos
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true // Permitir cookies y headers de autorización
+})); // Permitir requests del frontend
 app.use(express.json()); // Parsear JSON
 
 // Rutas API
