@@ -1,0 +1,108 @@
+[
+  {
+    "id": 1,
+    "email": "candidato@test.com",
+    "password": "password123",
+    "role": "candidate",
+    "name": "Juan García",
+    "profile": {
+      "firstName": "Juan",
+      "lastName": "García",
+      "email": "candidato@test.com",
+      "phone": "+34 612 345 678",
+      "location": "Madrid",
+      "bio": "Desarrollador Frontend con 3 años de experiencia buscando nuevas oportunidades.",
+      "skills": ["React", "JavaScript", "CSS", "HTML"],
+      "experience": "3-5 años",
+      "salaryExpectation": "35000-45000€",
+      "workModePreference": "híbrido",
+      "resume": "resume_juan_garcia.pdf",
+      "linkedin": "https://linkedin.com/in/juangarcia",
+      "github": "https://github.com/juangarcia",
+      "portfolio": "https://juangarcia.dev"
+    }
+  },
+  {
+    "id": 2,
+    "email": "empresa@test.com",
+    "password": "password123",
+    "role": "company_employees",
+    "name": "TechCorp España",
+    "profile": {
+      "companyName": "TechCorp España",
+      "email": "empresa@test.com",
+      "phone": "+34 912 345 678",
+      "location": "Madrid",
+      "industry": "Tecnología",
+      "size": "50-200 empleados",
+      "website": "https://techcorp.es",
+      "description": "Empresa líder en desarrollo de software con foco en soluciones innovadoras.",
+      "focus": "empleados",
+      "postedJobs": [1, 2],
+      "linkedin": "https://linkedin.com/company/techcorp"
+    }
+  },
+  {
+    "id": 3,
+    "email": "empresa-estudiantes@test.com",
+    "password": "password123",
+    "role": "company_students",
+    "name": "EduTech Academy",
+    "profile": {
+      "companyName": "EduTech Academy",
+      "email": "empresa-estudiantes@test.com",
+      "phone": "+34 913 456 789",
+      "location": "Barcelona",
+      "industry": "Educación",
+      "size": "20-50 empleados",
+      "website": "https://edutech.es",
+      "description": "Academia de formación tecnológica especializada en bootcamps y cursos intensivos.",
+      "focus": "estudiantes",
+      "postedCourses": [1, 2],
+      "linkedin": "https://linkedin.com/company/edutech"
+    }
+  },
+  {
+    "id": 4,
+    "email": "empresa-hibrida@test.com",
+    "password": "password123",
+    "role": "company_hybrid",
+    "name": "Innovate Solutions",
+    "profile": {
+      "companyName": "Innovate Solutions",
+      "email": "empresa-hibrida@test.com",
+      "phone": "+34 934 567 890",
+      "location": "Valencia",
+      "industry": "Tecnología",
+      "size": "100-500 empleados",
+      "website": "https://innovatesolutions.es",
+      "description": "Empresa tecnológica que busca talento tanto para empleo como para formación continua de sus colaboradores.",
+      "focus": "híbrido",
+      "postedJobs": [3, 4],
+      "postedCourses": [3, 4],
+      "linkedin": "https://linkedin.com/company/innovatesolutions"
+    }
+  },
+  {
+    "id": 5,
+    "email": "candidato2@test.com",
+    "password": "password123",
+    "role": "candidate",
+    "name": "María López",
+    "profile": {
+      "firstName": "María",
+      "lastName": "López",
+      "email": "candidato2@test.com",
+      "phone": "+34 622 345 679",
+      "location": "Barcelona",
+      "bio": "Diseñadora UX/UI apasionada por crear experiencias de usuario intuitivas y accesibles.",
+      "skills": ["Figma", "Adobe XD", "Sketch", "Prototipado"],
+      "experience": "1-3 años",
+      "salaryExpectation": "28000-35000€",
+      "workModePreference": "remoto",
+      "resume": "resume_maria_lopez.pdf",
+      "linkedin": "https://linkedin.com/in/marialopez",
+      "portfolio": "https://marialopez.design"
+    }
+  }
+]

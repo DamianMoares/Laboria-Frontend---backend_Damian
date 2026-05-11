@@ -1,0 +1,309 @@
+/* RegisterPage Styles - CSS Modules */
+.authPage {
+  min-height: 100vh;
+  padding: var(--spacing-xl) 0;
+}
+
+.authCard {
+  max-width: 1200vh;
+  width: 100%;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.authHeader {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 2px solid var(--color-gold);
+}
+
+.authLogo {
+  max-width: 180px;
+  height: auto;
+  margin-bottom: var(--spacing-md);
+}
+
+.authHeader h1 {
+  font-size: 2.5rem;
+  color: var(--color-gold);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 700;
+}
+
+.authSubtitle {
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+}
+
+.roleSelection h2 {
+  text-align: center;
+  color: var(--color-gold);
+  font-size: 1.8rem;
+  margin-bottom: var(--spacing-xl);
+}
+
+.roleCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.roleCard {
+  background-color: var(--color-bg-tertiary);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.roleCard:hover {
+  border-color: var(--color-gold);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.roleIcon {
+  font-size: 3.5rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.roleCard h3 {
+  color: var(--color-gold);
+  font-size: 1.4rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.roleCard p {
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.authForm {
+  margin-bottom: var(--spacing-xl);
+}
+
+.authError {
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid #ff4444;
+  color: #ff4444;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.95rem;
+}
+
+.formGroup {
+  margin-bottom: var(--spacing-xl);
+}
+
+.formGroup label {
+  display: block;
+  color: var(--color-text-primary);
+  font-weight: 500;
+  margin-bottom: var(--spacing-sm);
+  font-size: 1rem;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 1.05rem;
+  border: 2px solid var(--color-border);
+  transition: border-color var(--transition-fast);
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+  border-color: var(--color-gold);
+}
+
+.formGroup input.error,
+.formGroup select.error,
+.formGroup textarea.error {
+  border-color: #ff4444;
+}
+
+.formGroup input.error:focus,
+.formGroup select.error:focus,
+.formGroup textarea.error:focus {
+  border-color: #ff4444;
+  box-shadow: 0 0 0 2px rgba(255, 68, 68, 0.2);
+}
+
+.fieldError {
+  color: #ff4444;
+  font-size: 0.85rem;
+  margin-top: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.fieldError::before {
+  content: "⚠️";
+  font-size: 0.9rem;
+}
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.formActions {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-xl);
+}
+
+.formActions button {
+  flex: 1;
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.authFooter {
+  text-align: center;
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+.authFooter p {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.authLink {
+  color: var(--color-gold);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.authLink:hover {
+  color: var(--color-gold-light);
+}
+
+.legalConsents {
+  background-color: var(--color-bg-tertiary);
+  border: 2px solid var(--color-border-gold);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.legalConsents h3 {
+  color: var(--color-gold);
+  font-size: 1.3rem;
+  margin-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--spacing-sm);
+}
+
+.consentSection {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+.consentSection h4 {
+  color: var(--color-gold-light);
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.consentDescription {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-md);
+  line-height: 1.5;
+}
+
+.consentItem {
+  margin-bottom: var(--spacing-md);
+}
+
+.consentLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  transition: color var(--transition-fast);
+}
+
+.consentLabel:hover {
+  color: var(--color-text-primary);
+}
+
+.consentLabel input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-gold);
+  cursor: pointer;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.consentLabel input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.consentLabel span {
+  flex: 1;
+}
+
+.consentLabel a {
+  color: var(--color-gold);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.consentLabel a:hover {
+  color: var(--color-gold-light);
+  text-decoration: underline;
+}
+
+.consentLabel strong {
+  color: var(--color-gold);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .authCard {
+    padding: var(--spacing-lg);
+  }
+
+  .authHeader h1 {
+    font-size: 1.5rem;
+  }
+
+  .roleCards {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .formActions button {
+    width: 100%;
+  }
+}
