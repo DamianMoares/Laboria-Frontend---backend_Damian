@@ -66,7 +66,59 @@ Laboria es un metabuscador que integra ofertas laborales y cursos educativos de 
 - Stack: Vitest + React Testing Library
 - Mock de APIs para testing aislado
 
-## 🛠 Stack Tecnológico
+## � Ejecución Rápida
+
+### **Instalación Completa**
+```bash
+# Instalar todas las dependencias
+npm run install:all
+
+# Configurar variables de entorno
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+
+# Iniciar desarrollo (frontend + backend)
+npm run dev
+```
+
+### **Comandos Disponibles**
+
+#### **🔧 Desarrollo**
+```bash
+npm run dev              # Iniciar frontend + backend
+npm run dev:frontend     # Solo frontend (Vite dev)
+npm run dev:backend      # Solo backend (nodemon)
+```
+
+#### **🚀 Producción**
+```bash
+npm run start             # Iniciar frontend + backend
+npm run start:frontend    # Solo frontend (build + preview)
+npm run start:backend     # Solo backend (node server.js)
+```
+
+#### **📦 Build**
+```bash
+npm run build             # Build frontend + backend
+npm run build:frontend    # Solo frontend
+npm run build:backend     # Solo backend (Prisma + migrate)
+```
+
+#### **🧪 Testing**
+```bash
+npm run test              # Tests frontend + backend
+npm run test:frontend     # Solo frontend
+npm run test:backend      # Solo backend
+```
+
+#### **🚀 Despliegue**
+```bash
+npm run deploy             # Build + deploy completo
+npm run deploy:frontend    # Deploy frontend a GitHub Pages
+npm run deploy:backend     # Deploy backend a Railway/Vercel
+```
+
+## �🛠 Stack Tecnológico
 
 - **Frontend**: React 18.3.1
 - **Bundler**: Vite 5.2.11
@@ -76,10 +128,6 @@ Laboria es un metabuscador que integra ofertas laborales y cursos educativos de 
 - **Lenguaje**: JavaScript (sin TypeScript)
 - **Despliegue**: GitHub Pages + GitHub Actions CI/CD
 
-## 📦 Instalación
-
-```bash
-# Instalar dependencias
 npm install
 
 # Crear archivo .env (opcional - ver sección Variables de Entorno)

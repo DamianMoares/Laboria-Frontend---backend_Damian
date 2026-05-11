@@ -1,0 +1,37 @@
+{
+  "name": "laboria-full-stack",
+  "version": "1.0.0",
+  "description": "Laboria - Portal de Empleo y Formación Profesional (Full Stack)",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "setup": "npm run install:all && npm run build:backend",
+    "deploy": "npm run build:frontend && npm run deploy:backend",
+    "deploy:backend": "cd backend && echo 'Deploy backend to Railway/Vercel'",
+    "deploy:frontend": "cd frontend && echo 'Deploy frontend to GitHub Pages'"
+  },
+  "keywords": ["laboria", "empleo", "formacion", "react", "nodejs", "prisma"],
+  "author": "Damian Moares",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
