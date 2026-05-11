@@ -1,0 +1,109 @@
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(CANDIDATE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  jobs         Job[]         // Un usuario puede crear muchos empleos
+  courses      Course[]      // Un usuario puede crear muchos cursos
+  applications Application[] // Un usuario puede aplicar a muchos empleos
+}
+
+model Job {
+  id          String   @id @default(uuid())
+  title       String
+  company     String
+  location    String
+  salary      String?
+  description String
+  requirements String?
+  mode        WorkMode @default(REMOTE)
+  category    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relación con User (quién lo publicó)
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  // Relaciones
+  applications Application[] // Un empleo puede tener muchas aplicaciones
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  title       String
+  provider    String
+  description String
+  category    String
+  level       Level    @default(BEGINNER)
+  duration    String?
+  price       String?
+  url         String?
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relación con User (quién lo publicó)
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+}
+
+model Application {
+  id        String          @id @default(uuid())
+  status    ApplicationStatus @default(PENDING)
+  message   String?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  // Relaciones
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  
+  jobId String
+  job   Job    @relation(fields: [jobId], references: [id])
+
+  @@unique([userId, jobId]) // Un usuario solo puede aplicar una vez a un empleo
+}
+
+// Enums (tipos especiales)
+enum Role {
+  CANDIDATE
+  COMPANY_EMPLOYEES
+  COMPANY_STUDENTS
+  COMPANY_HYBRID
+  ADMIN
+}
+
+enum WorkMode {
+  REMOTE
+  HYBRID
+  ONSITE
+}
+
+enum Level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
