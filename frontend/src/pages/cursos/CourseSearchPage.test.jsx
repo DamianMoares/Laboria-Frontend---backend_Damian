@@ -57,7 +57,7 @@ describe('CourseSearchPage', () => {
       </BrowserRouter>
     );
 
-    const searchInput = screen.getByPlaceholderText(/Buscar por título, plataforma, tecnología/i);
+    const searchInput = screen.getByPlaceholderText(/Buscar por curso, plataforma, tecnología/i);
     expect(searchInput).toBeInTheDocument();
   });
 
@@ -69,9 +69,9 @@ describe('CourseSearchPage', () => {
     );
 
     expect(screen.getByText(/Ubicación/i)).toBeInTheDocument();
-    expect(screen.getByText(/Categoría/i)).toBeInTheDocument();
-    expect(screen.getByText(/Nivel/i)).toBeInTheDocument();
-    expect(screen.getByText(/Formato/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Nivel/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Formato/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Certificación/i)).toBeInTheDocument();
   });
 
   it('permite escribir en el campo de búsqueda', () => {
@@ -81,7 +81,7 @@ describe('CourseSearchPage', () => {
       </BrowserRouter>
     );
 
-    const searchInput = screen.getByPlaceholderText(/Buscar por título, plataforma, tecnología/i);
+    const searchInput = screen.getByPlaceholderText(/Buscar por curso, plataforma, tecnología/i);
     fireEvent.change(searchInput, { target: { value: 'React' } });
     expect(searchInput.value).toBe('React');
   });
@@ -93,7 +93,7 @@ describe('CourseSearchPage', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText(/Buscar/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Buscar/i })).toBeInTheDocument();
   });
 
   it('muestra el botón de filtros avanzados', () => {

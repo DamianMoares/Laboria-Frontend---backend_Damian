@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { AuthProvider, useAuth } from './AuthContext';
 import { authService } from '../services/authService';
 
-// Mock del authService
 vi.mock('../services/authService', () => ({
   authService: {
     login: vi.fn(),
@@ -13,10 +12,9 @@ vi.mock('../services/authService', () => ({
   },
 }));
 
-// Componente de prueba para usar el hook
 const TestComponent = () => {
   const { user, loading, isAuthenticated, login, register, logout } = useAuth();
-  
+
   return (
     <div>
       <div data-testid="loading">{loading ? 'loading' : 'not-loading'}</div>
@@ -35,14 +33,16 @@ describe('AuthContext', () => {
     localStorage.clear();
   });
 
-  it('inicializa con loading true y sin usuario', () => {
+  it('inicializa sin usuario cuando no hay sesión guardada', async () => {
     render(
       <AuthProvider>
         <TestComponent />
       </AuthProvider>
     );
 
-    expect(screen.getByTestId('loading')).toHaveTextContent('loading');
+    await waitFor(() => {
+      expect(screen.getByTestId('loading')).toHaveTextContent('not-loading');
+    });
     expect(screen.getByTestId('authenticated')).toHaveTextContent('not-authenticated');
     expect(screen.getByTestId('user')).toHaveTextContent('no-user');
   });
@@ -67,7 +67,7 @@ describe('AuthContext', () => {
 
   it('realiza login correctamente', async () => {
     const mockUser = { id: '1', email: 'test@test.com', name: 'Test User', role: 'CANDIDATE' };
-    authService.login.mockResolvedValue(mockUser);
+    authService.login.mockResolvedValue({ user: mockUser, token: 'mock-token' });
 
     render(
       <AuthProvider>
@@ -79,7 +79,7 @@ describe('AuthContext', () => {
     loginButton.click();
 
     await waitFor(() => {
-      expect(authService.login).toHaveBeenCalledWith('test@test.com', 'password');
+      expect(authService.login).toHaveBeenCalledWith({ email: 'test@test.com', password: 'password' });
       expect(screen.getByTestId('authenticated')).toHaveTextContent('authenticated');
       expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(mockUser));
     });
@@ -98,14 +98,14 @@ describe('AuthContext', () => {
     loginButton.click();
 
     await waitFor(() => {
-      expect(authService.login).toHaveBeenCalledWith('test@test.com', 'password');
+      expect(authService.login).toHaveBeenCalledWith({ email: 'test@test.com', password: 'password' });
       expect(screen.getByTestId('authenticated')).toHaveTextContent('not-authenticated');
     });
   });
 
   it('realiza registro correctamente', async () => {
     const mockUser = { id: '1', email: 'test@test.com', name: 'Test User', role: 'CANDIDATE' };
-    authService.register.mockResolvedValue(mockUser);
+    authService.register.mockResolvedValue({ user: mockUser, token: 'mock-token' });
 
     render(
       <AuthProvider>

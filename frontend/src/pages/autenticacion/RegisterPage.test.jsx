@@ -4,12 +4,9 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '../../context/AuthContext';
 import RegisterPage from './RegisterPage';
 
-// Mock del useAuth
 vi.mock('../../context/AuthContext', () => ({
-  ...vi.importActual('../../context/AuthContext'),
-  useAuth: () => ({
-    register: vi.fn(),
-  }),
+  useAuth: () => ({ register: vi.fn() }),
+  AuthProvider: ({ children }) => <>{children}</>,
 }));
 
 describe('RegisterPage', () => {
@@ -55,8 +52,8 @@ describe('RegisterPage', () => {
     fireEvent.click(candidateRole);
 
     await waitFor(() => {
-      expect(screen.getByText(/Email/i)).toBeInTheDocument();
-      expect(screen.getByText(/Contraseña/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
+      expect(screen.getByLabelText('Contraseña')).toBeInTheDocument();
     });
   });
 
@@ -74,7 +71,7 @@ describe('RegisterPage', () => {
 
     await waitFor(() => {
       expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Contraseña/i)).toBeInTheDocument();
+      expect(screen.getByLabelText('Contraseña')).toBeInTheDocument();
       expect(screen.getByLabelText(/Confirmar Contraseña/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Nombre/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Apellidos/i)).toBeInTheDocument();
@@ -159,7 +156,7 @@ describe('RegisterPage', () => {
     fireEvent.click(candidateRole);
 
     await waitFor(() => {
-      const passwordInput = screen.getByLabelText(/Contraseña/i);
+      const passwordInput = screen.getByLabelText('Contraseña');
       const confirmPasswordInput = screen.getByLabelText(/Confirmar Contraseña/i);
 
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
@@ -213,12 +210,8 @@ describe('RegisterPage', () => {
       </BrowserRouter>
     );
 
-    const authPage = document.querySelector('.authPage');
-    const authCard = document.querySelector('.authCard');
-    const roleSelection = document.querySelector('.roleSelection');
-
-    expect(authPage).toBeInTheDocument();
-    expect(authCard).toBeInTheDocument();
-    expect(roleSelection).toBeInTheDocument();
+    expect(screen.getByText(/Registro/i)).toBeInTheDocument();
+    expect(screen.getByText(/¿Qué tipo de cuenta necesitas?/i)).toBeInTheDocument();
+    expect(screen.getByText(/Candidato/i)).toBeInTheDocument();
   });
 });

@@ -1,25 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import jobsData from '../../data/jobs.json';
+import { applicationService } from '../../services/applicationService';
 import '../compartidos/MyListingsPage.css';
 
 const MyApplicationsPage = () => {
   const { user, isCandidate } = useAuth();
   const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user && isCandidate()) {
-      const savedApplications = JSON.parse(localStorage.getItem('user_applications') || '[]');
-      const userApplications = savedApplications.filter(app => app.userId === user.id);
-      
-      const jobsWithDetails = userApplications.map(app => {
-        const job = jobsData.find(j => j.id === app.jobId);
-        return job ? { ...job, applicationDate: app.applicationDate, status: app.status } : null;
-      }).filter(Boolean);
-      
-      setApplications(jobsWithDetails);
-    }
+    const fetchApplications = async () => {
+      if (!user || !isCandidate()) return;
+      setLoading(true);
+      try {
+        const data = await applicationService.getMyApplications();
+        setApplications(Array.isArray(data) ? data : []);
+      } catch (error) {
+        setApplications([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchApplications();
   }, [user, isCandidate]);
 
   if (!user || !isCandidate()) {
@@ -34,14 +37,15 @@ const MyApplicationsPage = () => {
     );
   }
 
-  const handleWithdraw = (jobId) => {
+  const handleWithdraw = async (appId) => {
     if (window.confirm('¿Estás seguro de que quieres retirar esta aplicación?')) {
-      const savedApplications = JSON.parse(localStorage.getItem('user_applications') || '[]');
-      const updatedApplications = savedApplications.filter(app => !(app.userId === user.id && app.jobId === jobId));
-      localStorage.setItem('user_applications', JSON.stringify(updatedApplications));
-      
-      setApplications(applications.filter(app => app.id !== jobId));
-      alert('Aplicación retirada (simulado)');
+      try {
+        await applicationService.cancel(appId);
+        setApplications(applications.filter(app => app.id !== appId));
+        alert('Aplicación retirada');
+      } catch (error) {
+        alert('Error al retirar aplicación');
+      }
     }
   };
 
@@ -58,43 +62,42 @@ const MyApplicationsPage = () => {
           </Link>
         </header>
 
-        {applications.length > 0 ? (
+        {loading ? (
+          <div className="loading">Cargando aplicaciones...</div>
+        ) : applications.length > 0 ? (
           <div className="listings-grid">
-            {applications.map(job => (
-              <div key={job.id} className="listing-card">
+            {applications.map(app => (
+              <div key={app.id} className="listing-card">
                 <div className="listing-header">
-                  <h3>{job.title}</h3>
-                  <span className={`badge ${job.status === 'pendiente' ? 'pending' : job.status === 'aceptada' ? 'accepted' : 'rejected'}`}>
-                    {job.status}
+                  <h3>{app.job?.title || 'Empleo'}</h3>
+                  <span className={`badge ${app.status === 'PENDING' ? 'pending' : app.status === 'ACCEPTED' ? 'accepted' : 'rejected'}`}>
+                    {app.status}
                   </span>
                 </div>
                 
                 <div className="listing-info">
                   <div className="info-item">
-                    <strong>Empresa:</strong> {job.company}
+                    <strong>Empresa:</strong> {app.job?.company || 'N/A'}
                   </div>
                   <div className="info-item">
-                    <strong>Ubicación:</strong> {job.location}
+                    <strong>Ubicación:</strong> {app.job?.location || 'N/A'}
                   </div>
                   <div className="info-item">
-                    <strong>Modalidad:</strong> {job.workMode}
+                    <strong>Mensaje:</strong> {app.message || 'Sin mensaje'}
                   </div>
                   <div className="info-item">
-                    <strong>Salario:</strong> {job.salary}
-                  </div>
-                  <div className="info-item">
-                    <strong>Aplicado:</strong> {job.applicationDate}
+                    <strong>Aplicado:</strong> {new Date(app.createdAt).toLocaleDateString()}
                   </div>
                 </div>
 
                 <div className="listing-actions">
-                  <Link to={`/empleos/${job.id}`} className="btn btn-secondary">
+                  <Link to={`/empleos/${app.job?.id}`} className="btn btn-secondary">
                     Ver Detalles
                   </Link>
-                  {job.status === 'pendiente' && (
+                  {app.status === 'PENDING' && (
                     <button 
                       className="btn btn-danger"
-                      onClick={() => handleWithdraw(job.id)}
+                      onClick={() => handleWithdraw(app.id)}
                     >
                       Retirar
                     </button>

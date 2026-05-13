@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { courseService } from '../../services/courseService';
 import '../compartidos/FormPage.css';
 
 const PostCoursePage = () => {
   const { user, isCompanyStudents, isCompanyHybrid } = useAuth();
   const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
 
   if (!user || (!isCompanyStudents() && !isCompanyHybrid())) {
     return (
@@ -20,46 +22,53 @@ const PostCoursePage = () => {
 
   const [formData, setFormData] = useState({
     title: '',
-    platform: user?.profile?.companyName || '',
-    level: 'básico',
+    provider: user?.name || '',
+    level: 'BEGINNER',
     duration: '',
-    format: 'online',
     price: '',
-    certification: false,
-    technology: '',
+    url: '',
+    image: '',
     description: '',
-    skills: '',
-    requirements: '',
-    instructor: user?.profile?.companyName || ''
+    category: 'Tecnología'
   });
 
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     
-    const newCourse = {
-      id: Date.now(),
-      ...formData,
-      skills: formData.skills.split(',').map(s => s.trim()),
-      requirements: formData.requirements.split('\n').filter(r => r.trim()),
-      rating: 0,
-      students: 0,
-      externalLink: '#'
+    const coursePayload = {
+      title: formData.title,
+      provider: formData.provider,
+      description: formData.description,
+      category: formData.category,
+      level: formData.level,
+      duration: formData.duration,
+      price: formData.price,
+      url: formData.url
     };
 
-    const postedCourses = JSON.parse(localStorage.getItem('posted_courses') || '[]');
-    postedCourses.push(newCourse);
-    localStorage.setItem('posted_courses', JSON.stringify(postedCourses));
-
-    alert('Curso publicado con éxito (simulado)');
-    navigate('/mis-cursos');
+    try {
+      await courseService.create(coursePayload);
+      alert('Curso publicado con éxito');
+      navigate('/mis-cursos');
+    } catch (error) {
+      const newCourse = { id: Date.now(), ...formData };
+      const postedCourses = JSON.parse(localStorage.getItem('posted_courses') || '[]');
+      postedCourses.push(newCourse);
+      localStorage.setItem('posted_courses', JSON.stringify(postedCourses));
+      alert('Curso guardado localmente (backend no disponible)');
+      navigate('/mis-cursos');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -89,12 +98,12 @@ const PostCoursePage = () => {
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="platform">Plataforma *</label>
+                <label htmlFor="provider">Proveedor *</label>
                 <input
                   type="text"
-                  id="platform"
-                  name="platform"
-                  value={formData.platform}
+                  id="provider"
+                  name="provider"
+                  value={formData.provider}
                   onChange={handleInputChange}
                   placeholder="Ej: Tu empresa"
                   required
@@ -102,16 +111,23 @@ const PostCoursePage = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="instructor">Instructor *</label>
-                <input
-                  type="text"
-                  id="instructor"
-                  name="instructor"
-                  value={formData.instructor}
+                <label htmlFor="category">Categoría *</label>
+                <select
+                  id="category"
+                  name="category"
+                  value={formData.category}
                   onChange={handleInputChange}
-                  placeholder="Nombre del instructor"
                   required
-                />
+                >
+                  <option value="Tecnología">Tecnología</option>
+                  <option value="Diseño">Diseño</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Negocios">Negocios</option>
+                  <option value="Idiomas">Idiomas</option>
+                  <option value="Salud">Salud</option>
+                  <option value="Educación">Educación</option>
+                  <option value="Otros">Otros</option>
+                </select>
               </div>
             </div>
 
@@ -125,25 +141,22 @@ const PostCoursePage = () => {
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="básico">Básico</option>
-                  <option value="intermedio">Intermedio</option>
-                  <option value="avanzado">Avanzado</option>
+                  <option value="BEGINNER">Básico</option>
+                  <option value="INTERMEDIATE">Intermedio</option>
+                  <option value="ADVANCED">Avanzado</option>
                 </select>
               </div>
 
               <div className="form-group">
-                <label htmlFor="format">Formato *</label>
-                <select
-                  id="format"
-                  name="format"
-                  value={formData.format}
+                <label htmlFor="url">URL del curso</label>
+                <input
+                  type="url"
+                  id="url"
+                  name="url"
+                  value={formData.url}
                   onChange={handleInputChange}
-                  required
-                >
-                  <option value="online">Online</option>
-                  <option value="presencial">Presencial</option>
-                  <option value="híbrido">Híbrido</option>
-                </select>
+                  placeholder="https://..."
+                />
               </div>
             </div>
 
@@ -175,27 +188,15 @@ const PostCoursePage = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="technology">Tecnología principal</label>
+              <label htmlFor="image">URL de imagen</label>
               <input
-                type="text"
-                id="technology"
-                name="technology"
-                value={formData.technology}
+                type="url"
+                id="image"
+                name="image"
+                value={formData.image}
                 onChange={handleInputChange}
-                placeholder="Ej: React, Python, JavaScript"
+                placeholder="https://ejemplo.com/imagen.jpg"
               />
-            </div>
-
-            <div className="form-group">
-              <label>
-                <input
-                  type="checkbox"
-                  name="certification"
-                  checked={formData.certification}
-                  onChange={handleInputChange}
-                />
-                Incluye certificación
-              </label>
             </div>
           </div>
 
@@ -215,37 +216,14 @@ const PostCoursePage = () => {
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="skills">Skills (separados por coma)</label>
-              <textarea
-                id="skills"
-                name="skills"
-                value={formData.skills}
-                onChange={handleInputChange}
-                placeholder="React, Hooks, Redux, State Management"
-                rows="3"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="requirements">Requisitos previos (uno por línea)</label>
-              <textarea
-                id="requirements"
-                name="requirements"
-                value={formData.requirements}
-                onChange={handleInputChange}
-                placeholder="JavaScript básico&#10;Conocimiento de HTML/CSS&#10;Ganas de aprender"
-                rows="3"
-              />
-            </div>
           </div>
 
           <div className="form-actions">
             <button type="button" className="btn btn-secondary" onClick={() => navigate(-1)}>
               Cancelar
             </button>
-            <button type="submit" className="btn btn-primary">
-              Publicar Curso
+            <button type="submit" className="btn btn-primary" disabled={submitting}>
+              {submitting ? 'Publicando...' : 'Publicar Curso'}
             </button>
           </div>
         </form>

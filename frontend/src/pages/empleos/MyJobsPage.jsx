@@ -1,25 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import jobsData from '../../data/jobs.json';
+import { jobService } from '../../services/jobService';
 import '../compartidos/MyListingsPage.css';
 
 const MyJobsPage = () => {
   const { user, isCompanyEmployees, isCompanyHybrid } = useAuth();
   const [postedJobs, setPostedJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user && user.profile) {
-      // Get jobs from user profile
-      const profileJobs = user.profile.postedJobs || [];
-      const jobsFromProfile = jobsData.filter(job => profileJobs.includes(job.id));
-      
-      // Get jobs from localStorage (newly posted)
-      const localStorageJobs = JSON.parse(localStorage.getItem('posted_jobs') || '[]');
-      const companyJobs = localStorageJobs.filter(job => job.company === user.profile.companyName);
-      
-      setPostedJobs([...jobsFromProfile, ...companyJobs]);
-    }
+    const fetchJobs = async () => {
+      if (!user) return;
+      setLoading(true);
+      try {
+        const data = await jobService.getAll();
+        setPostedJobs(Array.isArray(data) ? data.filter(j => j.authorId === user.id) : []);
+      } catch (error) {
+        setPostedJobs([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchJobs();
   }, [user]);
 
   if (!user || (!isCompanyEmployees() && !isCompanyHybrid())) {
@@ -34,17 +37,15 @@ const MyJobsPage = () => {
     );
   }
 
-  const handleDelete = (jobId) => {
+  const handleDelete = async (jobId) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta oferta?')) {
-      const updatedJobs = postedJobs.filter(job => job.id !== jobId);
-      setPostedJobs(updatedJobs);
-      
-      // Remove from localStorage
-      const localStorageJobs = JSON.parse(localStorage.getItem('posted_jobs') || '[]');
-      const updatedLocalStorageJobs = localStorageJobs.filter(job => job.id !== jobId);
-      localStorage.setItem('posted_jobs', JSON.stringify(updatedLocalStorageJobs));
-      
-      alert('Oferta eliminada (simulado)');
+      try {
+        await jobService.delete(jobId);
+        setPostedJobs(postedJobs.filter(job => job.id !== jobId));
+        alert('Oferta eliminada');
+      } catch (error) {
+        alert('Error al eliminar oferta');
+      }
     }
   };
 
@@ -61,44 +62,32 @@ const MyJobsPage = () => {
           </Link>
         </header>
 
-        {postedJobs.length > 0 ? (
+        {loading ? (
+          <div className="loading">Cargando ofertas...</div>
+        ) : postedJobs.length > 0 ? (
           <div className="listings-grid">
             {postedJobs.map(job => (
               <div key={job.id} className="listing-card">
                 <div className="listing-header">
                   <h3>{job.title}</h3>
-                  <span className="listing-date">{job.postedDate}</span>
+                  <span className="listing-date">{new Date(job.createdAt).toLocaleDateString()}</span>
                 </div>
                 
                 <div className="listing-info">
                   <div className="info-item">
+                    <strong>Empresa:</strong> {job.company}
+                  </div>
+                  <div className="info-item">
                     <strong>Ubicación:</strong> {job.location}
                   </div>
                   <div className="info-item">
-                    <strong>Modalidad:</strong> {job.workMode}
+                    <strong>Modalidad:</strong> {job.mode}
                   </div>
                   <div className="info-item">
-                    <strong>Jornada:</strong> {job.schedule}
+                    <strong>Categoría:</strong> {job.category}
                   </div>
                   <div className="info-item">
-                    <strong>Nivel:</strong> {job.experienceLevel}
-                  </div>
-                  <div className="info-item">
-                    <strong>Salario:</strong> {job.salary}
-                  </div>
-                  <div className="info-item">
-                    <strong>Tecnología:</strong> {job.technology}
-                  </div>
-                </div>
-
-                <div className="listing-stats">
-                  <div className="stat">
-                    <span className="stat-value">0</span>
-                    <span className="stat-label">Aplicaciones</span>
-                  </div>
-                  <div className="stat">
-                    <span className="stat-value">0</span>
-                    <span className="stat-label">Vistas</span>
+                    <strong>Salario:</strong> {job.salary || 'No especificado'}
                   </div>
                 </div>
 

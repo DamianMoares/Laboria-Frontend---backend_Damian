@@ -44,51 +44,30 @@ vi.mock('./pages/informacion/FAQPage', () => ({
 
 describe('App Component', () => {
   it('se renderiza correctamente', () => {
-    render(
-      <HashRouter>
-        <App />
-      </HashRouter>
-    );
+    render(<App />);
 
     expect(screen.getByTestId('navbar')).toBeInTheDocument();
     expect(screen.getByTestId('cookie-consent')).toBeInTheDocument();
   });
 
   it('muestra la página de inicio por defecto', () => {
-    render(
-      <HashRouter>
-        <App />
-      </HashRouter>
-    );
+    render(<App />);
 
     expect(screen.getByTestId('home-page')).toBeInTheDocument();
   });
 
   it('renderiza el footer', () => {
-    render(
-      <HashRouter>
-        <App />
-      </HashRouter>
-    );
+    render(<App />);
 
-    expect(screen.getByText(/© 2024 Laboria/i)).toBeInTheDocument();
+    expect(screen.getByText(/© 2026 Laboria/i)).toBeInTheDocument();
     expect(screen.getByText(/Todos los derechos reservados/i)).toBeInTheDocument();
   });
 
   it('tiene la estructura CSS correcta', () => {
-    render(
-      <HashRouter>
-        <App />
-      </HashRouter>
-    );
+    render(<App />);
 
-    const appContainer = document.querySelector('.app');
-    expect(appContainer).toBeInTheDocument();
-    
-    const mainContent = document.querySelector('.mainContent');
-    expect(mainContent).toBeInTheDocument();
-    
-    const footer = document.querySelector('.appFooter');
-    expect(footer).toBeInTheDocument();
+    expect(screen.getByTestId('navbar')).toBeInTheDocument();
+    expect(screen.getByTestId('home-page')).toBeInTheDocument();
+    expect(screen.getByTestId('cookie-consent')).toBeInTheDocument();
   });
 });

@@ -50,8 +50,8 @@ describe('Home Page', () => {
     );
 
     expect(screen.getByText(/¿Por qué Laboria?/i)).toBeInTheDocument();
-    expect(screen.getByText(/Empleo/i)).toBeInTheDocument();
-    expect(screen.getByText(/Formación/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Empleo/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Formación/i).length).toBeGreaterThan(0);
   });
 
   it('muestra las estadísticas', () => {
@@ -61,7 +61,7 @@ describe('Home Page', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText(/Ofertas de empleo/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Ofertas de empleo/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/Cursos disponibles/i)).toBeInTheDocument();
   });
 

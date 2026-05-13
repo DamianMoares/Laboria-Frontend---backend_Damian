@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { jobService } from '../../services/jobService';
 import '../compartidos/FormPage.css';
 
 const PostJobPage = () => {
   const { user, isCompanyEmployees, isCompanyHybrid } = useAuth();
   const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
 
   if (!user || (!isCompanyEmployees() && !isCompanyHybrid())) {
     return (
@@ -21,12 +23,12 @@ const PostJobPage = () => {
   const [formData, setFormData] = useState({
     title: '',
     location: '',
-    workMode: 'presencial',
+    mode: 'REMOTE',
     schedule: 'full-time',
     experienceLevel: 'junior',
     salary: '',
     contractType: 'indefinido',
-    sector: 'Tecnología',
+    category: 'Tecnología',
     technology: '',
     description: '',
     requirements: '',
@@ -40,26 +42,36 @@ const PostJobPage = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     
-    // Simular publicación - en versión real esto enviaría a API
-    const newJob = {
-      id: Date.now(),
-      ...formData,
-      company: user.profile.companyName,
-      requirements: formData.requirements.split('\n').filter(r => r.trim()),
-      benefits: formData.benefits.split('\n').filter(b => b.trim()),
-      postedDate: new Date().toISOString().split('T')[0]
+    const jobPayload = {
+      title: formData.title,
+      company: user.name,
+      location: formData.location,
+      mode: formData.mode,
+      salary: formData.salary,
+      description: formData.description,
+      requirements: formData.requirements,
+      category: formData.category
     };
 
-    // Guardar en localStorage para simular persistencia
-    const postedJobs = JSON.parse(localStorage.getItem('posted_jobs') || '[]');
-    postedJobs.push(newJob);
-    localStorage.setItem('posted_jobs', JSON.stringify(postedJobs));
-
-    alert('Oferta publicada con éxito (simulado)');
-    navigate('/mis-ofertas');
+    try {
+      await jobService.create(jobPayload);
+      alert('Oferta publicada con éxito');
+      navigate('/mis-ofertas');
+    } catch (error) {
+      // Fallback a localStorage si el backend no está disponible
+      const newJob = { id: Date.now(), ...formData, company: user.name };
+      const postedJobs = JSON.parse(localStorage.getItem('posted_jobs') || '[]');
+      postedJobs.push(newJob);
+      localStorage.setItem('posted_jobs', JSON.stringify(postedJobs));
+      alert('Oferta guardada localmente (backend no disponible)');
+      navigate('/mis-ofertas');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -104,15 +116,15 @@ const PostJobPage = () => {
               <div className="form-group">
                 <label htmlFor="workMode">Modalidad *</label>
                 <select
-                  id="workMode"
-                  name="workMode"
-                  value={formData.workMode}
+                  id="mode"
+                  name="mode"
+                  value={formData.mode}
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="presencial">Presencial</option>
-                  <option value="remoto">Remoto</option>
-                  <option value="híbrido">Híbrido</option>
+                  <option value="ONSITE">Presencial</option>
+                  <option value="REMOTE">Remoto</option>
+                  <option value="HYBRID">Híbrido</option>
                 </select>
               </div>
             </div>
@@ -182,9 +194,9 @@ const PostJobPage = () => {
               <div className="form-group">
                 <label htmlFor="sector">Sector *</label>
                 <select
-                  id="sector"
-                  name="sector"
-                  value={formData.sector}
+                  id="category"
+                  name="category"
+                  value={formData.category}
                   onChange={handleInputChange}
                   required
                 >
@@ -258,8 +270,8 @@ const PostJobPage = () => {
             <button type="button" className="btn btn-secondary" onClick={() => navigate(-1)}>
               Cancelar
             </button>
-            <button type="submit" className="btn btn-primary">
-              Publicar Oferta
+            <button type="submit" className="btn btn-primary" disabled={submitting}>
+              {submitting ? 'Publicando...' : 'Publicar Oferta'}
             </button>
           </div>
         </form>

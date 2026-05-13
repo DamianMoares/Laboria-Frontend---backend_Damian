@@ -1,23 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import coursesData from '../../data/courses.json';
+import { courseService } from '../../services/courseService';
 import '../compartidos/MyListingsPage.css';
 
 const MyCoursesPage = () => {
   const { user, isCompanyStudents, isCompanyHybrid } = useAuth();
   const [postedCourses, setPostedCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user && user.profile) {
-      const profileCourses = user.profile.postedCourses || [];
-      const coursesFromProfile = coursesData.filter(course => profileCourses.includes(course.id));
-      
-      const localStorageCourses = JSON.parse(localStorage.getItem('posted_courses') || '[]');
-      const companyCourses = localStorageCourses.filter(course => course.platform === user.profile.companyName);
-      
-      setPostedCourses([...coursesFromProfile, ...companyCourses]);
-    }
+    const fetchCourses = async () => {
+      if (!user) return;
+      setLoading(true);
+      try {
+        const data = await courseService.getAll();
+        setPostedCourses(Array.isArray(data) ? data.filter(c => c.authorId === user.id) : []);
+      } catch (error) {
+        setPostedCourses([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
   }, [user]);
 
   if (!user || (!isCompanyStudents() && !isCompanyHybrid())) {
@@ -32,16 +37,15 @@ const MyCoursesPage = () => {
     );
   }
 
-  const handleDelete = (courseId) => {
+  const handleDelete = async (courseId) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este curso?')) {
-      const updatedCourses = postedCourses.filter(course => course.id !== courseId);
-      setPostedCourses(updatedCourses);
-      
-      const localStorageCourses = JSON.parse(localStorage.getItem('posted_courses') || '[]');
-      const updatedLocalStorageCourses = localStorageCourses.filter(course => course.id !== courseId);
-      localStorage.setItem('posted_courses', JSON.stringify(updatedLocalStorageCourses));
-      
-      alert('Curso eliminado (simulado)');
+      try {
+        await courseService.delete(courseId);
+        setPostedCourses(postedCourses.filter(course => course.id !== courseId));
+        alert('Curso eliminado');
+      } catch (error) {
+        alert('Error al eliminar curso');
+      }
     }
   };
 
@@ -58,46 +62,31 @@ const MyCoursesPage = () => {
           </Link>
         </header>
 
-        {postedCourses.length > 0 ? (
+        {loading ? (
+          <div className="loading">Cargando cursos...</div>
+        ) : postedCourses.length > 0 ? (
           <div className="listings-grid">
             {postedCourses.map(course => (
               <div key={course.id} className="listing-card">
                 <div className="listing-header">
                   <h3>{course.title}</h3>
-                  {course.certification && (
-                    <span className="badge certification">Certificación</span>
-                  )}
                 </div>
                 
                 <div className="listing-info">
                   <div className="info-item">
-                    <strong>Plataforma:</strong> {course.platform}
+                    <strong>Proveedor:</strong> {course.provider}
                   </div>
                   <div className="info-item">
                     <strong>Nivel:</strong> {course.level}
                   </div>
                   <div className="info-item">
-                    <strong>Duración:</strong> {course.duration}
+                    <strong>Duración:</strong> {course.duration || 'N/A'}
                   </div>
                   <div className="info-item">
-                    <strong>Formato:</strong> {course.format}
+                    <strong>Categoría:</strong> {course.category}
                   </div>
                   <div className="info-item">
-                    <strong>Precio:</strong> {course.price}
-                  </div>
-                  <div className="info-item">
-                    <strong>Tecnología:</strong> {course.technology}
-                  </div>
-                </div>
-
-                <div className="listing-stats">
-                  <div className="stat">
-                    <span className="stat-value">{course.students}</span>
-                    <span className="stat-label">Estudiantes</span>
-                  </div>
-                  <div className="stat">
-                    <span className="stat-value">⭐ {course.rating}</span>
-                    <span className="stat-label">Rating</span>
+                    <strong>Precio:</strong> {course.price || 'Gratuito'}
                   </div>
                 </div>
 

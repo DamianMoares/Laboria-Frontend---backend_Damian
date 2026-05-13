@@ -69,10 +69,11 @@ export const AuthProvider = ({ children }) => {
     return { success: false, error: 'No hay usuario autenticado' };
   };
 
-  const isCandidate = () => user?.role === 'candidate';
-  const isCompanyEmployees = () => user?.role === 'company_employees';
-  const isCompanyStudents = () => user?.role === 'company_students';
-  const isCompanyHybrid = () => user?.role === 'company_hybrid';
+  const isCandidate = () => user?.role === 'CANDIDATE';
+  const isCompanyEmployees = () => user?.role === 'COMPANY_EMPLOYEES';
+  const isCompanyStudents = () => user?.role === 'COMPANY_STUDENTS';
+  const isCompanyHybrid = () => user?.role === 'COMPANY_HYBRID';
+  const isAdmin = () => user?.role === 'ADMIN';
   const isAnyCompany = () => isCompanyEmployees() || isCompanyStudents() || isCompanyHybrid();
 
   const value = {
@@ -87,6 +88,7 @@ export const AuthProvider = ({ children }) => {
     isCompanyEmployees,
     isCompanyStudents,
     isCompanyHybrid,
+    isAdmin,
     isAnyCompany,
     isAuthenticated: !!user
   };

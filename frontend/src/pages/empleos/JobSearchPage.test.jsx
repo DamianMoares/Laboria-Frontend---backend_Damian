@@ -36,7 +36,7 @@ describe('JobSearchPage', () => {
       </BrowserRouter>
     );
 
-    const searchInput = screen.getByPlaceholderText(/Buscar por título, empresa, tecnología/i);
+    const searchInput = screen.getByPlaceholderText(/Buscar por puesto, empresa, tecnología/i);
     expect(searchInput).toBeInTheDocument();
   });
 
@@ -48,8 +48,7 @@ describe('JobSearchPage', () => {
     );
 
     expect(screen.getByText(/Ubicación/i)).toBeInTheDocument();
-    expect(screen.getByText(/Categoría/i)).toBeInTheDocument();
-    expect(screen.getByText(/Modalidad/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Jornada/i)).toBeInTheDocument();
   });
 
   it('permite escribir en el campo de búsqueda', () => {
@@ -59,7 +58,7 @@ describe('JobSearchPage', () => {
       </BrowserRouter>
     );
 
-    const searchInput = screen.getByPlaceholderText(/Buscar por título, empresa, tecnología/i);
+    const searchInput = screen.getByPlaceholderText(/Buscar por puesto, empresa, tecnología/i);
     fireEvent.change(searchInput, { target: { value: 'React' } });
     expect(searchInput.value).toBe('React');
   });
@@ -71,7 +70,7 @@ describe('JobSearchPage', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText(/Buscar/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Buscar/i })).toBeInTheDocument();
   });
 
   it('muestra el botón de filtros avanzados', () => {

@@ -5,9 +5,14 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   
   return {
+    test: {
+      environment: 'jsdom',
+      setupFiles: './src/test/setup.js',
+      globals: true,
+    },
     plugins: [react()],
     server: {
-      port: 3000,
+      port: 5173,
       open: true,
       proxy: {
         '/api/jcyl': {
