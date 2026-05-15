@@ -3,9 +3,9 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import JobSearchPage from './JobSearchPage';
 
-// Mock de la función searchJobs
+// Mock de la función searchAllJobs
 vi.mock('../../context/ConexionApi', () => ({
-  searchJobs: vi.fn(() => Promise.resolve([
+  searchAllJobs: vi.fn(() => Promise.resolve([
     {
       id: '1',
       title: 'Desarrollador React',

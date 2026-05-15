@@ -3,8 +3,7 @@ name: Deploy Laboria to GitHub Pages
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'frontend/**'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -30,6 +29,8 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
 
     - name: Install dependencies
       working-directory: frontend
@@ -38,6 +39,12 @@ jobs:
     - name: Build frontend
       working-directory: frontend
       run: npm run build
+      env:
+        VITE_BASE_PATH: /Laboria-Frontend---backend_Damian/
+        VITE_API_URL: http://localhost:3000
+
+    - name: Configure Pages
+      uses: actions/configure-pages@v5
 
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3

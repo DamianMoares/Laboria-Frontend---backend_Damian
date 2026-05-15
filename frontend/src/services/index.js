@@ -1,5 +1,5 @@
 // Exportar todos los servicios
-export { api as default } from './api';
+export { default as api } from './api';
 export { authService } from './authService';
 export { jobService } from './jobService';
 export { courseService } from './courseService';

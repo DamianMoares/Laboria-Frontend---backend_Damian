@@ -51,10 +51,7 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',
       sourcemap: true
     },
-    // Base path dinámico según plataforma:
-    // - GitHub Pages: VITE_BASE_PATH=/Proyect-Laboria-Damian/
-    // - Netlify: VITE_BASE_PATH=/
-    // - Local: usa '/' por defecto
+    // Base path: Vercel y local usan '/', GitHub Pages necesita VITE_BASE_PATH
     base: env.VITE_BASE_PATH || '/',
   };
 });

@@ -3,9 +3,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import CourseSearchPage from './CourseSearchPage';
 
-// Mock de la función searchCourses
+// Mock de la función searchAllCourses
 vi.mock('../../context/ConexionApi', () => ({
-  searchCourses: vi.fn(() => Promise.resolve([
+  searchAllCourses: vi.fn(() => Promise.resolve([
     {
       id: '1',
       title: 'Curso de React',
