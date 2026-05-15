@@ -9,7 +9,7 @@ lerna-debug.log*
 
 node_modules
 # DOC - Uncomment to exclude from git
-DOC
+doc
 .env
 dist
 dist-ssr

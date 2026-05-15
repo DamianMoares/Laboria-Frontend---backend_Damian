@@ -79,14 +79,20 @@ export const AuthProvider = ({ children }) => {
     return { success: false, error: 'No hay usuario autenticado' };
   };
 
-  const deleteAccount = () => {
+  const deleteAccount = async () => {
     if (user) {
-      setUser(null);
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      localStorage.removeItem(`curriculum_${user.id}`);
-      localStorage.removeItem(`profile_${user.id}`);
-      return { success: true };
+      try {
+        await authService.deleteAccount();
+        setUser(null);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        localStorage.removeItem(`curriculum_${user.id}`);
+        localStorage.removeItem(`profile_${user.id}`);
+        return { success: true };
+      } catch (error) {
+        const errorMessage = error.message || 'Error al eliminar cuenta';
+        return { success: false, error: errorMessage };
+      }
     }
     return { success: false, error: 'No hay usuario autenticado' };
   };

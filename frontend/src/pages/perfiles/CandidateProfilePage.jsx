@@ -264,8 +264,8 @@ const CandidateProfilePage = () => {
                 </button>
                 <button 
                   className="btn btn-danger" 
-                  onClick={() => {
-                    deleteAccount();
+                  onClick={async () => {
+                    await deleteAccount();
                     navigate('/');
                   }}
                 >

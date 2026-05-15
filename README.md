@@ -113,9 +113,8 @@ npm run test:backend      # Solo backend
 
 #### **🚀 Despliegue**
 ```bash
-npm run deploy             # Build + deploy completo
-npm run deploy:frontend    # Deploy frontend a GitHub Pages
-npm run deploy:backend     # Deploy backend a Railway/Vercel
+npm run deploy             # Build frontend para GitHub Pages
+npm run deploy:frontend    # Build frontend para GitHub Pages
 ```
 
 ## �🛠 Stack Tecnológico
@@ -326,14 +325,19 @@ Ver `ANEXO-A-APIS.md` para documentación detallada.
 
 ## 🚀 Despliegue
 
-El proyecto está desplegado en GitHub Pages:
+### Frontend: GitHub Pages (implementado)
 
-- **URL**: https://damianmoares.github.io/Proyect-Laboria-Damian/
+- **URL**: https://damianmoares.github.io/Laboria-Frontend---backend_Damian/
 - **Router**: HashRouter (para evitar problemas de routing en hosting estático)
-- **CI/CD**: GitHub Actions automatizado
-- **Build**: Vite build en cada push a main
+- **CI/CD**: GitHub Actions automatizado (push a main → build + deploy)
+- **Build**: Vite con `VITE_BASE_PATH=/Laboria-Frontend---backend_Damian/`
+- **Archivo de workflow**: `.github/workflows/deploy.yml`
 
-Ver `ANEXO-C-DESPLIEGUE.md` para documentación detallada.
+### Backend: Pendiente de definir
+
+El backend (API Node.js + PostgreSQL) se desplegará en una plataforma a definir. Mientras tanto, el frontend funciona en modo lectura con datos locales (JSON) y autenticación simulada sin backend.
+
+Ver `doc/volumen-05-despliegue/README.md` para documentación detallada.
 
 ## 🚧 Estado del Proyecto
 

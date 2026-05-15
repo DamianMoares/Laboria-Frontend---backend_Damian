@@ -51,7 +51,7 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
         focus: profile.focus || ''
       });
     }
-  }, [user]);
+  }, [user, isOpen]);
 
   if (!isOpen) return null;
 

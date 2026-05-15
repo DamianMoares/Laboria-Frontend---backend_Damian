@@ -20,9 +20,8 @@
     "test:backend": "cd backend && npm test",
     "test:frontend": "cd frontend && npm test",
     "setup": "npm run install:all && npm run build:backend",
-    "deploy": "npm run build:frontend && npm run deploy:backend",
-    "deploy:backend": "cd backend && echo 'Deploy backend to Railway/Vercel'",
-    "deploy:frontend": "cd frontend && echo 'Deploy frontend to GitHub Pages'"
+    "deploy:frontend": "cd frontend && npm run build",
+    "deploy": "npm run deploy:frontend"
   },
   "keywords": ["laboria", "empleo", "formacion", "react", "nodejs", "prisma"],
   "author": "Damian Moares",
