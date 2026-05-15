@@ -13,11 +13,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware CORS
-const allowedOrigins = process.env.CORS_ORIGINS
+const corsOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',')
   : ['http://localhost:5173', 'http://localhost:4173'];
+const corsPatterns = corsOrigins.map(o => {
+  if (o.startsWith('*.')) return new RegExp('^https?://[a-zA-Z0-9.-]+' + o.slice(1).replace('.', '\\.') + '$');
+  return o;
+});
 app.use(cors({
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const match = corsPatterns.some(p => typeof p === 'string' ? p === origin : p.test(origin));
+    callback(null, match);
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true
