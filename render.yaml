@@ -26,6 +26,3 @@ databases:
   - name: laboria-db
     plan: free
     databaseName: laboria
-    ipAllowList:
-      - 74.220.48.0/24
-      - 74.220.56.0/24
