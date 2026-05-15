@@ -16,7 +16,7 @@ services:
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: CORS_ORIGINS
-        value: https://laboria-frontend.vercel.app,https://laboria-frontend-backend-damian.vercel.app
+        value: https://laboria-frontend-backend-damian.vercel.app,https://laboria-frontend-backend-damian-2t6zdiml5-damianmoares-projects.vercel.app
       - key: NODE_ENV
         value: production
       - key: PORT
@@ -26,4 +26,6 @@ databases:
   - name: laboria-db
     plan: free
     databaseName: laboria
-    ipAllowList: []
+    ipAllowList:
+      - 74.220.48.0/24
+      - 74.220.56.0/24
