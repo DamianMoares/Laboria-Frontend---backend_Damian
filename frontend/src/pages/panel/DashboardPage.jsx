@@ -19,7 +19,7 @@ const DashboardPage = () => {
     );
   }
 
-  const profile = user.profile || {};
+  const profile = JSON.parse(localStorage.getItem(`profile_${user.id}`) || 'null') || user.profile || {};
 
   // Configuración de pestañas por rol (para mostrar en el panel)
   const getCandidateTabs = () => [

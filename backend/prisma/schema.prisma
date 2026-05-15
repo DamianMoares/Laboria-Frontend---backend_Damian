@@ -1,48 +1,40 @@
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      Role     @default(CANDIDATE)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relaciones
-  jobs         Job[]         // Un usuario puede crear muchos empleos
-  courses      Course[]      // Un usuario puede crear muchos cursos
-  applications Application[] // Un usuario puede aplicar a muchos empleos
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  name         String
+  role         Role          @default(CANDIDATE)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  applications Application[]
+  courses      Course[]
+  jobs         Job[]
 }
 
 model Job {
-  id          String   @id @default(uuid())
-  title       String
-  company     String
-  location    String
-  salary      String?
-  description String
+  id           String        @id @default(uuid())
+  title        String
+  company      String
+  location     String
+  salary       String?
+  description  String
   requirements String?
-  mode        WorkMode @default(REMOTE)
-  category    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relación con User (quién lo publicó)
-  authorId String
-  author   User   @relation(fields: [authorId], references: [id])
-
-  // Relaciones
-  applications Application[] // Un empleo puede tener muchas aplicaciones
+  mode         WorkMode      @default(REMOTE)
+  category     String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  authorId     String
+  applications Application[]
+  author       User          @relation(fields: [authorId], references: [id])
 }
 
 model Course {
@@ -58,30 +50,24 @@ model Course {
   image       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  // Relación con User (quién lo publicó)
-  authorId String
-  author   User   @relation(fields: [authorId], references: [id])
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
 }
 
 model Application {
-  id        String          @id @default(uuid())
+  id        String            @id @default(uuid())
   status    ApplicationStatus @default(PENDING)
   message   String?
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  userId    String
+  jobId     String
+  job       Job               @relation(fields: [jobId], references: [id])
+  user      User              @relation(fields: [userId], references: [id])
 
-  // Relaciones
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-  
-  jobId String
-  job   Job    @relation(fields: [jobId], references: [id])
-
-  @@unique([userId, jobId]) // Un usuario solo puede aplicar una vez a un empleo
+  @@unique([userId, jobId])
 }
 
-// Enums (tipos especiales)
 enum Role {
   CANDIDATE
   COMPANY_EMPLOYEES

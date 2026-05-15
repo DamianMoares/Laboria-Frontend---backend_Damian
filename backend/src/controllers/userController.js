@@ -47,7 +47,7 @@ const register = async (req, res, next) => {
         email,
         password: hashedPassword,
         name,
-        role: role || 'CANDIDATE'
+        role: role ? role.toUpperCase() : 'CANDIDATE'
       },
       select: {
         id: true,

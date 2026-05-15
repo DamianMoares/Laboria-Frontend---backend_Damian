@@ -25,14 +25,15 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
     focus: ''
   });
   const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (user && user.profile) {
-      const profile = user.profile;
+    if (user) {
+      const profile = JSON.parse(localStorage.getItem(`profile_${user.id}`) || '{}');
       setFormData({
-        firstName: profile.firstName || '',
-        lastName: profile.lastName || '',
-        email: profile.email || '',
+        firstName: profile.firstName || user.name?.split(' ')[0] || '',
+        lastName: profile.lastName || user.name?.split(' ').slice(1).join(' ') || '',
+        email: profile.email || user.email || '',
         phone: profile.phone || '',
         location: profile.location || '',
         bio: profile.bio || '',
@@ -42,7 +43,7 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
         linkedin: profile.linkedin || '',
         github: profile.github || '',
         portfolio: profile.portfolio || '',
-        companyName: profile.companyName || '',
+        companyName: profile.companyName || user.name || '',
         industry: profile.industry || '',
         size: profile.size || '',
         website: profile.website || '',
@@ -64,63 +65,66 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
     }
     
     if (userType === 'candidate') {
-      if (!formData.firstName) {
-        newErrors.firstName = 'El nombre es obligatorio';
-      }
-      if (!formData.lastName) {
-        newErrors.lastName = 'El apellido es obligatorio';
-      }
+      if (!formData.firstName) newErrors.firstName = 'El nombre es obligatorio';
+      if (!formData.lastName) newErrors.lastName = 'El apellido es obligatorio';
     } else if (userType === 'company') {
-      if (!formData.companyName) {
-        newErrors.companyName = 'El nombre de la empresa es obligatorio';
-      }
-      if (!formData.industry) {
-        newErrors.industry = 'La industria es obligatoria';
-      }
+      if (!formData.companyName) newErrors.companyName = 'El nombre de la empresa es obligatorio';
+      if (!formData.industry) newErrors.industry = 'La industria es obligatoria';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (validateForm()) {
-      const profileData = userType === 'candidate' 
-        ? {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
-            location: formData.location,
-            bio: formData.bio,
-            experience: formData.experience,
-            salaryExpectation: formData.salaryExpectation,
-            workModePreference: formData.workModePreference,
-            linkedin: formData.linkedin,
-            github: formData.github,
-            portfolio: formData.portfolio
-          }
-        : {
-            companyName: formData.companyName,
-            email: formData.email,
-            phone: formData.phone,
-            location: formData.location,
-            industry: formData.industry,
-            size: formData.size,
-            website: formData.website,
-            description: formData.description,
-            focus: formData.focus
-          };
+    if (!validateForm()) return;
 
-      const result = updateProfile(profileData);
-      if (result.success) {
-        onClose();
-      } else {
-        setErrors({ general: result.error });
-      }
+    setSaving(true);
+
+    const profileData = userType === 'candidate'
+      ? {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          location: formData.location,
+          bio: formData.bio,
+          experience: formData.experience,
+          salaryExpectation: formData.salaryExpectation,
+          workModePreference: formData.workModePreference,
+          linkedin: formData.linkedin,
+          github: formData.github,
+          portfolio: formData.portfolio
+        }
+      : {
+          companyName: formData.companyName,
+          email: formData.email,
+          phone: formData.phone,
+          location: formData.location,
+          industry: formData.industry,
+          size: formData.size,
+          website: formData.website,
+          description: formData.description,
+          focus: formData.focus
+        };
+
+    // Guardar datos de perfil en localStorage (el backend no tiene modelo Profile)
+    localStorage.setItem(`profile_${user.id}`, JSON.stringify(profileData));
+
+    // Sincronizar name/email con la API (lo que soporta el backend)
+    const name = userType === 'candidate'
+      ? `${formData.firstName} ${formData.lastName}`
+      : formData.companyName;
+
+    const result = await updateProfile({ name, email: formData.email });
+
+    if (result.success) {
+      onClose();
+    } else {
+      setErrors({ general: result.error || 'Error al guardar' });
     }
+    setSaving(false);
   };
 
   const handleChange = (e) => {
@@ -392,8 +396,8 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
             <button type="button" className="btn btn-secondary" onClick={onClose}>
               Cancelar
             </button>
-            <button type="submit" className="btn btn-primary">
-              Guardar Cambios
+            <button type="submit" className="btn btn-primary" disabled={saving}>
+              {saving ? 'Guardando...' : 'Guardar Cambios'}
             </button>
           </div>
         </form>

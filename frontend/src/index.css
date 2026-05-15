@@ -259,3 +259,34 @@ input::placeholder {
     font-size: 0.9rem;
   }
 }
+
+/* ==========================================
+   PROTECTED ROUTE - No autorizado
+   ========================================== */
+.not-authorized {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+}
+
+.not-authorized h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--color-gold);
+}
+
+.not-authorized p {
+  margin-bottom: 2rem;
+  color: #ccc;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: var(--color-gold);
+  font-size: 1.2rem;
+}

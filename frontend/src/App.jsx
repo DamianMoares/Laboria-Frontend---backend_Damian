@@ -1,9 +1,11 @@
 import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ROLES } from './config/enums';
 import Navbar from './components/Navbar/Navbar';
 import TabsNavigation from './components/navigation/TabsNavigation';
 import CookieConsent from './components/CookieConsent';
+import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/inicio/Home';
 import JobSearchPage from './pages/empleos/JobSearchPage';
 import CourseSearchPage from './pages/cursos/CourseSearchPage';
@@ -50,16 +52,16 @@ function App() {
               <Route path="/faq" element={<FAQPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/registro" element={<RegisterPage />} />
-              <Route path="/perfil/candidato" element={<CandidateProfilePage />} />
-              <Route path="/perfil/empresa" element={<CompanyProfilePage />} />
-              <Route path="/panel" element={<DashboardPage />} />
-              <Route path="/publicar-oferta" element={<PostJobPage />} />
-              <Route path="/mis-ofertas" element={<MyJobsPage />} />
-              <Route path="/publicar-curso" element={<PostCoursePage />} />
-              <Route path="/mis-cursos" element={<MyCoursesPage />} />
-              <Route path="/mis-aplicaciones" element={<MyApplicationsPage />} />
-              <Route path="/cursos-guardados" element={<SavedCoursesPage />} />
-              <Route path="/curriculum" element={<CurriculumPage />} />
+              <Route path="/perfil/candidato" element={<ProtectedRoute roles={[ROLES.CANDIDATE]}><CandidateProfilePage /></ProtectedRoute>} />
+              <Route path="/perfil/empresa" element={<ProtectedRoute roles={[ROLES.COMPANY_EMPLOYEES, ROLES.COMPANY_STUDENTS, ROLES.COMPANY_HYBRID]}><CompanyProfilePage /></ProtectedRoute>} />
+              <Route path="/panel" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+              <Route path="/publicar-oferta" element={<ProtectedRoute roles={[ROLES.COMPANY_EMPLOYEES, ROLES.COMPANY_HYBRID]}><PostJobPage /></ProtectedRoute>} />
+              <Route path="/mis-ofertas" element={<ProtectedRoute roles={[ROLES.COMPANY_EMPLOYEES, ROLES.COMPANY_HYBRID]}><MyJobsPage /></ProtectedRoute>} />
+              <Route path="/publicar-curso" element={<ProtectedRoute roles={[ROLES.COMPANY_STUDENTS, ROLES.COMPANY_HYBRID]}><PostCoursePage /></ProtectedRoute>} />
+              <Route path="/mis-cursos" element={<ProtectedRoute roles={[ROLES.COMPANY_STUDENTS, ROLES.COMPANY_HYBRID]}><MyCoursesPage /></ProtectedRoute>} />
+              <Route path="/mis-aplicaciones" element={<ProtectedRoute roles={[ROLES.CANDIDATE]}><MyApplicationsPage /></ProtectedRoute>} />
+              <Route path="/cursos-guardados" element={<ProtectedRoute roles={[ROLES.CANDIDATE]}><SavedCoursesPage /></ProtectedRoute>} />
+              <Route path="/curriculum" element={<ProtectedRoute roles={[ROLES.CANDIDATE]}><CurriculumPage /></ProtectedRoute>} />
               {/* Rutas de Administración */}
               <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
               <Route path="/admin/users" element={<ProtectedAdminRoute><AdminUsers /></ProtectedAdminRoute>} />

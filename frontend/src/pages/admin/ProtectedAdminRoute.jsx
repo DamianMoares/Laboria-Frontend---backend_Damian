@@ -1,49 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import AdminLogin from './AdminLogin';
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const ProtectedAdminRoute = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, loading, isAdmin, logout } = useAuth();
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = () => {
-    const adminAuth = localStorage.getItem('admin_auth');
-    
-    if (adminAuth) {
-      try {
-        const auth = JSON.parse(adminAuth);
-        const now = new Date().getTime();
-        
-        // Verificar si la sesión no ha expirado
-        if (auth.authenticated && auth.expiresAt && now < auth.expiresAt) {
-          setIsAuthenticated(true);
-        } else {
-          // Sesión expirada, limpiar
-          localStorage.removeItem('admin_auth');
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        localStorage.removeItem('admin_auth');
-        setIsAuthenticated(false);
-      }
-    }
-    
-    setIsLoading(false);
-  };
-
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('admin_auth');
-    setIsAuthenticated(false);
-  };
-
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="admin-loading">
         <div className="spinner"></div>
@@ -52,11 +14,14 @@ const ProtectedAdminRoute = ({ children }) => {
     );
   }
 
-  if (!isAuthenticated) {
-    return <AdminLogin onLogin={handleLogin} />;
+  if (!user || !isAdmin()) {
+    return <Navigate to="/login" replace />;
   }
 
-  // Pasar función de logout al componente hijo
+  const handleLogout = () => {
+    logout();
+  };
+
   return React.cloneElement(children, { onAdminLogout: handleLogout });
 };
 

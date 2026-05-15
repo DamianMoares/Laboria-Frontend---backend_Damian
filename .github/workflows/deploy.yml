@@ -3,7 +3,7 @@ name: Deploy Laboria to GitHub Pages
 on:
   push:
     branches: [ main ]
-  paths:
+    paths:
       - 'frontend/**'
 
 jobs:

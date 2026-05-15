@@ -1,9 +1,10 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const dotenv = require('dotenv');
 
-// Cargar variables de entorno
-dotenv.config();
+// Cargar variables de entorno (busca .env donde está server.js)
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 // Importar middleware
 const errorHandler = require('./src/middleware/errorHandler');
@@ -35,6 +36,16 @@ app.get('/', (req, res) => {
 // Manejo de errores (siempre al final)
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM recibido - cerrando servidor...');
+  server.close(() => process.exit(0));
+});
+process.on('SIGINT', () => {
+  console.log('🛑 SIGINT recibido - cerrando servidor...');
+  server.close(() => process.exit(0));
 });

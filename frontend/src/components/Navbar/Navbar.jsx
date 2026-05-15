@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import logoBlanco from '../../assets/img/Laboria_Fondo_Negro.png';
+import logoSitio from '../../assets/img/Laboria_Fondo_Negro.png';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
@@ -30,7 +30,7 @@ const Navbar = () => {
     <nav className={styles.navbar}>
       <div className={styles.navbarContainer}>
         <Link to="/" className={styles.navbarLogo} onClick={closeMobileMenu}>
-          <img src={logoBlanco} alt="Laboria " className={styles.navbarLogoImg} />
+          <img src={logoSitio} alt="Laboria " className={styles.navbarLogoImg} />
         </Link>
         <button 
           className={styles.navbarToggle} 
@@ -74,13 +74,6 @@ const Navbar = () => {
           </li>
           {isAuthenticated ? (
             <>
-              {isAdmin && (
-                <li className={styles.navbarItem}>
-                  <Link to="/admin" className={styles.navbarLinkAdminLink} onClick={closeMobileMenu}>
-                    🎛️ Admin
-                  </Link>
-                </li>
-              )}
               <li className={styles.navbarItem}>
                 <button onClick={() => { handleProfileClick(); closeMobileMenu(); }} className={styles.navbarLinkProfileButton}>
                   Mi Perfil

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { ROLES } from '../../config/enums';
 import logoNegro from '../../assets/img/Laboria_Fondo_Negro.png';
 import styles from './LoginPage.module.css';
 
@@ -83,7 +84,7 @@ const LoginPage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -106,14 +107,24 @@ const LoginPage = () => {
       return;
     }
 
-    const result = login(email, password);
+    const result = await login(email, password);
     
     if (result.success) {
       // Redirect based on role
-      if (result.user.role === 'candidate') {
-        navigate('/perfil/candidato');
-      } else {
-        navigate('/perfil/empresa');
+      switch (result.user.role) {
+        case ROLES.CANDIDATE:
+          navigate('/perfil/candidato');
+          break;
+        case ROLES.ADMIN:
+          navigate('/admin');
+          break;
+        case ROLES.COMPANY_EMPLOYEES:
+        case ROLES.COMPANY_STUDENTS:
+        case ROLES.COMPANY_HYBRID:
+          navigate('/perfil/empresa');
+          break;
+        default:
+          navigate('/');
       }
     } else {
       setError(result.error);
@@ -199,27 +210,33 @@ const LoginPage = () => {
               <div className={styles.demoAccountsList}>
                 <div 
                   className={`${styles.demoAccount} ${styles.demoAccountClickable}`}
-                  onClick={() => handleFillDemo('candidato@test.com', 'password123')}
+                  onClick={() => handleFillDemo('admin@laboria.com', 'admin123')}
                 >
-                  <strong>Candidato:</strong> candidato@test.com / password123
+                  <strong>Administrador:</strong> admin@laboria.com / admin123
                 </div>
                 <div 
                   className={`${styles.demoAccount} ${styles.demoAccountClickable}`}
-                  onClick={() => handleFillDemo('empresa@test.com', 'password123')}
+                  onClick={() => handleFillDemo('candidate@laboria.com', 'candidate123')}
                 >
-                  <strong>Empresa (empleados):</strong> empresa@test.com / password123
+                  <strong>Candidato:</strong> candidate@laboria.com / candidate123
                 </div>
                 <div 
                   className={`${styles.demoAccount} ${styles.demoAccountClickable}`}
-                  onClick={() => handleFillDemo('empresa-estudiantes@test.com', 'password123')}
+                  onClick={() => handleFillDemo('company@laboria.com', 'company123')}
                 >
-                  <strong>Empresa (estudiantes):</strong> empresa-estudiantes@test.com / password123
+                  <strong>Empresa (empleados):</strong> company@laboria.com / company123
                 </div>
                 <div 
                   className={`${styles.demoAccount} ${styles.demoAccountClickable}`}
-                  onClick={() => handleFillDemo('empresa-hibrida@test.com', 'password123')}
+                  onClick={() => handleFillDemo('recruiter@laboria.com', 'recruiter123')}
                 >
-                  <strong>Empresa (híbrida):</strong> empresa-hibrida@test.com / password123
+                  <strong>Empresa (estudiantes):</strong> recruiter@laboria.com / recruiter123
+                </div>
+                <div 
+                  className={`${styles.demoAccount} ${styles.demoAccountClickable}`}
+                  onClick={() => handleFillDemo('hybrid@laboria.com', 'hybrid123')}
+                >
+                  <strong>Empresa (híbrida):</strong> hybrid@laboria.com / hybrid123
                 </div>
               </div>
             )}

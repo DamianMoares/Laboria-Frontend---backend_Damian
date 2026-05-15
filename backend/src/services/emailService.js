@@ -1,11 +1,24 @@
-const { Resend } = require('resend');
+let Resend;
+try {
+  Resend = require('resend').Resend;
+} catch (e) {
+  console.warn('⚠️ Paquete resend no disponible - emails desactivados');
+}
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Solo inicializar Resend si la API key está configurada
+let resend = null;
+if (Resend && process.env.RESEND_API_KEY) {
+  resend = new Resend(process.env.RESEND_API_KEY);
+}
 
 const emailService = {
   // Enviar email de bienvenida
   sendWelcome: async (to, name) => {
     try {
+      if (!resend) {
+        console.log('Email service no configurado - omitiendo envío de email');
+        return;
+      }
       await resend.emails.send({
         from: 'Laboria <onboarding@resend.dev>',
         to,
@@ -24,6 +37,10 @@ const emailService = {
   // Notificar cuando aplican a empleo
   sendApplicationReceived: async (to, jobTitle, applicantName) => {
     try {
+      if (!resend) {
+        console.log('Email service no configurado - omitiendo envío de notificación');
+        return;
+      }
       await resend.emails.send({
         from: 'Laboria <notifications@resend.dev>',
         to,

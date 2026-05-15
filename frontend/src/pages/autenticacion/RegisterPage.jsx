@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { ROLES } from '../../config/enums';
 import logoNegro from '../../assets/img/Laboria_Fondo_Negro.png';
 import styles from './RegisterPage.module.css';
 
@@ -129,7 +130,7 @@ const RegisterPage = () => {
     setRole('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -173,45 +174,21 @@ const RegisterPage = () => {
       return;
     }
 
+    const roleMap = {
+      candidate: ROLES.CANDIDATE,
+      company_employees: ROLES.COMPANY_EMPLOYEES,
+      company_students: ROLES.COMPANY_STUDENTS,
+      company_hybrid: ROLES.COMPANY_HYBRID,
+    };
+
     const userData = {
       email: formData.email,
       password: formData.password,
-      role: role,
+      role: roleMap[role] || role,
       name: role === 'candidate' ? `${formData.firstName} ${formData.lastName}` : formData.companyName,
-      profile: {}
     };
 
-    if (role === 'candidate') {
-      userData.profile = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
-        location: formData.location,
-        bio: formData.bio,
-        skills: formData.skills.split(',').map(s => s.trim()),
-        experience: formData.experience,
-        salaryExpectation: formData.salaryExpectation,
-        workModePreference: formData.workModePreference
-      };
-    } else {
-      userData.profile = {
-        companyName: formData.companyName,
-        email: formData.email,
-        phone: formData.phone,
-        location: formData.location,
-        industry: formData.industry,
-        size: formData.size,
-        website: formData.website,
-        description: formData.description,
-        focus: role === 'company_hybrid' ? 'híbrido' : 
-                role === 'company_employees' ? 'empleados' : 'estudiantes',
-        postedJobs: [],
-        postedCourses: []
-      };
-    }
-
-    const result = register(userData);
+    const result = await register(userData);
     
     if (result.success) {
       // Guardar consentimiento de cookies en localStorage
@@ -225,7 +202,7 @@ const RegisterPage = () => {
       };
       localStorage.setItem('cookieConsent', JSON.stringify(cookieConsent));
       
-      navigate(role === 'candidate' ? '/perfil/candidato' : '/perfil/empresa');
+      navigate(userData.role === ROLES.CANDIDATE ? '/perfil/candidato' : '/perfil/empresa');
     } else {
       setError(result.error);
     }

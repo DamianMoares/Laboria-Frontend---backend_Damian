@@ -38,7 +38,7 @@ const CandidateProfilePage = () => {
     );
   }
 
-  const profile = user.profile || {};
+  const profile = JSON.parse(localStorage.getItem(`profile_${user.id}`) || 'null') || user.profile || {};
 
   return (
     <div className="profile-page candidate-profile-page">
@@ -50,7 +50,7 @@ const CandidateProfilePage = () => {
               {profile.lastName ? profile.lastName[0] : ''}
             </div>
             <div className="profile-info">
-              <h1>{profile.firstName} {profile.lastName}</h1>
+              <h1>{profile.firstName || user.name} {profile.lastName || ''}</h1>
               <p className="profile-email">{profile.email}</p>
               <p className="profile-location">{profile.location}</p>
             </div>

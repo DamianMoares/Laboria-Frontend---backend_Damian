@@ -24,7 +24,7 @@ const CompanyProfilePage = () => {
     );
   }
 
-  const profile = user.profile || {};
+  const profile = JSON.parse(localStorage.getItem(`profile_${user.id}`) || 'null') || user.profile || {};
   const focus = profile.focus || '';
 
   // Get posted jobs and courses based on IDs
@@ -45,7 +45,7 @@ const CompanyProfilePage = () => {
               {profile.companyName ? profile.companyName[0] : user.name[0]}
             </div>
             <div className="profile-info">
-              <h1>{profile.companyName}</h1>
+              <h1>{profile.companyName || user.name}</h1>
               <p className="profile-email">{profile.email}</p>
               <p className="profile-location">{profile.location}</p>
               <div className="company-badges">
