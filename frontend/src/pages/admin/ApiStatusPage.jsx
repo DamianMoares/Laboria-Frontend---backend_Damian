@@ -92,10 +92,28 @@ const ApiStatusPage = ({ onAdminLogout }) => {
     setBackendTestResults(null);
     try {
       const result = await adminService.runTests();
-      setBackendTestResults(result);
+      if (result && result.suites) {
+        setBackendTestResults(result);
+      } else {
+        setBackendTestResults({
+          total: 0,
+          passed: 0,
+          failed: 0,
+          duration: '0s',
+          suites: [{ name: 'Error', tests: [{ name: 'El backend no devolvió resultados válidos', status: 'failed' }] }]
+        });
+      }
       setBackendTestLastRun(new Date().toLocaleTimeString());
     } catch (error) {
       console.error('Error running backend tests:', error);
+      setBackendTestResults({
+        total: 0,
+        passed: 0,
+        failed: 1,
+        duration: '0s',
+        suites: [{ name: 'Error de conexión', tests: [{ name: error.message || 'No se pudo conectar con el backend', status: 'failed' }] }]
+      });
+      setBackendTestLastRun(new Date().toLocaleTimeString());
     } finally {
       setBackendTestLoading(false);
     }
