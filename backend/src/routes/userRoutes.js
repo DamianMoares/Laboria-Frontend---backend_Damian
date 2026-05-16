@@ -41,6 +41,12 @@ router.put('/profile/me', authMiddleware, updateProfileRules, (req, res, next) =
 // POST /api/users/change-password - Cambiar contraseña
 router.post('/change-password', authMiddleware, userController.changePassword);
 
+// GET /api/users/curriculum - Obtener curriculum
+router.get('/curriculum', authMiddleware, userController.getCurriculum);
+
+// PUT /api/users/curriculum - Guardar curriculum
+router.put('/curriculum', authMiddleware, userController.saveCurriculum);
+
 // DELETE /api/users/account - Eliminar mi cuenta
 router.delete('/account', authMiddleware, (req, res, next) => {
   req.params.id = req.user.id;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { curriculumService } from '../../services/curriculumService';
 import styles from './CurriculumPage.module.css';
 
 const CurriculumPage = () => {
@@ -14,6 +15,7 @@ const CurriculumPage = () => {
   const [editingItems, setEditingItems] = useState({});
   const [expandedItems, setExpandedItems] = useState({});
   const [validationErrors, setValidationErrors] = useState({});
+  const [saving, setSaving] = useState(false);
   const [newItems, setNewItems] = useState({
     experience: null,
     education: null,
@@ -24,17 +26,29 @@ const CurriculumPage = () => {
 
   useEffect(() => {
     if (user && isCandidate()) {
-      const savedCurriculum = JSON.parse(localStorage.getItem(`curriculum_${user.id}`) || 'null');
-      if (savedCurriculum) {
-        setCurriculum(savedCurriculum);
-      }
+      curriculumService.get().then(data => {
+        if (data.curriculum) {
+          setCurriculum(data.curriculum);
+        }
+      }).catch(() => {
+        const saved = JSON.parse(localStorage.getItem(`curriculum_${user.id}`) || 'null');
+        if (saved) setCurriculum(saved);
+      });
     }
   }, [user, isCandidate]);
 
-  const saveCurriculum = () => {
+  const saveCurriculum = async () => {
     if (user) {
-      localStorage.setItem(`curriculum_${user.id}`, JSON.stringify(curriculum));
-      alert('Currículum guardado con éxito');
+      setSaving(true);
+      try {
+        await curriculumService.save(curriculum);
+        localStorage.setItem(`curriculum_${user.id}`, JSON.stringify(curriculum));
+        alert('Currículum guardado con éxito');
+      } catch {
+        localStorage.setItem(`curriculum_${user.id}`, JSON.stringify(curriculum));
+        alert('Currículum guardado localmente');
+      }
+      setSaving(false);
     }
   };
 
@@ -434,8 +448,8 @@ const CurriculumPage = () => {
           <p className={styles['curriculum-subtitle']}>
             Agrega y gestiona los elementos de tu currículum. Marca los elementos que quieres enviar al aplicar a ofertas.
           </p>
-          <button className="btn btn-primary" onClick={saveCurriculum}>
-            Guardar Currículum
+          <button className="btn btn-primary" onClick={saveCurriculum} disabled={saving}>
+            {saving ? 'Guardando...' : 'Guardar Currículum'}
           </button>
         </header>
 

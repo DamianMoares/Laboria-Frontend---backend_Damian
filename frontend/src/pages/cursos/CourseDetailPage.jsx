@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { courseApplicationService } from '../../services/courseApplicationService';
 import coursesData from '../../data/courses.json';
 import styles from './CourseDetailPage.module.css';
 
@@ -10,20 +11,40 @@ const CourseDetailPage = () => {
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
+  const [applied, setApplied] = useState(false);
+  const [applying, setApplying] = useState(false);
 
   useEffect(() => {
     const foundCourse = coursesData.find(c => c.id === parseInt(id));
     setCourse(foundCourse);
 
-    // Check if user has already saved this course
     if (user && isCandidate()) {
       const savedCourses = JSON.parse(localStorage.getItem('user_saved_courses') || '[]');
       const alreadySaved = savedCourses.some(
         saved => saved.userId === user.id && saved.courseId === parseInt(id)
       );
       setIsSaved(alreadySaved);
+
+      courseApplicationService.getMyApplications().then(data => {
+        const alreadyApplied = data.some(a => a.courseId === String(id));
+        setApplied(alreadyApplied);
+      }).catch(() => {});
     }
   }, [id, user, isCandidate]);
+
+  const handleApply = async () => {
+    if (!isAuthenticated) { navigate('/login'); return; }
+    if (!isCandidate()) { alert('Solo candidatos pueden inscribirse'); return; }
+    setApplying(true);
+    try {
+      await courseApplicationService.apply(String(id), '');
+      setApplied(true);
+      alert('Inscripción enviada exitosamente');
+    } catch (err) {
+      alert(err.message || 'Error al inscribirse');
+    }
+    setApplying(false);
+  };
 
   if (!course) {
     return (
@@ -166,12 +187,23 @@ const CourseDetailPage = () => {
               </div>
 
               {isCandidate() && (
-                <button 
-                  className={styles['btn-save-sidebar'] + (isSaved ? ' ' + styles['saved'] : '')}
-                  onClick={handleSave}
-                >
-                  {isSaved ? '★ Guardado' : '☆ Guardar Curso'}
-                </button>
+                <>
+                  <button 
+                    className={styles['btn-save-sidebar'] + (isSaved ? ' ' + styles['saved'] : '')}
+                    onClick={handleSave}
+                  >
+                    {isSaved ? '★ Guardado' : '☆ Guardar Curso'}
+                  </button>
+                  {applied ? (
+                    <button className={styles['btn-applied-sidebar']} disabled>
+                      ✓ Inscrito
+                    </button>
+                  ) : (
+                    <button className={styles['btn-enroll-sidebar']} onClick={handleApply} disabled={applying}>
+                      {applying ? 'Inscribiendo...' : 'Inscribirme'}
+                    </button>
+                  )}
+                </>
               )}
               <a 
                 href={course.externalLink} 

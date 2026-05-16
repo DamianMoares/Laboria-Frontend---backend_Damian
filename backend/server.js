@@ -38,6 +38,7 @@ app.use('/api/users', require('./src/routes/userRoutes'));
 app.use('/api/jobs', require('./src/routes/jobRoutes'));
 app.use('/api/courses', require('./src/routes/courseRoutes'));
 app.use('/api/applications', require('./src/routes/applicationRoutes'));
+app.use('/api/course-applications', require('./src/routes/courseApplicationRoutes'));
 app.use('/api/admin', require('./src/routes/adminRoutes')); // Rutas de administración
 
 // Ruta de prueba

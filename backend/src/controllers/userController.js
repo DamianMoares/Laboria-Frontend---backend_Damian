@@ -268,6 +268,35 @@ const changePassword = async (req, res, next) => {
   }
 };
 
+// OBTENER CURRICULUM
+const getCurriculum = async (req, res, next) => {
+  try {
+    const curriculum = await prisma.curriculum.findUnique({
+      where: { userId: req.user.id }
+    });
+    res.json({ curriculum: curriculum?.data || null });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GUARDAR CURRICULUM
+const saveCurriculum = async (req, res, next) => {
+  try {
+    const { data } = req.body;
+
+    const curriculum = await prisma.curriculum.upsert({
+      where: { userId: req.user.id },
+      update: { data },
+      create: { userId: req.user.id, data }
+    });
+
+    res.json({ message: 'Currículum guardado', curriculum: curriculum.data });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -276,5 +305,7 @@ module.exports = {
   deleteAccount,
   forgotPassword,
   resetPassword,
-  changePassword
+  changePassword,
+  getCurriculum,
+  saveCurriculum
 };
