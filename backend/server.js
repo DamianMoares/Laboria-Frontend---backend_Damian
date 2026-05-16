@@ -8,6 +8,7 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 
 // Importar middleware
 const errorHandler = require('./src/middleware/errorHandler');
+const prisma = require('./src/config/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -52,11 +53,12 @@ const server = app.listen(PORT, () => {
 });
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('🛑 SIGTERM recibido - cerrando servidor...');
-  server.close(() => process.exit(0));
-});
-process.on('SIGINT', () => {
-  console.log('🛑 SIGINT recibido - cerrando servidor...');
-  server.close(() => process.exit(0));
-});
+const gracefulShutdown = async (signal) => {
+  console.log(`🛑 ${signal} recibido - cerrando servidor...`);
+  server.close(async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+  });
+};
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
