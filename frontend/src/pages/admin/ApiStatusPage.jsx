@@ -76,6 +76,8 @@ const ApiStatusPage = ({ onAdminLogout }) => {
   const handleRunFrontendTests = async () => {
     setTestLoading(true);
     setTestResults(null);
+    setBackendTestResults(null);
+    setBackendTestLoading(false);
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
       setTestResults(mockFrontendTests);
@@ -90,6 +92,8 @@ const ApiStatusPage = ({ onAdminLogout }) => {
   const handleRunBackendTests = async () => {
     setBackendTestLoading(true);
     setBackendTestResults(null);
+    setTestResults(null);
+    setTestLoading(false);
     try {
       const result = await adminService.runTests();
       if (result && result.suites) {
