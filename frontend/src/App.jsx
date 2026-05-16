@@ -15,6 +15,8 @@ import AboutPage from './pages/informacion/AboutPage';
 import FAQPage from './pages/informacion/FAQPage';
 import LoginPage from './pages/autenticacion/LoginPage';
 import RegisterPage from './pages/autenticacion/RegisterPage';
+import ForgotPasswordPage from './pages/autenticacion/ForgotPasswordPage';
+import ResetPasswordPage from './pages/autenticacion/ResetPasswordPage';
 import CandidateProfilePage from './pages/perfiles/CandidateProfilePage';
 import CompanyProfilePage from './pages/perfiles/CompanyProfilePage';
 import DashboardPage from './pages/panel/DashboardPage';
@@ -52,6 +54,8 @@ function App() {
               <Route path="/faq" element={<FAQPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/registro" element={<RegisterPage />} />
+              <Route path="/olvide-mi-contrasena" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/perfil/candidato" element={<ProtectedRoute roles={[ROLES.CANDIDATE]}><CandidateProfilePage /></ProtectedRoute>} />
               <Route path="/perfil/empresa" element={<ProtectedRoute roles={[ROLES.COMPANY_EMPLOYEES, ROLES.COMPANY_STUDENTS, ROLES.COMPANY_HYBRID]}><CompanyProfilePage /></ProtectedRoute>} />
               <Route path="/panel" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />

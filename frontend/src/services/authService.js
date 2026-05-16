@@ -40,6 +40,16 @@ export const authService = {
     return response.data;
   },
 
+  forgotPassword: async (email) => {
+    const response = await api.post('/users/forgot-password', { email });
+    return response.data;
+  },
+
+  resetPassword: async (token, password) => {
+    const response = await api.post('/users/reset-password', { token, password });
+    return response.data;
+  },
+
   isAuthenticated: () => !!localStorage.getItem('token'),
 
   getCurrentUser: () => {

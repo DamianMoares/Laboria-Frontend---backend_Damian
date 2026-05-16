@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const prisma = require('../config/database');
 const { generateToken } = require('../utils/jwt');
 const emailService = require('../services/emailService');
@@ -172,10 +173,75 @@ const deleteAccount = async (req, res, next) => {
   }
 };
 
+// SOLICITAR RESTABLECIMIENTO DE CONTRASEÑA
+const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return res.json({ message: 'Si el email existe, recibirás instrucciones para restablecer tu contraseña.' });
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 3600000); // 1 hora
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { resetPasswordToken: token, resetPasswordExpires: expires }
+    });
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const resetUrl = `${frontendUrl}/reset-password?token=${token}`;
+
+    emailService.sendPasswordReset(user.email, user.name, resetUrl).catch(console.error);
+
+    res.json({ message: 'Si el email existe, recibirás instrucciones para restablecer tu contraseña.' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// RESTABLECER CONTRASEÑA
+const resetPassword = async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+
+    const user = await prisma.user.findFirst({
+      where: {
+        resetPasswordToken: token,
+        resetPasswordExpires: { gte: new Date() }
+      }
+    });
+
+    if (!user) {
+      const error = new Error('Token inválido o expirado');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetPasswordToken: null,
+        resetPasswordExpires: null
+      }
+    });
+
+    res.json({ message: 'Contraseña restablecida exitosamente' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
   getProfile,
   updateProfile,
-  deleteAccount
+  deleteAccount,
+  forgotPassword,
+  resetPassword
 };

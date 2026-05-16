@@ -8,16 +8,18 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  password     String
-  name         String
-  role         Role          @default(CANDIDATE)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  applications Application[]
-  courses      Course[]
-  jobs         Job[]
+  id                   String        @id @default(uuid())
+  email                String        @unique
+  password             String
+  name                 String
+  role                 Role          @default(CANDIDATE)
+  resetPasswordToken   String?       @unique
+  resetPasswordExpires DateTime?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  applications         Application[]
+  courses              Course[]
+  jobs                 Job[]
 }
 
 model Job {

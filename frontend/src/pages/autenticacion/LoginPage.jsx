@@ -186,6 +186,9 @@ const LoginPage = () => {
             <button type="submit" className="btn btn-primary btn-full">
               Iniciar Sesión
             </button>
+            <p className={styles.forgotPassword}>
+              <Link to="/olvide-mi-contrasena" className={styles.authLink}>¿Olvidaste tu contraseña?</Link>
+            </p>
           </form>
 
           <div className={styles.authFooter}>

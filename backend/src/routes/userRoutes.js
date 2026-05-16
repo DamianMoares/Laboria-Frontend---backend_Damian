@@ -17,6 +17,12 @@ router.post('/register', authLimiter, registerRules, userController.register);
 // POST /api/users/login (con rate limiting + validación)
 router.post('/login', authLimiter, loginRules, userController.login);
 
+// POST /api/users/forgot-password - Solicitar restablecimiento
+router.post('/forgot-password', userController.forgotPassword);
+
+// POST /api/users/reset-password - Restablecer contraseña
+router.post('/reset-password', userController.resetPassword);
+
 // ==========================================
 // RUTAS PROTEGIDAS (requieren JWT)
 // ==========================================
