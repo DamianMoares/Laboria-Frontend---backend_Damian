@@ -93,6 +93,24 @@ model ScrapedCourse {
   author      User?    @relation(fields: [authorId], references: [id])
 }
 
+model ScrapedJob {
+  id           String   @id @default(uuid())
+  title        String
+  company      String
+  location     String   @default("")
+  salary       String?
+  description  String   @default("")
+  contractType String?
+  workMode     WorkMode @default(REMOTE)
+  category     String   @default("general")
+  url          String?
+  source       String
+  sourceUrl    String?
+  publishedAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 enum Role {
   CANDIDATE
   COMPANY_EMPLOYEES

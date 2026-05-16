@@ -1,0 +1,138 @@
+.page {
+  min-height: 100vh;
+  padding: var(--spacing-xl) 0;
+}
+
+.header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.header h1 {
+  color: var(--color-gold);
+  font-size: 2rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.header p {
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  max-width: 700px;
+}
+
+.filters {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+
+.filters input,
+.filters select {
+  padding: 0.625rem 0.875rem;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  color: var(--color-text);
+  font-size: 0.9375rem;
+}
+
+.filters input {
+  flex: 1;
+  min-width: 300px;
+}
+
+.loading {
+  text-align: center;
+  color: var(--color-text-secondary);
+  padding: var(--spacing-2xl);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.card {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  transition: border-color 0.2s;
+}
+
+.card:hover {
+  border-color: var(--color-gold);
+}
+
+.card h3 {
+  color: var(--color-text);
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+
+.company {
+  color: var(--color-gold);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.location {
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+}
+
+.description {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+.meta {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.badge {
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 0.1875rem 0.5rem;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.salary {
+  color: #28a745;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.link {
+  color: var(--color-gold);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-top: auto;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.empty {
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: var(--spacing-2xl);
+  grid-column: 1 / -1;
+}
