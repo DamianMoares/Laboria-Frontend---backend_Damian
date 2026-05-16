@@ -28,8 +28,6 @@ import MyApplicationsPage from './pages/aplicaciones/MyApplicationsPage';
 import SavedCoursesPage from './pages/cursos/SavedCoursesPage';
 import CurriculumPage from './pages/curriculo/CurriculumPage';
 import SettingsPage from './pages/configuracion/SettingsPage';
-import ExternalCoursesPage from './pages/cursos-externos/ExternalCoursesPage';
-import AdminScraper from './pages/admin/AdminScraper';
 import ApiStatusPage from './pages/admin/ApiStatusPage';
 import ProtectedAdminRoute from './pages/admin/ProtectedAdminRoute';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -70,7 +68,6 @@ function App() {
               <Route path="/cursos-guardados" element={<ProtectedRoute roles={[ROLES.CANDIDATE]}><SavedCoursesPage /></ProtectedRoute>} />
               <Route path="/curriculum" element={<ProtectedRoute roles={[ROLES.CANDIDATE]}><CurriculumPage /></ProtectedRoute>} />
               <Route path="/configuracion" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-              <Route path="/red-cursos" element={<ExternalCoursesPage />} />
               {/* Rutas de Administración */}
               <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
               <Route path="/admin/users" element={<ProtectedAdminRoute><AdminUsers /></ProtectedAdminRoute>} />
@@ -78,7 +75,6 @@ function App() {
               <Route path="/admin/courses" element={<ProtectedAdminRoute><AdminCourses /></ProtectedAdminRoute>} />
               <Route path="/admin/applications" element={<ProtectedAdminRoute><AdminApplications /></ProtectedAdminRoute>} />
               <Route path="/admin/api-status" element={<ProtectedAdminRoute><ApiStatusPage /></ProtectedAdminRoute>} />
-              <Route path="/admin/scraper" element={<ProtectedAdminRoute><AdminScraper /></ProtectedAdminRoute>} />
             </Routes>
           </main>
 

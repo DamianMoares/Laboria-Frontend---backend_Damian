@@ -60,11 +60,6 @@ const Navbar = () => {
                   Búsqueda cursos
                 </Link>
               </li>
-              <li className={styles.navbarItem}>
-                <Link to="/red-cursos" className={styles.navbarLink} onClick={closeMobileMenu}>
-                  Red de Cursos
-                </Link>
-              </li>
               {isCandidate() && (
                 <li className={styles.navbarItem}>
                   <Link to="/curriculum" className={styles.navbarLink} onClick={closeMobileMenu}>
@@ -105,11 +100,6 @@ const Navbar = () => {
               <li className={styles.navbarItem}>
                 <Link to="/cursos" className={styles.navbarLink} onClick={closeMobileMenu}>
                   Cursos
-                </Link>
-              </li>
-              <li className={styles.navbarItem}>
-                <Link to="/red-cursos" className={styles.navbarLink} onClick={closeMobileMenu}>
-                  Red de Cursos
                 </Link>
               </li>
               <li className={styles.navbarItem}>

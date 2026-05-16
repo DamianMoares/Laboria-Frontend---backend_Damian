@@ -18,9 +18,8 @@ model User {
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
   applications         Application[]
-    courses              Course[]
-    jobs                 Job[]
-    scrapedCourses       ScrapedCourse[]
+  courses              Course[]
+  jobs                 Job[]
 }
 
 model Job {
@@ -71,28 +70,6 @@ model Application {
   @@unique([userId, jobId])
 }
 
-model ScrapedCourse {
-  id          String   @id @default(uuid())
-  title       String
-  provider    String
-  description String   @default("")
-  category    String   @default("general")
-  level       Level    @default(BEGINNER)
-  duration    String?
-  price       String?
-  priceType   PriceType @default(FREE)
-  url         String?
-  image       String?
-  source      String
-  sourceUrl   String?
-  language    String   @default("es")
-  publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  authorId    String?
-  author      User?    @relation(fields: [authorId], references: [id])
-}
-
 enum Role {
   CANDIDATE
   COMPANY_EMPLOYEES
@@ -111,12 +88,6 @@ enum Level {
   BEGINNER
   INTERMEDIATE
   ADVANCED
-}
-
-enum PriceType {
-  FREE
-  PAID
-  FREEMIUM
 }
 
 enum ApplicationStatus {
