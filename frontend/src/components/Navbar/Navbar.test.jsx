@@ -47,7 +47,8 @@ describe('Navbar Component', () => {
 
     expect(screen.getByText(/Inicio/i)).toBeInTheDocument();
     expect(screen.getByText(/Empleos/i)).toBeInTheDocument();
-    expect(screen.getByText(/Cursos/i)).toBeInTheDocument();
+    const cursoLinks = screen.getAllByText(/Cursos/i);
+    expect(cursoLinks.length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/Acerca de/i)).toBeInTheDocument();
     expect(screen.getByText(/FAQ/i)).toBeInTheDocument();
   });

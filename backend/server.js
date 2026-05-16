@@ -39,6 +39,7 @@ app.use('/api/jobs', require('./src/routes/jobRoutes'));
 app.use('/api/courses', require('./src/routes/courseRoutes'));
 app.use('/api/applications', require('./src/routes/applicationRoutes'));
 app.use('/api/admin', require('./src/routes/adminRoutes')); // Rutas de administración
+app.use('/api/scraper', require('./src/routes/scraperRoutes')); // Escaneo de cursos
 
 // Ruta de prueba
 app.get('/', (req, res) => {
