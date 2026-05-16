@@ -1,6 +1,6 @@
 # 📋 Auditoría Completa — Laboria
 
-> Fecha: 16 mayo 2026 · Commit: `b7e57a3`
+> Fecha: 16 mayo 2026 · Commit: `b679b1a`
 
 ---
 
@@ -263,6 +263,12 @@ npm test
 | **C)** Usar CSS-in-JS (styled-components, emotion) para todo | Alta | 4-5 horas (refactor mayor) |
 
 **Recomendación:** Opción B (cambiar convención para componentes nuevos) + migrar los archivos más conflictivos cuando haya tiempo.
+
+### 🟢 Baja — Corregidas
+
+#### #5 Build con `migrate deploy`
+
+✅ **FIXED** — `backend/package.json` cambió de `prisma db push` a `prisma migrate deploy`. La migración ya existe en `prisma/migrations/` y se aplica correctamente en una DB limpia.
 
 ### 🟡 Media — Corregidas
 
