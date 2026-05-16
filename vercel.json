@@ -5,6 +5,12 @@
   "outputDirectory": "dist",
   "installCommand": "npm ci",
   "rewrites": [
+    { "source": "/api/jcyl/(.*)", "destination": "https://data.opendatasoft.com/$1" },
+    { "source": "/api/jobicy/(.*)", "destination": "https://jobicy.com/$1" },
+    { "source": "/api/himalayas/(.*)", "destination": "https://himalayas.app/$1" },
+    { "source": "/api/remotive/(.*)", "destination": "https://remotive.com/$1" },
+    { "source": "/api/arbeitnow/(.*)", "destination": "https://www.arbeitnow.com/$1" },
+    { "source": "/api/khanacademy/(.*)", "destination": "https://www.khanacademy.org/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

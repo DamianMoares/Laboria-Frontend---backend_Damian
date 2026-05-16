@@ -1,143 +1,126 @@
-# 👥 **USUARIOS DE DEMOSTRACIÓN - LABORIA**
-
-## 🎉 **USUARIOS CREADOS EXITOSAMENTE**
-
-He creado 5 usuarios de demostración en la base de datos SQLite para que puedas probar el sistema con diferentes roles y funcionalidades.
+# USUARIOS DE DEMOSTRACIÓN - LABORIA
 
 ---
 
-## 📋 **CREDENCIALES DE DEMOSTRACIÓN**
+## CREDENCIALES
 
-| 📧 EMAIL | 🔐 CONTRASEÑA | 👤 ROL | 📋 NOMBRE |
-|-----------|---------------|----------|-----------|
-| **admin@laboria.com** | **admin123** | ADMIN | Administrador Laboria |
-| **candidate@laboria.com** | **candidate123** | CANDIDATE | Juan Pérez |
-| **company@laboria.com** | **company123** | COMPANY_EMPLOYEES | Tech Solutions S.A. |
-| **recruiter@laboria.com** | **recruiter123** | COMPANY_STUDENTS | María González |
-| **hybrid@laboria.com** | **hybrid123** | COMPANY_HYBRID | Carlos Rodríguez |
-
----
-
-## 🎯 **FUNCIONALIDADES POR ROL**
-
-### **👑 ADMIN (admin@laboria.com)**
-- ✅ Acceso completo al sistema
-- ✅ Gestión de todos los usuarios
-- ✅ Configuración del sistema
-- ✅ Panel de administración
-- ✅ Estadísticas y reportes
-
-### **👤 CANDIDATE (candidate@laboria.com)**
-- ✅ Buscar y aplicar a trabajos
-- ✅ Ver cursos disponibles
-- ✅ Gestionar perfil personal
-- ✅ Historial de aplicaciones
-- ✅ Dashboard personal
-
-### **🏢 COMPANY_EMPLOYEES (company@laboria.com)**
-- ✅ Publicar ofertas de trabajo
-- ✅ Ver aplicaciones recibidas
-- ✅ Gestionar candidatos
-- ✅ Panel de reclutamiento
-- ✅ Estadísticas de contratación
-
-### **🎓 COMPANY_STUDENTS (recruiter@laboria.com)**
-- ✅ Publicar cursos y capacitación
-- ✅ Gestionar estudiantes
-- ✅ Ver progreso de cursos
-- ✅ Panel educativo
-- ✅ Certificaciones
-
-### **🔄 COMPANY_HYBRID (hybrid@laboria.com)**
-- ✅ Funciones de COMPANY + STUDENTS
-- ✅ Publicar trabajos y cursos
-- ✅ Gestión integral
-- ✅ Panel combinado
-- ✅ Reportes completos
+| Email | Contraseña | Nombre | Rol |
+|---|---|---|---|
+| `admin@laboria.com` | `admin123` | Admin Laboria | ADMIN |
+| `carlos@email.com` | `carlos123` | Carlos García López | CANDIDATE |
+| `maria@email.com` | `maria123` | María Rodríguez Pérez | CANDIDATE |
+| `javier@email.com` | `javier123` | Javier Martínez Ruiz | CANDIDATE |
+| `info@techcorp.com` | `techcorp123` | TechCorp Solutions | COMPANY_EMPLOYEES |
+| `info@edunext.com` | `edunext123` | EduNext Academy | COMPANY_STUDENTS |
+| `info@innovagroup.com` | `innova123` | InnovaGroup | COMPANY_HYBRID |
+| `info@datasoft.com` | `datasoft123` | DataSoft Technologies | COMPANY_EMPLOYEES |
+| `info@cursosalfa.com` | `alfa123` | Cursos Alfa | COMPANY_STUDENTS |
 
 ---
 
-## 🚀 **CÓMO USAR LOS USUARIOS DEMO**
+## FUNCIONALIDADES POR ROL
 
-### **1. Iniciar el Backend:**
+### ADMIN (`admin@laboria.com`)
+- Panel de administración con estadísticas
+- Gestión de usuarios, empleos, cursos y aplicaciones
+- Cambio de roles y eliminación de usuarios
+
+### CANDIDATE (`carlos@email.com`, `maria@email.com`, `javier@email.com`)
+- Buscar y aplicar a empleos
+- Ver cursos disponibles
+- Gestionar perfil personal
+- Historial de aplicaciones
+
+### COMPANY_EMPLOYEES (`info@techcorp.com`, `info@datasoft.com`)
+- Publicar y gestionar ofertas de empleo
+- Ver candidatos que aplicaron
+- Gestionar aplicaciones (aceptar/rechazar)
+
+### COMPANY_STUDENTS (`info@edunext.com`, `info@cursosalfa.com`)
+- Publicar y gestionar cursos
+- Contenido formativo
+
+### COMPANY_HYBRID (`info@innovagroup.com`)
+- Publicar empleos y cursos
+- Gestión integral
+
+---
+
+## DATOS DE EJEMPLO CREADOS
+
+### Empleos (8)
+| Título | Empresa | Ubicación | Modalidad |
+|---|---|---|---|
+| Desarrollador Full Stack | TechCorp Solutions | Madrid | HYBRID |
+| Data Scientist Senior | DataSoft Technologies | Barcelona | REMOTE |
+| Diseñador UX/UI | InnovaGroup | Valencia | ONSITE |
+| DevOps Engineer | TechCorp Solutions | Madrid | REMOTE |
+| Profesor de Programación Web | EduNext Academy | Online | REMOTE |
+| Analista de Ciberseguridad | DataSoft Technologies | Barcelona | HYBRID |
+| Técnico de Marketing Digital | InnovaGroup | Valencia | ONSITE |
+| Coordinador de Formación Online | EduNext Academy | Online | REMOTE |
+
+### Cursos (8)
+| Título | Proveedor | Categoría | Precio |
+|---|---|---|---|
+| React desde Cero | EduNext Academy | Desarrollo Web | Gratis |
+| Node.js Avanzado | EduNext Academy | Desarrollo Web | 49€ |
+| Python para Data Science | Cursos Alfa | Datos e IA | 79€ |
+| Diseño UX/UI Profesional | Cursos Alfa | Diseño | 59€ |
+| Ciberseguridad Práctica | EduNext Academy | Ciberseguridad | 89€ |
+| Cloud Computing con AWS | Cursos Alfa | Cloud | 99€ |
+| Marketing Digital Completo | EduNext Academy | Marketing | Gratis |
+| Inglés Técnico para TI | Cursos Alfa | Idiomas | 39€ |
+
+### Postulaciones (5)
+| Candidato | Empleo | Estado |
+|---|---|---|
+| Carlos García | Desarrollador Full Stack | PENDING |
+| María Rodríguez | Data Scientist Senior | PENDING |
+| Javier Martínez | Diseñador UX/UI | PENDING |
+| Carlos García | DevOps Engineer | PENDING |
+| María Rodríguez | Analista de Ciberseguridad | PENDING |
+
+---
+
+## CÓMO PROBAR
+
+### Local
 ```bash
-cd backend
-npm run dev
+# Backend
+cd backend && npm run dev
+
+# Frontend
+cd frontend && npm run dev
 ```
 
-### **2. Iniciar el Frontend:**
-```bash
-cd frontend
-npm run dev
-```
+Abrir http://localhost:5173
 
-### **3. Probar Login:**
-1. Abre http://localhost:5173 en tu navegador
-2. Usa cualquiera de las credenciales de la tabla
-3. Explora las funcionalidades según el rol
+### Producción
+- **Frontend**: https://laboria-frontend-backend-damian.vercel.app
+- **Backend**: https://laboria-backend.onrender.com
 
-### **4. Probar API Directamente:**
+### API Directa
 ```bash
-# Ejemplo de login con admin
+# Login
 curl -X POST http://localhost:3000/api/users/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@laboria.com","password":"admin123"}'
+
+# Probar en producción
+curl -X POST https://laboria-backend.onrender.com/api/users/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@laboria.com","password":"admin123"}'
 ```
 
 ---
 
-## 🔧 **SCRIPTS CREADOS**
+## EJECUTAR SEED
 
-### **📄 scripts/seedDemoUsers.js**
-- Script para crear usuarios de demostración
-- Elimina usuarios existentes y crea nuevos
-- Encripta contraseñas con bcrypt
-
-### **📄 testDemoUsers.js**
-- Script para verificar que todos los usuarios funcionen
-- Prueba login para cada usuario
-- Muestra tokens JWT generados
-
----
-
-## ✅ **VERIFICACIÓN COMPLETADA**
-
-Todos los usuarios de demostración han sido:
-- ✅ **Creados** en la base de datos SQLite
-- ✅ **Verificados** con login exitoso
-- ✅ **Probados** con tokens JWT generados
-- ✅ **Documentados** con credenciales claras
-
----
-
-## 🎯 **PRÓXIMOS PASOS RECOMENDADOS**
-
-1. **Probar cada rol** en el frontend
-2. **Verificar permisos** según el rol
-3. **Explorar funcionalidades** específicas
-4. **Probar flujo completo** de usuario
-5. **Documentar comportamiento** del sistema
-
----
-
-## 📞 **COMANDOS ÚTILES**
+Si necesitas recargar los datos (se borra y recrea todo automáticamente):
 
 ```bash
-# Recrear usuarios demo
-node scripts/seedDemoUsers.js
-
-# Verificar usuarios demo
-node testDemoUsers.js
-
-# Ver base de datos
-npx prisma studio
-
-# Reiniciar servidor
-npm run dev
+cd backend && node prisma/seed.js
 ```
 
----
-
-**¡Los usuarios de demostración están listos para usar!** 🎊
-
-Ahora puedes probar el sistema Laboria con diferentes roles y funcionalidades completas.
+Es seguro ejecutarlo múltiples veces (usa `findFirst` + `create` para empleos/cursos y `upsert` para usuarios).
