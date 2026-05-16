@@ -5,17 +5,13 @@ import logoSitio from '../../assets/img/Laboria_Fondo_Negro.png';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, isCandidate, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/');
-  };
-
-  const handleProfileClick = () => {
-    navigate('/panel');
   };
 
   const toggleMobileMenu = () => {
@@ -47,37 +43,41 @@ const Navbar = () => {
           <div className={styles.navbarOverlay} onClick={closeMobileMenu}></div>
         )}
         <ul className={`${styles.navbarMenu} ${mobileMenuOpen ? styles.open : ''}`}>
-          <li className={styles.navbarItem}>
-            <Link to="/" className={styles.navbarLink} onClick={closeMobileMenu}>
-              Inicio
-            </Link>
-          </li>
-          <li className={styles.navbarItem}>
-            <Link to="/empleos" className={styles.navbarLink} onClick={closeMobileMenu}>
-              Empleos
-            </Link>
-          </li>
-          <li className={styles.navbarItem}>
-            <Link to="/cursos" className={styles.navbarLink} onClick={closeMobileMenu}>
-              Cursos
-            </Link>
-          </li>
-          <li className={styles.navbarItem}>
-            <Link to="/acerca-de" className={styles.navbarLink} onClick={closeMobileMenu}>
-              Acerca de
-            </Link>
-          </li>
-          <li className={styles.navbarItem}>
-            <Link to="/faq" className={styles.navbarLink} onClick={closeMobileMenu}>
-              FAQ
-            </Link>
-          </li>
           {isAuthenticated ? (
             <>
               <li className={styles.navbarItem}>
-                <button onClick={() => { handleProfileClick(); closeMobileMenu(); }} className={styles.navbarLinkProfileButton}>
-                  Mi Perfil
-                </button>
+                <Link to="/panel" className={styles.navbarLink} onClick={closeMobileMenu}>
+                  Inicio
+                </Link>
+              </li>
+              <li className={styles.navbarItem}>
+                <Link to="/empleos" className={styles.navbarLink} onClick={closeMobileMenu}>
+                  Búsqueda empleo
+                </Link>
+              </li>
+              <li className={styles.navbarItem}>
+                <Link to="/cursos" className={styles.navbarLink} onClick={closeMobileMenu}>
+                  Búsqueda cursos
+                </Link>
+              </li>
+              {isCandidate() && (
+                <li className={styles.navbarItem}>
+                  <Link to="/curriculum" className={styles.navbarLink} onClick={closeMobileMenu}>
+                    CV
+                  </Link>
+                </li>
+              )}
+              {isCandidate() && (
+                <li className={styles.navbarItem}>
+                  <Link to="/mis-aplicaciones" className={styles.navbarLink} onClick={closeMobileMenu}>
+                    Postulaciones
+                  </Link>
+                </li>
+              )}
+              <li className={styles.navbarItem}>
+                <Link to="/configuracion" className={styles.navbarLink} onClick={closeMobileMenu}>
+                  Configuración
+                </Link>
               </li>
               <li className={styles.navbarItem}>
                 <button onClick={() => { handleLogout(); closeMobileMenu(); }} className={styles.navbarLinkLogoutButton}>
@@ -87,6 +87,31 @@ const Navbar = () => {
             </>
           ) : (
             <>
+              <li className={styles.navbarItem}>
+                <Link to="/" className={styles.navbarLink} onClick={closeMobileMenu}>
+                  Inicio
+                </Link>
+              </li>
+              <li className={styles.navbarItem}>
+                <Link to="/empleos" className={styles.navbarLink} onClick={closeMobileMenu}>
+                  Empleos
+                </Link>
+              </li>
+              <li className={styles.navbarItem}>
+                <Link to="/cursos" className={styles.navbarLink} onClick={closeMobileMenu}>
+                  Cursos
+                </Link>
+              </li>
+              <li className={styles.navbarItem}>
+                <Link to="/acerca-de" className={styles.navbarLink} onClick={closeMobileMenu}>
+                  Acerca de
+                </Link>
+              </li>
+              <li className={styles.navbarItem}>
+                <Link to="/faq" className={styles.navbarLink} onClick={closeMobileMenu}>
+                  FAQ
+                </Link>
+              </li>
               <li className={styles.navbarItem}>
                 <Link to="/login" className={styles.navbarLinkLoginButton} onClick={closeMobileMenu}>
                   Iniciar Sesión

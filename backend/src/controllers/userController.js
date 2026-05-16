@@ -236,6 +236,38 @@ const resetPassword = async (req, res, next) => {
   }
 };
 
+// CAMBIAR CONTRASEÑA (autenticado)
+const changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      const error = new Error('Usuario no encontrado');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const isValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isValid) {
+      const error = new Error('Contraseña actual incorrecta');
+      error.statusCode = 401;
+      throw error;
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword }
+    });
+
+    res.json({ message: 'Contraseña actualizada exitosamente' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -243,5 +275,6 @@ module.exports = {
   updateProfile,
   deleteAccount,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  changePassword
 };

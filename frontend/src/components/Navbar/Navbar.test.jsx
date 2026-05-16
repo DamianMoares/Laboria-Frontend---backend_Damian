@@ -20,9 +20,9 @@ describe('Navbar Component', () => {
     useAuth.mockReturnValue({
       user: null,
       isAuthenticated: false,
-      isCandidate: false,
-      isAnyCompany: false,
-      isAdmin: false,
+      isCandidate: () => false,
+      isAnyCompany: () => false,
+      isAdmin: () => false,
       logout: vi.fn(),
     });
   });
@@ -67,9 +67,9 @@ describe('Navbar Component', () => {
     useAuth.mockReturnValue({
       user: { id: '1', email: 'test@test.com', role: 'CANDIDATE' },
       isAuthenticated: true,
-      isCandidate: true,
-      isAnyCompany: false,
-      isAdmin: false,
+      isCandidate: () => true,
+      isAnyCompany: () => false,
+      isAdmin: () => false,
       logout: vi.fn(),
     });
 
@@ -79,7 +79,9 @@ describe('Navbar Component', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText(/Mi Perfil/i)).toBeInTheDocument();
+    expect(screen.getByText(/Búsqueda empleo/i)).toBeInTheDocument();
+    expect(screen.getByText(/Búsqueda cursos/i)).toBeInTheDocument();
+    expect(screen.getByText(/Configuración/i)).toBeInTheDocument();
     expect(screen.getByText(/Cerrar Sesión/i)).toBeInTheDocument();
     expect(screen.queryByText(/Iniciar Sesión/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Registrarse/i)).not.toBeInTheDocument();
@@ -157,9 +159,9 @@ describe('Navbar Component', () => {
     useAuth.mockReturnValue({
       user: { id: '1', email: 'test@test.com', role: 'CANDIDATE' },
       isAuthenticated: true,
-      isCandidate: true,
-      isAnyCompany: false,
-      isAdmin: false,
+      isCandidate: () => true,
+      isAnyCompany: () => false,
+      isAdmin: () => false,
       logout: mockLogout,
     });
 

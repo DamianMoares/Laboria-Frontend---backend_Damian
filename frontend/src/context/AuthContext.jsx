@@ -79,6 +79,16 @@ export const AuthProvider = ({ children }) => {
     return { success: false, error: 'No hay usuario autenticado' };
   };
 
+  const changePassword = async (currentPassword, newPassword) => {
+    try {
+      const response = await authService.changePassword(currentPassword, newPassword);
+      return { success: true, message: response.message };
+    } catch (error) {
+      const errorMessage = error.message || 'Error al cambiar contraseña';
+      return { success: false, error: errorMessage };
+    }
+  };
+
   const deleteAccount = async () => {
     if (user) {
       try {
@@ -111,6 +121,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateProfile,
+    changePassword,
     deleteAccount,
     isCandidate,
     isCompanyEmployees,

@@ -27,6 +27,7 @@ import MyCoursesPage from './pages/cursos/MyCoursesPage';
 import MyApplicationsPage from './pages/aplicaciones/MyApplicationsPage';
 import SavedCoursesPage from './pages/cursos/SavedCoursesPage';
 import CurriculumPage from './pages/curriculo/CurriculumPage';
+import SettingsPage from './pages/configuracion/SettingsPage';
 import ApiStatusPage from './pages/admin/ApiStatusPage';
 import ProtectedAdminRoute from './pages/admin/ProtectedAdminRoute';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -66,6 +67,7 @@ function App() {
               <Route path="/mis-aplicaciones" element={<ProtectedRoute roles={[ROLES.CANDIDATE]}><MyApplicationsPage /></ProtectedRoute>} />
               <Route path="/cursos-guardados" element={<ProtectedRoute roles={[ROLES.CANDIDATE]}><SavedCoursesPage /></ProtectedRoute>} />
               <Route path="/curriculum" element={<ProtectedRoute roles={[ROLES.CANDIDATE]}><CurriculumPage /></ProtectedRoute>} />
+              <Route path="/configuracion" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               {/* Rutas de Administración */}
               <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
               <Route path="/admin/users" element={<ProtectedAdminRoute><AdminUsers /></ProtectedAdminRoute>} />

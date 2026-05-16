@@ -1,0 +1,107 @@
+.page {
+  min-height: 100vh;
+  padding: var(--spacing-xl) 0;
+}
+
+.header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.header h1 {
+  color: var(--color-gold);
+  font-size: 2rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.header p {
+  color: var(--color-text-secondary);
+}
+
+.section {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.section h2 {
+  color: var(--color-gold);
+  font-size: 1.25rem;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.formGroup {
+  margin-bottom: var(--spacing-md);
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.formGroup input {
+  width: 100%;
+  max-width: 480px;
+  padding: 0.625rem 0.75rem;
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  color: var(--color-text);
+  font-size: 0.9375rem;
+}
+
+.formGroup input:focus {
+  outline: none;
+  border-color: var(--color-gold);
+}
+
+.formGroup input.error {
+  border-color: var(--color-danger);
+}
+
+.success {
+  background-color: rgba(40, 167, 69, 0.1);
+  border: 1px solid #28a745;
+  color: #28a745;
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.error {
+  background-color: rgba(220, 53, 69, 0.1);
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger);
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.dangerText {
+  color: var(--color-danger);
+  margin-bottom: var(--spacing-md);
+  font-size: 0.9375rem;
+}
+
+.confirmDelete {
+  background-color: rgba(220, 53, 69, 0.05);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+}
+
+.confirmDelete p {
+  color: var(--color-danger);
+  margin-bottom: var(--spacing-md);
+  font-weight: 600;
+}
+
+.confirmActions {
+  display: flex;
+  gap: var(--spacing-sm);
+}

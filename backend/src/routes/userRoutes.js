@@ -38,6 +38,9 @@ router.put('/profile/me', authMiddleware, updateProfileRules, (req, res, next) =
   userController.updateProfile(req, res, next);
 });
 
+// POST /api/users/change-password - Cambiar contraseña
+router.post('/change-password', authMiddleware, userController.changePassword);
+
 // DELETE /api/users/account - Eliminar mi cuenta
 router.delete('/account', authMiddleware, (req, res, next) => {
   req.params.id = req.user.id;
