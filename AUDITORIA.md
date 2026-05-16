@@ -1,6 +1,6 @@
 # 📋 Auditoría Completa — Laboria
 
-> Fecha: 16 mayo 2026 · Commit: `9bfb668`
+> Fecha: 16 mayo 2026 · Commit: `b7e57a3`
 
 ---
 
@@ -47,7 +47,8 @@
 
 - Singleton `PrismaClient` en `backend/src/config/database.js`
 - Seed script con `upsert` para 5 usuarios demo
-- Build: `prisma generate && prisma db push`
+- Build: `prisma generate && prisma migrate deploy`
+- Shutdown: `prisma.$disconnect()` en SIGTERM/SIGINT ✅
 
 ### ⚠️ Validaciones
 
@@ -152,6 +153,7 @@
 | Frontend | 8 archivos (`*.test.jsx`) | 59 | ✅ |
 | Backend | 1 archivo (`userController.test.js`) | 3 | ✅ |
 | **Total** | **9 archivos** | **62** | **✅ todos pasan** |
+| Backend test obsoletos eliminados | 3 archivos (`testDemoUsers.js`, `test_endpoints.js`, `test_endpoints_fixed.js`) | — | ✅ limpiado |
 
 ### ✅ `npm test` desde la raíz — FUNCIONA
 
@@ -244,7 +246,7 @@ npm test
 |---|-----------|-------------------|
 | 2 | Backend sin tests | ✅ 3 tests con vitest en `backend/src/__tests__/userController.test.js` |
 
-### 🟢 Baja — Pendientes (con soluciones)
+### 🟢 Baja — Pendiente
 
 #### #3 CSS Modules inconsistentes
 
@@ -262,67 +264,15 @@ npm test
 
 **Recomendación:** Opción B (cambiar convención para componentes nuevos) + migrar los archivos más conflictivos cuando haya tiempo.
 
-#### #5 No hay migration history (usa `prisma db push`)
-
-**Qué es:** El build usa `npx prisma db push` que aplica el schema directamente sin crear un historial de migraciones.
-
-**Por qué importa:** Si dos desarrolladores hacen cambios al schema al mismo tiempo, no hay forma de resolver conflictos. En producción, `db push` podría borrar datos accidentalmente.
-
-**Soluciones:**
-
-| Solución | Dificultad | Tiempo estimado |
-|----------|-----------|-----------------|
-| **A)** Generar migración inicial desde el schema actual | Baja | 15 min |
-| **B)** Usar `prisma migrate dev` en desarrollo y `prisma migrate deploy` en producción | Media | 1 hora |
-| **C)** Seguir con `db push` pero hacer backups antes de cambios | Baja | 5 min (configurar backup automático) |
-
-**Pasos para opción A (la más fácil):**
-
-```bash
-cd backend
-npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > prisma/migrations/0_init.sql
-npx prisma migrate resolve --applied 0_init
-```
-
-Esto "caza" el estado actual como una migración aplicada. A partir de ahí, los cambios nuevos se hacen con `prisma migrate dev`.
-
-### 🟡 Media — Nuevas incidencias encontradas
+### 🟡 Media — Corregidas
 
 #### #6 Backend no desconecta Prisma al apagarse
 
-**Qué es:** `server.js` maneja `SIGTERM` y `SIGINT` pero solo cierra el servidor HTTP, no llama a `prisma.$disconnect()`.
-
-**Por qué importa:** En Render, cuando el servicio se detiene o reinicia, las conexiones a la base de datos quedan abiertas. Con el tiempo, PostgreSQL puede quedarse sin conexiones disponibles.
-
-**Solución:** Agregar `prisma.$disconnect()` en los handlers de shutdown:
-
-```javascript
-// backend/server.js después de server.close()
-process.on('SIGTERM', () => {
-  server.close(async () => {
-    await prisma.$disconnect();
-    process.exit(0);
-  });
-});
-process.on('SIGINT', () => {
-  server.close(async () => {
-    await prisma.$disconnect();
-    process.exit(0);
-  });
-});
-```
+✅ **FIXED** — `server.js` ahora importa `prisma` desde `database.js` y llama a `await prisma.$disconnect()` antes de `process.exit()` en SIGTERM y SIGINT.
 
 #### #7 Scripts de test manuales obsoletos
 
-**Qué es:** `backend/testDemoUsers.js`, `backend/test_endpoints.js` y `backend/test_endpoints_fixed.js` (232 líneas total) son scripts de prueba manuales que no forman parte del test suite automatizado.
-
-**Por qué importa:** Archivos muertos que confunden y no se mantienen. Si alguien ejecuta `npm test` del backend, estos scripts no se ejecutan, pero ocupan espacio.
-
-**Solución:** Eliminarlos después de verificar que no contienen lógica útil no cubierta por los tests automatizados:
-
-```bash
-rm backend/testDemoUsers.js backend/test_endpoints.js backend/test_endpoints_fixed.js
-```
+✅ **FIXED** — Eliminados `backend/testDemoUsers.js`, `backend/test_endpoints.js` y `backend/test_endpoints_fixed.js`.
 
 ---
 
@@ -358,11 +308,10 @@ rm backend/testDemoUsers.js backend/test_endpoints.js backend/test_endpoints_fix
 
 ---
 
-## Prioridad de acciones recomendadas
+## Prioridad de acciones — Pendientes
 
 | Prioridad | Acción | Incidencia | Esfuerzo |
 |-----------|--------|-----------|----------|
-| 🔴 | Agregar `prisma.$disconnect()` en shutdown | #6 | 10 min |
-| 🟡 | Eliminar scripts de test manuales obsoletos | #7 | 5 min |
 | 🟢 | Decidir convención de CSS Modules para adelante | #3 | 15 min (decisión) |
-| 🟢 | Generar migración inicial desde schema actual | #5 | 15 min |
+
+**✅ Incidencias #1, #2, #4, #5, #6, #7 — todas corregidas**
