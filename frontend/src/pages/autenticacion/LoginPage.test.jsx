@@ -127,22 +127,6 @@ describe('LoginPage', () => {
     });
   });
 
-  it('muestra la sección de cuentas de demostración', () => {
-    render(
-      <BrowserRouter>
-        <AuthProvider>
-          <LoginPage />
-        </AuthProvider>
-      </BrowserRouter>
-    );
-
-    const toggleButton = screen.getByRole('button', { name: /Cuentas de demo/i });
-    expect(toggleButton).toBeInTheDocument();
-    fireEvent.click(toggleButton);
-    expect(screen.getAllByText(/Candidato/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Empresa/i).length).toBeGreaterThan(0);
-  });
-
   it('tiene los estilos CSS correctos', () => {
     render(
       <BrowserRouter>

@@ -9,7 +9,6 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [showDemoAccounts, setShowDemoAccounts] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({
     email: '',
     password: ''
@@ -131,11 +130,6 @@ const LoginPage = () => {
     }
   };
 
-  const handleFillDemo = (demoEmail, demoPassword) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
-  };
-
   return (
     <div className={`${styles.authPage} login-page`}>
       <div className="container">
@@ -199,48 +193,6 @@ const LoginPage = () => {
             <p><Link to="/" className={styles.authLink}>Volver al inicio</Link></p>
           </div>
 
-          <div className={styles.demoAccounts}>
-            <button 
-              className={styles.demoAccountsToggle}
-              onClick={() => setShowDemoAccounts(!showDemoAccounts)}
-            >
-              <h3>Cuentas de demo {showDemoAccounts ? '▼' : '▶'}</h3>
-            </button>
-            {showDemoAccounts && (
-              <div className={styles.demoAccountsList}>
-                <div 
-                  className={`${styles.demoAccount} ${styles.demoAccountClickable}`}
-                  onClick={() => handleFillDemo('admin@laboria.com', 'admin123')}
-                >
-                  <strong>Administrador:</strong> admin@laboria.com / admin123
-                </div>
-                <div 
-                  className={`${styles.demoAccount} ${styles.demoAccountClickable}`}
-                  onClick={() => handleFillDemo('candidate@laboria.com', 'candidate123')}
-                >
-                  <strong>Candidato:</strong> candidate@laboria.com / candidate123
-                </div>
-                <div 
-                  className={`${styles.demoAccount} ${styles.demoAccountClickable}`}
-                  onClick={() => handleFillDemo('company@laboria.com', 'company123')}
-                >
-                  <strong>Empresa (empleados):</strong> company@laboria.com / company123
-                </div>
-                <div 
-                  className={`${styles.demoAccount} ${styles.demoAccountClickable}`}
-                  onClick={() => handleFillDemo('recruiter@laboria.com', 'recruiter123')}
-                >
-                  <strong>Empresa (estudiantes):</strong> recruiter@laboria.com / recruiter123
-                </div>
-                <div 
-                  className={`${styles.demoAccount} ${styles.demoAccountClickable}`}
-                  onClick={() => handleFillDemo('hybrid@laboria.com', 'hybrid123')}
-                >
-                  <strong>Empresa (híbrida):</strong> hybrid@laboria.com / hybrid123
-                </div>
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </div>
