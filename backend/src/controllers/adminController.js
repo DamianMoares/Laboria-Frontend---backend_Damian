@@ -633,6 +633,75 @@ const updateApplicationStatusAsAdmin = async (req, res, next) => {
   }
 };
 
+/**
+ * Ejecutar tests del backend (vitest)
+ * GET /api/admin/tests/run
+ */
+const runTests = async (req, res, next) => {
+  try {
+    const { execSync } = require('child_process');
+    const path = require('path');
+    const backendDir = path.resolve(__dirname, '../..');
+
+    const output = execSync('npx vitest run --reporter=json', {
+      cwd: backendDir,
+      timeout: 60000,
+      encoding: 'utf-8'
+    });
+
+    const vitestResult = JSON.parse(output);
+    const suites = vitestResult.testResults.map(file => ({
+      name: path.basename(file.name, '.test.js'),
+      tests: file.assertionResults.map(t => ({
+        name: t.title,
+        status: t.status
+      }))
+    }));
+
+    const durationMs = vitestResult.testResults.reduce((sum, f) => {
+      return sum + (f.endTime - f.startTime);
+    }, 0);
+    const duration = (durationMs / 1000).toFixed(1) + 's';
+
+    res.json({
+      success: true,
+      total: vitestResult.numTotalTests,
+      passed: vitestResult.numPassedTests,
+      failed: vitestResult.numFailedTests,
+      duration,
+      suites
+    });
+  } catch (error) {
+    if (error.stdout) {
+      try {
+        const vitestResult = JSON.parse(error.stdout);
+        const path = require('path');
+        const suites = vitestResult.testResults.map(file => ({
+          name: path.basename(file.name, '.test.js'),
+          tests: file.assertionResults.map(t => ({
+            name: t.title,
+            status: t.status
+          }))
+        }));
+        const durationMs = vitestResult.testResults.reduce((sum, f) => sum + (f.endTime - f.startTime), 0);
+        const duration = (durationMs / 1000).toFixed(1) + 's';
+        return res.json({
+          success: true,
+          total: vitestResult.numTotalTests,
+          passed: vitestResult.numPassedTests,
+          failed: vitestResult.numFailedTests,
+          duration,
+          suites
+        });
+      } catch (_) {
+        // fall through to error handler
+      }
+    }
+    error.statusCode = 500;
+    next(error);
+  }
+};
+
 module.exports = {
   getDashboardStats,
   getAllUsers,
@@ -646,5 +715,6 @@ module.exports = {
   updateCourseAsAdmin,
   deleteCourseAsAdmin,
   getAllApplications,
-  updateApplicationStatusAsAdmin
+  updateApplicationStatusAsAdmin,
+  runTests
 };

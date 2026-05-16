@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { checkApiConnection } from '../../context/ConexionApi';
+import { adminService } from '../../services/adminService';
 import AdminNavigation from './AdminNavigation';
 import styles from './ApiStatusPage.module.css';
 
@@ -30,56 +31,18 @@ const ApiStatusPage = ({ onAdminLogout }) => {
   const handleRunTests = async () => {
     setTestLoading(true);
     try {
-      // Simular ejecución de tests (en un entorno real, esto ejecutaría Vitest)
-      // Por ahora, mostramos resultados simulados
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const mockTestResults = {
-        total: 18,
-        passed: 18,
-        failed: 0,
-        duration: '2.3s',
-        suites: [
-          {
-            name: 'Home Page',
-            tests: [
-              { name: 'se renderiza correctamente', status: 'passed' },
-              { name: 'muestra el subtítulo del portal', status: 'passed' },
-              { name: 'muestra los botones de navegación principales', status: 'passed' },
-              { name: 'muestra las secciones de características', status: 'passed' },
-              { name: 'muestra las estadísticas', status: 'passed' },
-              { name: 'muestra la sección de llamada a la acción', status: 'passed' },
-            ]
-          },
-          {
-            name: 'JobSearchPage',
-            tests: [
-              { name: 'se renderiza correctamente', status: 'passed' },
-              { name: 'muestra el campo de búsqueda', status: 'passed' },
-              { name: 'muestra los filtros principales', status: 'passed' },
-              { name: 'permite escribir en el campo de búsqueda', status: 'passed' },
-              { name: 'muestra el botón de búsqueda', status: 'passed' },
-              { name: 'muestra el botón de filtros avanzados', status: 'passed' },
-            ]
-          },
-          {
-            name: 'CourseSearchPage',
-            tests: [
-              { name: 'se renderiza correctamente', status: 'passed' },
-              { name: 'muestra el campo de búsqueda', status: 'passed' },
-              { name: 'muestra los filtros principales', status: 'passed' },
-              { name: 'permite escribir en el campo de búsqueda', status: 'passed' },
-              { name: 'muestra el botón de búsqueda', status: 'passed' },
-              { name: 'muestra el botón de filtros avanzados', status: 'passed' },
-            ]
-          }
-        ]
-      };
-      
-      setTestResults(mockTestResults);
+      const result = await adminService.runTests();
+      setTestResults(result);
       setTestLastRun(new Date().toLocaleTimeString());
     } catch (error) {
       console.error('Error running tests:', error);
+      setTestResults({
+        total: 0,
+        passed: 0,
+        failed: 0,
+        duration: '0s',
+        suites: []
+      });
     } finally {
       setTestLoading(false);
     }

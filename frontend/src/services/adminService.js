@@ -161,5 +161,18 @@ export const adminService = {
   updateApplicationStatus: async (id, status) => {
     const response = await api.put(`/admin/applications/${id}/status`, { status });
     return response.data;
+  },
+
+  // ==========================================
+  // TESTS DEL BACKEND
+  // ==========================================
+
+  /**
+   * Ejecutar tests del backend (vitest)
+   * @returns {Promise<Object>} Resultados de los tests
+   */
+  runTests: async () => {
+    const response = await api.get('/admin/tests/run');
+    return response.data;
   }
 };

@@ -60,4 +60,10 @@ router.get('/applications', adminController.getAllApplications);
 // Actualizar estado de aplicación
 router.put('/applications/:id/status', adminController.updateApplicationStatusAsAdmin);
 
+// ==========================================
+// TESTS DEL BACKEND
+// ==========================================
+// Ejecutar tests (vitest) del backend
+router.get('/tests/run', adminController.runTests);
+
 module.exports = router;
