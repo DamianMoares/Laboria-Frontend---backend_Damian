@@ -85,26 +85,6 @@ describe('Navbar Component', () => {
     expect(screen.queryByText(/Registrarse/i)).not.toBeInTheDocument();
   });
 
-  it('muestra enlace de admin cuando el usuario es admin', () => {
-    useAuth.mockReturnValue({
-      user: { id: '1', email: 'admin@test.com', role: 'ADMIN' },
-      isAuthenticated: true,
-      isCandidate: false,
-      isAnyCompany: false,
-      isAdmin: true,
-      logout: vi.fn(),
-    });
-
-    render(
-      <BrowserRouter>
-        <Navbar />
-      </BrowserRouter>
-    );
-
-    const adminLinks = screen.getAllByText(/Admin/i);
-    expect(adminLinks.length).toBeGreaterThan(0);
-  });
-
   it('tiene el menú móvil cerrado por defecto', () => {
     render(
       <BrowserRouter>

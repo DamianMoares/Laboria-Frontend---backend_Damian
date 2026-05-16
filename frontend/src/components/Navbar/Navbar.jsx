@@ -5,7 +5,7 @@ import logoSitio from '../../assets/img/Laboria_Fondo_Negro.png';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
-  const { user, isAuthenticated, logout, isAdmin } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
@@ -74,13 +74,6 @@ const Navbar = () => {
           </li>
           {isAuthenticated ? (
             <>
-              {isAdmin && (
-                <li className={styles.navbarItem}>
-                  <Link to="/admin" className={styles.navbarLink} onClick={closeMobileMenu}>
-                    Admin
-                  </Link>
-                </li>
-              )}
               <li className={styles.navbarItem}>
                 <button onClick={() => { handleProfileClick(); closeMobileMenu(); }} className={styles.navbarLinkProfileButton}>
                   Mi Perfil
