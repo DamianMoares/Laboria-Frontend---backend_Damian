@@ -5,16 +5,9 @@ import logoSitio from '../../assets/img/Laboria_Fondo_Negro.png';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
-  const { user, isAuthenticated, isCandidate, isAnyCompany, isAdmin, logout } = useAuth();
+  const { isAuthenticated, isCandidate, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-
-  const getHomeRoute = () => {
-    if (isCandidate()) return '/perfil/candidato';
-    if (isAnyCompany()) return '/perfil/empresa';
-    if (isAdmin()) return '/admin';
-    return '/';
-  };
 
   const handleLogout = () => {
     logout();
@@ -53,18 +46,13 @@ const Navbar = () => {
           {isAuthenticated ? (
             <>
               <li className={styles.navbarItem}>
-                <Link to={getHomeRoute()} className={styles.navbarLink} onClick={closeMobileMenu}>
+                <Link to="/panel" className={styles.navbarLink} onClick={closeMobileMenu}>
                   Inicio
                 </Link>
               </li>
               <li className={styles.navbarItem}>
                 <Link to="/empleos" className={styles.navbarLink} onClick={closeMobileMenu}>
                   Búsqueda empleo
-                </Link>
-              </li>
-              <li className={styles.navbarItem}>
-                <Link to="/red-empleo" className={styles.navbarLink} onClick={closeMobileMenu}>
-                  Red de Empleo
                 </Link>
               </li>
               <li className={styles.navbarItem}>
@@ -112,11 +100,6 @@ const Navbar = () => {
               <li className={styles.navbarItem}>
                 <Link to="/empleos" className={styles.navbarLink} onClick={closeMobileMenu}>
                   Empleos
-                </Link>
-              </li>
-              <li className={styles.navbarItem}>
-                <Link to="/red-empleo" className={styles.navbarLink} onClick={closeMobileMenu}>
-                  Red de Empleo
                 </Link>
               </li>
               <li className={styles.navbarItem}>

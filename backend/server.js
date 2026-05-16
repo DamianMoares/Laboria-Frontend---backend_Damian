@@ -40,7 +40,6 @@ app.use('/api/courses', require('./src/routes/courseRoutes'));
 app.use('/api/applications', require('./src/routes/applicationRoutes'));
 app.use('/api/admin', require('./src/routes/adminRoutes')); // Rutas de administración
 app.use('/api/scraper', require('./src/routes/scraperRoutes')); // Escaneo de cursos
-app.use('/api/job-scraper', require('./src/routes/jobScraperRoutes')); // Escaneo de empleos
 
 // Ruta de prueba
 app.get('/', (req, res) => {

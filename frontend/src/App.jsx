@@ -29,9 +29,7 @@ import SavedCoursesPage from './pages/cursos/SavedCoursesPage';
 import CurriculumPage from './pages/curriculo/CurriculumPage';
 import SettingsPage from './pages/configuracion/SettingsPage';
 import ExternalCoursesPage from './pages/cursos-externos/ExternalCoursesPage';
-import ExternalJobsPage from './pages/empleos-externos/ExternalJobsPage';
 import AdminScraper from './pages/admin/AdminScraper';
-import AdminJobScraper from './pages/admin/AdminJobScraper';
 import ApiStatusPage from './pages/admin/ApiStatusPage';
 import ProtectedAdminRoute from './pages/admin/ProtectedAdminRoute';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -73,7 +71,6 @@ function App() {
               <Route path="/curriculum" element={<ProtectedRoute roles={[ROLES.CANDIDATE]}><CurriculumPage /></ProtectedRoute>} />
               <Route path="/configuracion" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="/red-cursos" element={<ExternalCoursesPage />} />
-              <Route path="/red-empleo" element={<ExternalJobsPage />} />
               {/* Rutas de Administración */}
               <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
               <Route path="/admin/users" element={<ProtectedAdminRoute><AdminUsers /></ProtectedAdminRoute>} />
@@ -82,7 +79,6 @@ function App() {
               <Route path="/admin/applications" element={<ProtectedAdminRoute><AdminApplications /></ProtectedAdminRoute>} />
               <Route path="/admin/api-status" element={<ProtectedAdminRoute><ApiStatusPage /></ProtectedAdminRoute>} />
               <Route path="/admin/scraper" element={<ProtectedAdminRoute><AdminScraper /></ProtectedAdminRoute>} />
-              <Route path="/admin/job-scraper" element={<ProtectedAdminRoute><AdminJobScraper /></ProtectedAdminRoute>} />
             </Routes>
           </main>
 
