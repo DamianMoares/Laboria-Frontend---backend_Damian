@@ -122,6 +122,15 @@ const updateProfile = async (req, res, next) => {
       throw error;
     }
     
+    if (email !== undefined && email !== existing.email) {
+      const emailTaken = await prisma.user.findUnique({ where: { email } });
+      if (emailTaken) {
+        const error = new Error('Email ya registrado');
+        error.statusCode = 409;
+        throw error;
+      }
+    }
+
     const data = {};
     if (name !== undefined) data.name = name;
     if (email !== undefined) data.email = email;

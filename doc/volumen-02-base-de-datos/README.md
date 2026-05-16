@@ -277,7 +277,7 @@ Esto:
 npx prisma migrate deploy
 ```
 
-Este comando se ejecuta automáticamente en Render durante el build.
+Este comando se ejecuta automáticamente en Render durante el build (definido en `render.yaml`).
 
 ### Migración inicial
 
@@ -289,60 +289,69 @@ La migración `20260515084230_init` crea las 4 tablas (`User`, `Job`, `Course`, 
 
 **Archivo:** `backend/prisma/seed.js`
 
-```javascript
-const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
+El seed se ejecuta **manualmente** con `npm run seed` (no hay hook postbuild). Crea 9 usuarios, 8 empleos, 8 cursos y 5 postulaciones.
 
-const prisma = new PrismaClient();
-
-async function main() {
-  const demoAccounts = [
-    { email: 'admin@laboria.com', password: 'admin123', name: 'Admin Laboria', role: 'ADMIN' },
-    { email: 'candidate@laboria.com', password: 'candidate123', name: 'Carlos García', role: 'CANDIDATE' },
-    { email: 'company@laboria.com', password: 'company123', name: 'TechCorp Solutions', role: 'COMPANY_EMPLOYEES' },
-    { email: 'recruiter@laboria.com', password: 'recruiter123', name: 'EduNext Academy', role: 'COMPANY_STUDENTS' },
-    { email: 'hybrid@laboria.com', password: 'hybrid123', name: 'InnovaGroup', role: 'COMPANY_HYBRID' },
-  ];
-
-  for (const acc of demoAccounts) {
-    const hashed = await bcrypt.hash(acc.password, 10);
-    await prisma.user.upsert({
-      where: { email: acc.email },
-      update: {},
-      create: { email: acc.email, password: hashed, name: acc.name, role: acc.role },
-    });
-  }
-  // ...
-}
-```
-
-**Detalle del proceso:**
-
-| Paso | Descripción |
-|---|---|
-| 1. Hash | Cada contraseña se hashea con bcrypt (10 rondas) |
-| 2. Upsert | `prisma.user.upsert()` — si el email ya existe, no hace nada; si no, crea el usuario |
-| 3. Resultado | 5 cuentas demo con nombres reales (no genéricos) |
-
-**Cuentas creadas:**
+### Cuentas creadas (9 usuarios)
 
 | Email | Contraseña | Nombre visible | Rol |
 |---|---|---|---|
 | `admin@laboria.com` | `admin123` | Admin Laboria | ADMIN |
-| `candidate@laboria.com` | `candidate123` | Carlos García | CANDIDATE |
-| `company@laboria.com` | `company123` | TechCorp Solutions | COMPANY_EMPLOYEES |
-| `recruiter@laboria.com` | `recruiter123` | EduNext Academy | COMPANY_STUDENTS |
-| `hybrid@laboria.com` | `hybrid123` | InnovaGroup | COMPANY_HYBRID |
+| `carlos@email.com` | `carlos123` | Carlos García López | CANDIDATE |
+| `maria@email.com` | `maria123` | María Rodríguez Pérez | CANDIDATE |
+| `javier@email.com` | `javier123` | Javier Martínez Ruiz | CANDIDATE |
+| `info@techcorp.com` | `techcorp123` | TechCorp Solutions | COMPANY_EMPLOYEES |
+| `info@edunext.com` | `edunext123` | EduNext Academy | COMPANY_STUDENTS |
+| `info@innovagroup.com` | `innova123` | InnovaGroup | COMPANY_HYBRID |
+| `info@datasoft.com` | `datasoft123` | DataSoft Technologies | COMPANY_EMPLOYEES |
+| `info@cursosalfa.com` | `alfa123` | Cursos Alfa | COMPANY_STUDENTS |
 
-**Ejecutar el seed:**
+### Empleos (8)
+
+| Título | Empresa | Categoría | Modalidad |
+|---|---|---|---|
+| Desarrollador Full Stack | TechCorp Solutions | Tecnología | HYBRID |
+| Data Scientist Senior | DataSoft Technologies | Datos e IA | REMOTE |
+| Diseñador UX/UI | InnovaGroup | Diseño | ONSITE |
+| DevOps Engineer | TechCorp Solutions | Tecnología | REMOTE |
+| Profesor de Programación Web | EduNext Academy | Educación | REMOTE |
+| Analista de Ciberseguridad | DataSoft Technologies | Tecnología | HYBRID |
+| Técnico de Marketing Digital | InnovaGroup | Marketing | ONSITE |
+| Coordinador de Formación Online | EduNext Academy | Educación | REMOTE |
+
+### Cursos (8)
+
+| Título | Proveedor | Categoría | Nivel |
+|---|---|---|---|
+| React desde Cero | EduNext Academy | Desarrollo Web | BEGINNER |
+| Node.js Avanzado | EduNext Academy | Desarrollo Web | ADVANCED |
+| Python para Data Science | Cursos Alfa | Datos e IA | INTERMEDIATE |
+| Diseño UX/UI Profesional | Cursos Alfa | Diseño | BEGINNER |
+| Ciberseguridad Práctica | EduNext Academy | Ciberseguridad | INTERMEDIATE |
+| Cloud Computing con AWS | Cursos Alfa | Cloud | INTERMEDIATE |
+| Marketing Digital Completo | EduNext Academy | Marketing | BEGINNER |
+| Inglés Técnico para TI | Cursos Alfa | Idiomas | INTERMEDIATE |
+
+### Postulaciones (5)
+
+| Candidato | Empleo |
+|---|---|
+| Carlos García | Desarrollador Full Stack |
+| María Rodríguez | Data Scientist Senior |
+| Javier Martínez | Diseñador UX/UI |
+| Carlos García | DevOps Engineer |
+| María Rodríguez | Analista de Ciberseguridad |
+
+### Ejecutar el seed
 
 ```bash
 # Local
-cd backend && node prisma/seed.js
+cd backend && npm run seed
 
 # En Render (después del deploy)
-# Dashboard → Shell → node prisma/seed.js
+# Dashboard → Shell → cd backend && npm run seed
 ```
+
+**Nota:** El seed ya no se ejecuta automáticamente tras el build (`postbuild` eliminado). Debe ejecutarse manualmente.
 
 ---
 
@@ -366,8 +375,8 @@ profile_{userId}
 // Para candidato:
 {
   firstName: "Carlos",
-  lastName: "García",
-  email: "candidate@laboria.com",
+  lastName: "García López",
+  email: "carlos@email.com",
   phone: "+34 600 000 000",
   location: "Madrid",
   bio: "Desarrollador full stack...",
@@ -382,7 +391,7 @@ profile_{userId}
 // Para empresa:
 {
   companyName: "EduNext Academy",
-  email: "recruiter@laboria.com",
+  email: "info@edunext.com",
   phone: "+34 600 000 000",
   location: "Barcelona",
   industry: "Educación",
@@ -399,10 +408,11 @@ profile_{userId}
 Login/Registro
     │
     ▼
-AuthContext.seedProfile()
-  └─ ¿Ya existe profile_{userId} en localStorage?
-       ├─ Sí → no hacer nada
-       └─ No → crear perfil inicial con datos de user.name/user.email
+AuthContext.handleSetUser()
+  └─ seedProfile(user)
+     └─ ¿Ya existe profile_{userId} en localStorage?
+        ├─ Sí → no hacer nada
+        └─ No → crear perfil inicial con datos de user.name/user.email
     │
     ▼
 EditProfileModal (guardar)
@@ -410,10 +420,9 @@ EditProfileModal (guardar)
   └─ Envía solo { name, email } a PUT /users/profile/me (backend)
     │
     ▼
-ProfilePages / DashboardPage
+Páginas de perfil
   └─ Lee de localStorage (profile_{userId})
-     └─ Fallback → user.profile (objeto vacío)
-        └─ Fallback → user.name
+     └─ Fallback → datos de user.name
 ```
 
 ### ¿Por qué esta solución?
@@ -422,7 +431,7 @@ ProfilePages / DashboardPage
 |---|---|
 | El backend no tiene modelo Profile | El controlador `updateProfile` solo actualiza `name` y `email` |
 | Datos del perfil son solo frontend | Phone, bio, skills, etc. no se usan en el backend |
- | Persistencia entre sesiones | localStorage conserva los datos aunque el usuario cierre el navegador |
+| Persistencia entre sesiones | localStorage conserva los datos aunque el usuario cierre el navegador |
 | Portabilidad | Si el usuario cambia de dispositivo, pierde los datos. Es una limitación conocida |
 
 ### Mejora futura recomendada

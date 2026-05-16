@@ -213,10 +213,6 @@ const JobSearchPage = () => {
     setError(null);
   };
 
-  const handleApply = (jobId) => {
-    alert(`Aplicando a la oferta ${jobId} (simulado - sin backend real)`);
-  };
-
   return (
     <div className={styles['job-search-page']}>
       <div className={styles['search-header']}>

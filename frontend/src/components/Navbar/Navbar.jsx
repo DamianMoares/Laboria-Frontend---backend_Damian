@@ -5,7 +5,7 @@ import logoSitio from '../../assets/img/Laboria_Fondo_Negro.png';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
-  const { user, isAuthenticated, logout, isCandidate, isAnyCompany, isAdmin } = useAuth();
+  const { user, isAuthenticated, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 

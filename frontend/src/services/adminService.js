@@ -163,5 +163,3 @@ export const adminService = {
     return response.data;
   }
 };
-
-export default adminService;

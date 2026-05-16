@@ -3,244 +3,384 @@
 ## Índice del volumen
 
 1. [Arquitectura de despliegue](#1-arquitectura-de-despliegue)
-2. [GitHub Pages + GitHub Actions](#2-github-pages--github-actions)
-3. [HashRouter y Base Path](#3-hashrouter-y-base-path)
-4. [Workflow CI/CD](#4-workflow-cicd)
-5. [Variables de entorno](#5-variables-de-entorno)
-6. [Procedimiento de deploy paso a paso](#6-procedimiento-de-deploy-paso-a-paso)
-7. [Solución de problemas comunes](#7-solución-de-problemas-comunes)
-8. [Próximos pasos: backend](#8-próximos-pasos-backend)
+2. [Vercel (Frontend)](#2-vercel-frontend)
+3. [Render (Backend + Base de datos)](#3-render-backend--base-de-datos)
+4. [Configuración de Vercel](#4-configuración-de-vercel)
+5. [Configuración de Render](#5-configuración-de-render)
+6. [CORS entre frontend y backend](#6-cors-entre-frontend-y-backend)
+7. [Seed de datos en producción](#7-seed-de-datos-en-producción)
+8. [Variables de entorno en cada entorno](#8-variables-de-entorno-en-cada-entorno)
+9. [Procedimiento de deploy completo](#9-procedimiento-de-deploy-completo)
+10. [Verificar comunicación frontend-backend](#10-verificar-comunicación-frontend-backend)
+11. [Solución de problemas comunes](#11-solución-de-problemas-comunes)
 
 ---
 
 ## 1. Arquitectura de despliegue
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     GitHub.com                               │
-│                                                             │
-│  ┌─────────────────────────────┐  ┌──────────────────────┐  │
-│  │  Repositorio                │  │  GitHub Actions       │  │
-│  │  damianmoares/              │  │                       │  │
-│  │  Laboria-Frontend---backend │  │  Push a main:         │  │
-│  │  _Damian                    │─>│  1. Setup Node        │  │
-│  │                             │  │  2. npm ci            │  │
-│  │  main branch                │  │  3. npm run build     │  │
-│  │                             │  │  4. Deploy to Pages   │  │
-│  └─────────────────────────────┘  └──────────┬───────────┘  │
-│                                              │              │
-└──────────────────────────────────────────────┼──────────────┘
-                                               │
-                    ┌──────────────────────────┘
-                    ▼
-┌──────────────────────────────────────────────────────────────┐
-│  GitHub Pages                                                │
-│  https://damianmoares.github.io/Laboria-Frontend---backend_  │
-│  Damian/                                                    │
-│                                                             │
-│  Sirve: index.html + assets JS/CSS (SPA estática)           │
-│  API calls: localhost:3000 (backend local)                  │
-└──────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                         Vercel                                       │
+│  https://laboria-frontend-backend-damian.vercel.app                 │
+│                                                                     │
+│  Sirve: SPA React (index.html + assets JS/CSS)                     │
+│  Rewrites: /api/* → APIs externas (evita CORS)                     │
+│  SPA Fallback: /* → /index.html                                    │
+│                                                                     │
+│  Llamadas API:                                                      │
+│    · /api/users, /api/jobs, ... → https://laboria-backend.onrender.com │
+│    · /api/jcyl/* → data.opendatasoft.com (proxy)                    │
+│    · /api/jobicy/* → jobicy.com (proxy)                             │
+└──────────────────────┬──────────────────────────────────────────────┘
+                       │
+                       │ Peticiones HTTP (CORS permitido)
+                       ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                         Render                                       │
+│  https://laboria-backend.onrender.com                               │
+│                                                                     │
+│  Servicio Web: laboria-backend (Node.js + Express)                  │
+│    - Build: cd backend && npx prisma generate && npx prisma migrate │
+│    - Start: cd backend && node server.js                            │
+│                                                                     │
+│  Base de Datos: laboria-db (PostgreSQL)                             │
+│    - Conexión automática via DATABASE_URL                           │
+│    - Generada por Render Blueprint                                  │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
-**Actualmente:** Solo el frontend está desplegado en GitHub Pages. El backend se ejecuta localmente. La sección [8. Próximos pasos: backend](#8-próximos-pasos-backend) detalla cómo desplegarlo más adelante.
+### Flujo de una petición
+
+```
+Navegador → Vercel (frontend)
+  ├─ Ruta SPA (/empleos, /cursos...) → sirve index.html
+  ├─ /api/users/*, /api/jobs/*   → proxy a https://laboria-backend.onrender.com
+  └─ /api/jcyl/*, /api/khanacademy/* → proxy a APIs externas
+```
 
 ---
 
-## 2. GitHub Pages + GitHub Actions
+## 2. Vercel (Frontend)
 
-### Cómo funciona
+### Plataforma
 
-GitHub Pages sirve archivos estáticos desde un workflow de GitHub Actions. En este proyecto:
-1. Haces push a `main`
-2. GitHub Actions ejecuta el workflow `.github/workflows/deploy.yml`
-3. El workflow instala dependencias, hace build con Vite y despliega a GitHub Pages
-4. La aplicación queda disponible en la URL pública
+Vercel despliega el frontend React como sitio estático. Cada push a `main` redepliega automáticamente (si está conectado al repositorio de GitHub).
 
-### Workflow: `.github/workflows/deploy.yml`
+### URL de producción
+
+```
+https://laboria-frontend-backend-damian.vercel.app
+```
+
+### Configuración
+
+La configuración de Vercel está en `vercel.json` en la raíz del proyecto:
+
+| Parámetro | Valor | Explicación |
+|---|---|---|
+| `rootDirectory` | `frontend` | Vercel ejecuta los comandos dentro de `frontend/` |
+| `framework` | `vite` | Vercel reconoce automáticamente el framework y sus settings |
+| `buildCommand` | `npm run build` | Genera el build en `frontend/dist/` |
+| `outputDirectory` | `dist` | Directorio que Vercel sirve como sitio estático |
+| `installCommand` | `npm ci` | Instalación limpia de dependencias |
+
+### Rewrites
+
+```json
+{
+  "rewrites": [
+    { "source": "/api/jcyl/(.*)", "destination": "https://data.opendatasoft.com/$1" },
+    { "source": "/api/jobicy/(.*)", "destination": "https://jobicy.com/$1" },
+    { "source": "/api/himalayas/(.*)", "destination": "https://himalayas.app/$1" },
+    { "source": "/api/remotive/(.*)", "destination": "https://remotive.com/$1" },
+    { "source": "/api/arbeitnow/(.*)", "destination": "https://www.arbeitnow.com/$1" },
+    { "source": "/api/khanacademy/(.*)", "destination": "https://www.khanacademy.org/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+```
+
+- Las primeras 6 reglas redirigen rutas `/api/*` a APIs externas (proxy inverso, evita CORS)
+- La última regla captura **todas** las rutas SPA y las sirve con `index.html` (fallback para HashRouter)
+
+### Sin VITE_BASE_PATH
+
+A diferencia de GitHub Pages, Vercel despliega en la raíz del dominio. No se necesita `VITE_BASE_PATH`. El `base` de `vite.config.js` usa `'/'` por defecto.
+
+---
+
+## 3. Render (Backend + Base de datos)
+
+### Plataforma
+
+Render despliega el backend Node.js + PostgreSQL mediante **Render Blueprint** (infraestructura como código en `render.yaml`).
+
+### Servicios
+
+| Servicio | Tipo | Plan | URL |
+|---|---|---|---|
+| `laboria-backend` | Web Service (Node) | Free | `https://laboria-backend.onrender.com` |
+| `laboria-db` | PostgreSQL | Free | Conectado automáticamente al backend |
+
+### URL de producción del backend
+
+```
+https://laboria-backend.onrender.com
+```
+
+### Build y Start
 
 ```yaml
-name: Deploy Laboria to GitHub Pages
-
-on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'frontend/**'
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-
-    - name: Install dependencies
-      working-directory: frontend
-      run: npm ci
-
-    - name: Build frontend
-      working-directory: frontend
-      run: npm run build
-
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: frontend/dist
-
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+buildCommand: cd backend && npx prisma generate && npx prisma migrate deploy
+startCommand: cd backend && node server.js
+healthCheckPath: /
 ```
 
-### Paso a paso del workflow
+- **Build:** Genera Prisma Client y aplica migraciones automáticamente
+- **Start:** Inicia Express en el puerto asignado por Render (10000)
+- **Health check:** Render verifica que `GET /` responda 200
 
-| Paso | Acción | Descripción |
+### Variables de entorno en Render
+
+| Variable | Origen | Valor |
 |---|---|---|
-| 1 | `checkout@v4` | Clona el repositorio en el runner de GitHub |
-| 2 | `setup-node@v4` | Instala Node 18 con cache de npm |
-| 3 | `npm ci` | Instala dependencias exactas desde `package-lock.json` |
-| 4 | `npm run build` | Ejecuta Vite build: lee `.env.production`, compila React, genera `frontend/dist/` |
-| 5 | `upload-pages-artifact@v3` | Sube `frontend/dist/` como artifact |
-| 6 | `deploy-pages@v4` | Despliega el artifact a GitHub Pages |
-
-### Disparadores del workflow
-
-- **Push a `main`** que modifique archivos en `frontend/`
-- **Manual** desde la pestaña Actions → "Deploy Laboria to GitHub Pages" → "Run workflow"
+| `DATABASE_URL` | `fromDatabase: laboria-db` | Generada automáticamente por Render |
+| `JWT_SECRET` | `generateValue: true` | Secreto aleatorio generado en el primer deploy |
+| `JWT_EXPIRES_IN` | Valor fijo | `7d` |
+| `CORS_ORIGINS` | Valor fijo | `https://laboria-frontend-backend-damian.vercel.app,*.vercel.app` |
+| `NODE_ENV` | Valor fijo | `production` |
+| `PORT` | Valor fijo | `10000` |
 
 ---
 
-## 3. HashRouter y Base Path
+## 4. Configuración de Vercel
 
-### Problema
+**Archivo:** `vercel.json` (raíz del proyecto)
 
-GitHub Pages no permite configurar reglas de redirección del servidor. Si usas `BrowserRouter` de React Router, al recargar una ruta como `/empleos`, el servidor busca un archivo `/empleos/index.html` que no existe y devuelve 404.
-
-### Solución: HashRouter
-
-Con `HashRouter`, las rutas se representan con `#`:
-- `https://domain.com/#/empleos`
-- El navegador nunca envía `/empleos` al servidor
-- El servidor solo ve `index.html` y lo sirve correctamente
-
-### Base path
-
-El proyecto se despliega en una subruta de GitHub Pages:
-```
-https://damianmoares.github.io/Laboria-Frontend---backend_Damian/
-```
-
-Vite necesita saber esta ruta para generar URLs correctas de assets (JS, CSS, imágenes).
-
-**Configuración:**
-
-`.env.production`:
-```
-VITE_BASE_PATH=/Laboria-Frontend---backend_Damian/
+```json
+{
+  "rootDirectory": "frontend",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm ci",
+  "rewrites": [
+    { "source": "/api/jcyl/(.*)", "destination": "https://data.opendatasoft.com/$1" },
+    { "source": "/api/jobicy/(.*)", "destination": "https://jobicy.com/$1" },
+    { "source": "/api/himalayas/(.*)", "destination": "https://himalayas.app/$1" },
+    { "source": "/api/remotive/(.*)", "destination": "https://remotive.com/$1" },
+    { "source": "/api/arbeitnow/(.*)", "destination": "https://www.arbeitnow.com/$1" },
+    { "source": "/api/khanacademy/(.*)", "destination": "https://www.khanacademy.org/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
 ```
 
-`vite.config.js`:
+**Nota:** No hay regla para `/api/users/*` o `/api/jobs/*` porque esas llamadas van directamente al backend de Laboria (no pasan por proxy de Vercel). El frontend llama a `VITE_API_URL` directamente.
+
+---
+
+## 5. Configuración de Render
+
+**Archivo:** `render.yaml` (raíz del proyecto)
+
+```yaml
+services:
+  - type: web
+    name: laboria-backend
+    runtime: node
+    plan: free
+    buildCommand: cd backend && npx prisma generate && npx prisma migrate deploy
+    startCommand: cd backend && node server.js
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: laboria-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CORS_ORIGINS
+        value: https://laboria-frontend-backend-damian.vercel.app,*.vercel.app
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+
+databases:
+  - name: laboria-db
+    plan: free
+    databaseName: laboria
+```
+
+### Despliegue del Blueprint
+
+1. Ir a [dashboard.render.com](https://dashboard.render.com)
+2. Conectar repositorio de GitHub
+3. Seleccionar "Blueprint" como tipo de despliegue
+4. Render detecta `render.yaml` y crea ambos servicios automáticamente
+
+---
+
+## 6. CORS entre frontend y backend
+
+El backend acepta peticiones del frontend mediante una configuración CORS dinámica que soporta **patrones wildcard**:
+
 ```javascript
-base: env.VITE_BASE_PATH || '/',
+const corsOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',')
+  : ['http://localhost:5173', 'http://localhost:4173'];
+
+const corsPatterns = corsOrigins.map(o => {
+  if (o.startsWith('*.'))
+    return new RegExp('^https?://[a-zA-Z0-9.-]+' + o.slice(1).replace('.', '\\.') + '$');
+  return o;
+});
 ```
 
-Sin `VITE_BASE_PATH`, los assets se buscan en `https://damianmoares.github.io/assets/...` en lugar de `https://damianmoares.github.io/Laboria-Frontend---backend_Damian/assets/...`.
+### En producción
+
+`CORS_ORIGINS` en Render:
+```
+https://laboria-frontend-backend-damian.vercel.app,*.vercel.app
+```
+
+Esto permite:
+- `https://laboria-frontend-backend-damian.vercel.app` — URL exacta de producción
+- `*.vercel.app` — cualquier subdominio de Vercel (deploy previews, branches)
+
+### En desarrollo local
+
+Sin `CORS_ORIGINS`, usa por defecto:
+- `http://localhost:5173` — Vite dev server
+- `http://localhost:4173` — Vite preview
 
 ---
 
-## 4. Variables de entorno
+## 7. Seed de datos en producción
 
-| Variable | Local (`frontend/.env`) | Producción (`frontend/.env.production`) |
-|---|---|---|
-| `VITE_API_URL` | `http://localhost:3000` | `http://localhost:3000` (pendiente backend) |
-| `VITE_BASE_PATH` | (no definida) | `/Laboria-Frontend---backend_Damian/` |
+El seed **no se ejecuta automáticamente** durante el build. Debe ejecutarse manualmente después del primer deploy.
 
-**Nota:** `VITE_BASE_PATH` solo está en `.env.production` para no romper el dev server local.
+### Opción 1: Render Shell
 
----
+1. Ir a [dashboard.render.com](https://dashboard.render.com) → laboria-backend
+2. Ir a la pestaña **Shell**
+3. Ejecutar:
+```bash
+cd backend && node prisma/seed.js
+```
 
-## 5. Procedimiento de deploy paso a paso
-
-### Prerequisitos
-- Cuenta en GitHub con el repositorio pusheado
-- El workflow `.github/workflows/deploy.yml` existe en `main`
-
-### Paso 1: Verificar configuración de Pages
-
-1. Ir a GitHub → Repositorio → Settings → Pages
-2. Source: **GitHub Actions**
-3. Verificar que no hay ningún otro origen configurado
-
-### Paso 2: Push a main
+### Opción 2: npm run seed (si el script está configurado)
 
 ```bash
-git add .
-git commit -m "mensaje"
-git push origin main
+cd backend && npm run seed
 ```
 
-### Paso 3: Verificar el workflow
+### Verificar seed
 
-1. Ir a GitHub → Repositorio → Actions
-2. Ver el workflow "Deploy Laboria to GitHub Pages" en ejecución
-3. Esperar a que termine (~2 minutos)
-4. Verificar que el deploy es exitoso (checkmark verde)
-
-### Paso 4: Verificar el sitio
-
-1. Abrir `https://damianmoares.github.io/Laboria-Frontend---backend_Damian/`
-2. Verificar que la página carga correctamente
-3. Navegar entre rutas
-4. Abrir DevTools → Network → verificar que no hay assets 404
+```bash
+curl https://laboria-backend.onrender.com/api/admin/dashboard
+# Debe mostrar stats con usuarios, empleos, cursos
+```
 
 ---
 
-## 6. Solución de problemas comunes
+## 8. Variables de entorno en cada entorno
+
+| Variable | Local (frontend/.env) | Producción (frontend/.env.production) | Render (render.yaml) |
+|---|---|---|---|
+| `VITE_API_URL` | `http://localhost:3000` | `https://laboria-backend.onrender.com` | — |
+| `VITE_BASE_PATH` | no definida | no definida | — |
+| `VITE_JOBS_API_1_URL` | `/api/jcyl/...` | `/api/jcyl/...` | — |
+| `DATABASE_URL` | En backend/.env local | — | Generada por Render |
+| `JWT_SECRET` | En backend/.env local | — | Generada por Render |
+| `CORS_ORIGINS` | no definida | — | `https://laboria-frontend-backend-damian.vercel.app,*.vercel.app` |
+| `NODE_ENV` | `development` | — | `production` |
+
+---
+
+## 9. Procedimiento de deploy completo
+
+### Primer deploy
+
+#### Backend (Render)
+
+1. Ir a [dashboard.render.com](https://dashboard.render.com)
+2. Nuevo → Blueprint
+3. Conectar repositorio de GitHub
+4. Render detecta `render.yaml` → crea `laboria-backend` + `laboria-db`
+5. Esperar a que terminen ambos servicios (~5 minutos)
+6. Verificar: `curl https://laboria-backend.onrender.com/` → debe responder JSON
+7. Ejecutar seed: Render Dashboard → laboria-backend → Shell → `cd backend && node prisma/seed.js`
+
+#### Frontend (Vercel)
+
+1. Ir a [vercel.com](https://vercel.com)
+2. Importar repositorio de GitHub
+3. Configurar:
+   - Root Directory: `frontend`
+   - Framework Preset: `Vite`
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+4. Añadir variable de entorno: `VITE_API_URL=https://laboria-backend.onrender.com`
+5. Deploy
+6. Verificar: `https://laboria-frontend-backend-damian.vercel.app/`
+
+### Deploys posteriores
+
+- **Frontend:** Push a `main` → Vercel redepliega automáticamente
+- **Backend:** Push a `main` → Render redepliega automáticamente
+
+---
+
+## 10. Verificar comunicación frontend-backend
+
+1. Abrir `https://laboria-frontend-backend-damian.vercel.app/`
+2. Abrir DevTools → Red (Network tab)
+3. Navegar a Empleos → verificar que las peticiones a `/api/jobs` llegan al backend
+4. Verificar que no hay errores CORS en la consola
+5. Probar login con `admin@laboria.com` / `admin123`
+6. Verificar que el token se guarda y las rutas protegidas funcionan
+
+### Endpoints de verificación
+
+| Endpoint | Método | Respuesta esperada |
+|---|---|---|
+| `https://laboria-backend.onrender.com/` | GET | `{ message: "¡Backend de Laboria funcionando!" }` |
+| `https://laboria-frontend-backend-damian.vercel.app/` | GET | HTML de la SPA |
+| `https://laboria-backend.onrender.com/api/jobs` | GET | Array de empleos (si hay seed) |
+
+---
+
+## 11. Solución de problemas comunes
+
+### Frontend
 
 | Problema | Causa probable | Solución |
 |---|---|---|
-| **Página blanca** | `VITE_BASE_PATH` incorrecto o faltante | Verificar `.env.production` → debe coincidir con el nombre del repo exactamente |
-| **Assets 404 (CSS/JS no cargan)** | `base` en vite.config.js incorrecto | Revisar que `VITE_BASE_PATH` termina con `/` |
-| **Error 404 al recargar página** | Uso de `BrowserRouter` en vez de `HashRouter` | Cambiar a `HashRouter` en `main.jsx` |
-| **npm run build falla localmente** | Dependencias faltantes | Ejecutar `npm ci` en `frontend/` |
-| **Workflow de Actions falla** | Error en el build | Ir a Actions → ver logs → identificar el error |
-| **El sitio no se actualiza tras push** | Workflow no se disparó | Verificar que los cambios están en `frontend/` (el workflow solo corre si hay cambios en esa carpeta) |
-| **Favicon 404** | Favicon en ruta incorrecta | Colocar `favicon.png` en `frontend/public/` |
+| **Página blanca** | Error en build de Vite | Ver logs del deploy en Vercel Dashboard |
+| **Error 404 al recargar página** | SPA fallback no configurado | Verificar `rewrites` en `vercel.json`: `{ "source": "/(.*)", "destination": "/index.html" }` |
+| **Assets JS/CSS 404** | `VITE_BASE_PATH` incorrecto | Vercel despliega en raíz, no necesita base path. Verificar que no está definido en `.env.production` |
+| **API calls fallan** | `VITE_API_URL` incorrecto | Verificar que apunta a `https://laboria-backend.onrender.com` en producción |
+| **CORS error en consola** | Backend no permite el origen | Verificar `CORS_ORIGINS` en Render — debe incluir `*.vercel.app` |
 
----
+### Backend (Render)
 
-## 7. Próximos pasos: backend
+| Problema | Causa probable | Solución |
+|---|---|---|
+| **Deploy falla (build)** | Error en migraciones de Prisma | Revisar logs del build en Render. Verificar que `DATABASE_URL` está disponible |
+| **Deploy falla (start)** | Puerto incorrecto | Render asigna `PORT=10000`. Verificar que `server.js` usa `process.env.PORT` |
+| **Error 503** | Health check fallando | Verificar que `GET /` responde 200. Revisar logs de la aplicación |
+| **Conexión a BD falla** | `DATABASE_URL` incorrecta | En Render se inyecta automáticamente. Verificar en Environment Variables |
+| **Seed no funciona** | BD vacía o sin migraciones | Ejecutar migraciones primero: `cd backend && npx prisma migrate deploy` |
 
-Actualmente el frontend funciona en modo lectura con datos locales (JSON en `public/data/`). Cuando quieras desplegar el backend:
+### Comunicación Frontend-Backend
 
-1. Elegir plataforma: Render, Railway, Fly.io, o la que prefieras
-2. Configurar:
-   - `DATABASE_URL` → PostgreSQL
-   - `JWT_SECRET` → variable secreta
-   - `CORS_ORIGINS` → `https://damianmoares.github.io`
-3. Actualizar `frontend/.env.production`:
-   ```
-   VITE_API_URL=https://url-del-backend-en-produccion
-   ```
-4. Hacer push a main → GitHub Actions redepliega automáticamente
-
-Este documento se actualizará cuando el backend esté desplegado.
+| Problema | Causa | Solución |
+|---|---|---|
+| **Login devuelve 401** | Credenciales incorrectas o seed no ejecutado | Ejecutar seed en producción |
+| **Login devuelve CORS error** | Origen no permitido | Verificar `CORS_ORIGINS` en Render |
+| **Las rutas protegidas redirigen al login** | Token no se guarda o expiró | Verificar que `localStorage` tiene el token tras login |
+| **Las APIs externas no responden** | Rewrite de Vercel mal configurado | Verificar `vercel.json` → las rutas `/api/jcyl/*` etc. deben coincidir |

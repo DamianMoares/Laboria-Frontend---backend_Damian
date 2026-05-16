@@ -79,8 +79,7 @@ PORT=3000
 ## 3. `frontend/.env`
 
 **Ubicación:** `frontend/.env`  
-**Propósito:** Variables de entorno para el frontend en **desarrollo local**.  
-**Importante:** Este archivo NO debe contener `VITE_BASE_PATH` porque rompe el dev server local.
+**Propósito:** Variables de entorno para el frontend en **desarrollo local**.
 
 ```
 # API 1 - Junta Castilla y León Empleo (usa proxy Vite)
@@ -141,27 +140,44 @@ VITE_API_URL=http://localhost:3000
 | `VITE_COURSES_API_1_URL` | Khan Academy API para cursos |
 | `VITE_API_URL` | URL del backend de Laboria |
 
-**Nota:** Las rutas que empiezan con `/api/...` usan el **proxy de Vite** en desarrollo para evitar CORS. En producción, estas llamadas irían directamente a las APIs externas desde el navegador.
+**Nota:** Las rutas que empiezan con `/api/...` usan el **proxy de Vite** en desarrollo para evitar CORS. En producción (Vercel), se usa el sistema de **rewrites** de `vercel.json` con el mismo propósito.
 
 ---
 
 ## 4. `frontend/.env.production`
 
 **Ubicación:** `frontend/.env.production`  
-**Propósito:** Variables que Vite usa SOLO durante el build de producción (`vite build`).
+**Propósito:** Variables que Vite usa SOLO durante el build de producción (`vite build`).  
+**Nota:** No incluye `VITE_BASE_PATH` — Vercel despliega en la raíz del dominio, por lo que `base` por defecto es `/`.
 
 ```
-VITE_BASE_PATH=/Laboria-Frontend---backend_Damian/
+# Vercel despliega en raíz, no necesita VITE_BASE_PATH
+# (vite.config.js usa '/' por defecto)
 
-VITE_API_URL=http://localhost:3000
+# API Backend Laboria en Render (actualizar tras el deploy)
+VITE_API_URL=https://laboria-backend.onrender.com
+
+# APIs externas — usan proxy de Vercel (rewrites en vercel.json)
+VITE_JOBS_API_1_URL=/api/jcyl/api/records/1.0/search/?dataset=ofertas-de-empleo@jcyl
+VITE_JOBS_API_1_KEY=
+VITE_JOBS_API_3_URL=/api/jobicy/api/v2/remote-jobs
+VITE_JOBS_API_3_KEY=
+VITE_JOBS_API_4_URL=/api/himalayas/jobs/api
+VITE_JOBS_API_4_KEY=
+VITE_JOBS_API_5_URL=/api/remotive/api/remote-jobs
+VITE_JOBS_API_5_KEY=
+VITE_JOBS_API_6_URL=/api/arbeitnow/api/job-board-api
+VITE_JOBS_API_6_KEY=
+VITE_COURSES_API_1_URL=/api/khanacademy/api/v1/topic/root
+VITE_COURSES_API_1_KEY=
 ```
 
 **Detalle de cada variable:**
 
 | Variable | Valor | Explicación |
 |---|---|---|
-| `VITE_BASE_PATH` | `/Laboria-Frontend---backend_Damian/` | Ruta base para GitHub Pages. Vite la usa para generar las URLs de assets (CSS, JS, imágenes). Sin esto, los assets buscan en `/` y fallan con 404 |
-| `VITE_API_URL` | `http://localhost:3000` | URL del backend. Temporalmente apunta a localhost hasta que el backend se despliegue en producción |
+| `VITE_API_URL` | `https://laboria-backend.onrender.com` | URL del backend en producción (Render) |
+| `VITE_JOBS_API_*_URL` | `/api/...` | Rutas que Vercel redirige mediante rewrites a las APIs externas |
 
 ---
 
@@ -178,6 +194,11 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   
   return {
+    test: {
+      environment: 'jsdom',
+      setupFiles: './src/test/setup.js',
+      globals: true,
+    },
     plugins: [react()],
     server: {
       port: 5173,           // Puerto del dev server
@@ -188,27 +209,27 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/jcyl/, ''),
         },
-        '/api/serpapi': {    // SerpApi
+        '/api/serpapi': {
           target: 'https://serpapi.com',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/serpapi/, ''),
         },
-        '/api/jobicy': {     // Jobicy
+        '/api/jobicy': {
           target: 'https://jobicy.com',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/jobicy/, ''),
         },
-        '/api/himalayas': {  // Himalayas
+        '/api/himalayas': {
           target: 'https://himalayas.app',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/himalayas/, ''),
         },
-        '/api/remotive': {   // Remotive
+        '/api/remotive': {
           target: 'https://remotive.com',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/remotive/, ''),
         },
-        '/api/arbeitnow': {  // Arbeitnow
+        '/api/arbeitnow': {
           target: 'https://www.arbeitnow.com',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/arbeitnow/, ''),
@@ -219,7 +240,7 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',        // Directorio de salida
       sourcemap: true        // Source maps para debugging
     },
-    base: env.VITE_BASE_PATH || '/',  // Base path dinámico
+    base: env.VITE_BASE_PATH || '/',  // Base path: por defecto '/' (Vercel/raíz)
   };
 });
 ```
@@ -228,13 +249,14 @@ export default defineConfig(({ mode }) => {
 
 | Sección | Explicación |
 |---|---|
-| `plugins: [react()]` | Plugin de React para Vite (HMR, JSX transform) |
+| `test` | Configuración de Vitest: usa jsdom como entorno DOM simulado, archivo de setup global |
+| `plugins: [react()]` | Plugin de React para Vite (HMR, JSX transform). No incluye Tailwind (se usa CSS Modules) |
 | `server.port: 5173` | Puerto del servidor de desarrollo |
-| `server.proxy` | **Proxy inverso**: en desarrollo, las rutas `/api/jcyl/*` se redirigen a `data.opendatasoft.com` sin que el navegador vea CORS. Esto permite que el frontend en `localhost:5173` llame a APIs externas como si fueran del mismo origen |
+| `server.proxy` | **Proxy inverso para desarrollo**: rutas `/api/*` se redirigen a APIs externas sin CORS. En producción Vercel hace lo mismo con `rewrites` |
 | `build.outDir: 'dist'` | Carpeta donde Vite genera el build de producción |
-| `base: env.VITE_BASE_PATH \|\| '/'` | Base path dinámico: en local es `/`, en GitHub Pages es `/Laboria-Frontend---backend_Damian/` |
+| `base: env.VITE_BASE_PATH \|\| '/'` | Base path: en local y Vercel es `/`; solo se usa `VITE_BASE_PATH` para GitHub Pages (ya no usado) |
 
-**Funcionamiento del proxy:**
+**Funcionamiento del proxy en desarrollo:**
 
 ```
 Navegador                    Vite Dev Server               API Externa
@@ -301,7 +323,9 @@ Navegador                    Vite Dev Server               API Externa
     "start": "node server.js",
     "dev": "nodemon server.js",
     "build": "npx prisma generate && npx prisma migrate deploy",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "seed": "node prisma/seed.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -310,13 +334,15 @@ Navegador                    Vite Dev Server               API Externa
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.1",
+    "express-validator": "^7.3.2",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.20.0",
     "resend": "^3.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14",
-    "prisma": "^6.19.3"
+    "prisma": "^6.19.3",
+    "vitest": "^4.1.6"
   }
 }
 ```
@@ -327,22 +353,26 @@ Navegador                    Vite Dev Server               API Externa
 |---|---|---|
 | `start` | `node server.js` | Inicia el servidor en producción |
 | `dev` | `nodemon server.js` | Inicia con hot-reload para desarrollo |
-| `build` | `npx prisma generate && npx prisma migrate deploy` | Genera Prisma Client y aplica migraciones pendientes |
-| `test` | `echo "Error..."` | Placeholder (sin tests implementados) |
+| `build` | `npx prisma generate && npx prisma migrate deploy` | Genera Prisma Client y aplica migraciones |
+| `seed` | `node prisma/seed.js` | Ejecuta el seed de datos (manual, no automático) |
+| `test` | `vitest run` | Ejecuta los tests una vez |
+| `test:watch` | `vitest` | Ejecuta tests en modo watch |
 
 **Dependencias clave:**
 
 | Paquete | Propósito |
 |---|---|
 | `express` | Framework HTTP |
+| `express-validator` | Validación de datos de entrada en rutas |
 | `@prisma/client` + `prisma` | ORM para PostgreSQL |
 | `pg` | Driver nativo de PostgreSQL para Prisma |
 | `bcryptjs` | Hash de contraseñas |
 | `jsonwebtoken` | JWT para autenticación |
 | `cors` | Middleware CORS |
-| `express-rate-limit` | Rate limiting |
+| `express-rate-limit` | Rate limiting en rutas de autenticación |
 | `dotenv` | Variables de entorno |
 | `resend` | Envío de emails |
+| `vitest` | Testing |
 | `nodemon` | Hot reload en desarrollo |
 
 ---
@@ -355,13 +385,14 @@ Navegador                    Vite Dev Server               API Externa
 ```json
 {
   "name": "laboria",
+  "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest run",
     "test:ui": "vitest --ui"
   },
   "dependencies": {
@@ -370,16 +401,14 @@ Navegador                    Vite Dev Server               API Externa
     "react-router-dom": "^6.22.3"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.1",
-    "vite": "^5.2.11",
-    "vitest": "^1.4.0",
-    "jsdom": "^24.0.0",
-    "@testing-library/react": "^14.2.1",
     "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.1",
     "@testing-library/user-event": "^14.5.2",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitest/ui": "^1.4.0"
+    "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/ui": "^1.4.0",
+    "jsdom": "^29.1.1",
+    "vite": "^5.2.11",
+    "vitest": "^1.4.0"
   }
 }
 ```
@@ -399,17 +428,19 @@ Navegador                    Vite Dev Server               API Externa
 | Paquete | Propósito |
 |---|---|
 | `react` + `react-dom` | UI library |
-| `react-router-dom` | Enrutamiento SPA |
+| `react-router-dom` | Enrutamiento SPA (HashRouter) |
 | `vite` + `@vitejs/plugin-react` | Bundler y dev server con soporte React |
 | `vitest` + `jsdom` | Testing con entorno DOM simulado |
 | `@testing-library/react` | Testing de componentes React |
+
+**Nota:** No se incluye Tailwind CSS. El proyecto usa **CSS Modules** para estilos encapsulados por componente. Tampoco se incluye `axios` — las peticiones HTTP se hacen con la **Fetch API** nativa del navegador a través de `services/api.js`.
 
 ---
 
 ## 9. `frontend/src/index.css`
 
 **Ubicación:** `frontend/src/index.css`  
-**Propósito:** Estilos globales y variables CSS del tema.
+**Propósito:** Estilos globales y variables CSS del tema. No incluye Tailwind — el proyecto usa CSS Modules para estilos encapsulados.
 
 **Variables CSS definidas:**
 
@@ -443,4 +474,11 @@ Navegador                    Vite Dev Server               API Externa
 | `--color-text-secondary` | `#cccccc` | Texto secundario |
 | `--color-bg-secondary` | `#1a1a1a` | Fondos de tarjetas y secciones |
 
-También define estilos base para `body`, enlaces, botones, inputs y layout responsive.
+También define estilos base para `body`, enlaces, botones, inputs y layout responsive. Los estilos específicos de cada componente residen en archivos `*.module.css` (28 archivos en total).
+
+### Arquitectura CSS
+
+- **`index.css`** — variables globales, reset básico, utilidades generales
+- **`*.module.css`** — estilos encapsulados por componente/página (28 archivos)
+- No se usa Tailwind CSS ni ningún framework CSS externo
+- Cada componente importa su propio módulo CSS: `import styles from './Componente.module.css'`

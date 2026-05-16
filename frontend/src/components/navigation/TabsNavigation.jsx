@@ -11,8 +11,6 @@ const TabsNavigation = () => {
     return null;
   }
 
-  const profile = user.profile || {};
-
   // Configuración de pestañas por rol
   const getCandidateTabs = () => [
     { id: 'jobs', label: 'Empleos', icon: '💼', link: '/empleos' },

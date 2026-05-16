@@ -166,6 +166,13 @@ const updateUserRole = async (req, res, next) => {
       throw error;
     }
 
+    const targetUser = await prisma.user.findUnique({ where: { id } });
+    if (!targetUser) {
+      const error = new Error('Usuario no encontrado');
+      error.statusCode = 404;
+      throw error;
+    }
+
     const user = await prisma.user.update({
       where: { id },
       data: { role },
@@ -200,6 +207,13 @@ const deleteUserAsAdmin = async (req, res, next) => {
     if (id === req.user.id) {
       const error = new Error('No puedes eliminar tu propia cuenta desde el panel de admin');
       error.statusCode = 403;
+      throw error;
+    }
+
+    const existing = await prisma.user.findUnique({ where: { id } });
+    if (!existing) {
+      const error = new Error('Usuario no encontrado');
+      error.statusCode = 404;
       throw error;
     }
 
@@ -340,7 +354,11 @@ const getAllJobs = async (req, res, next) => {
 const updateJobAsAdmin = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const jobData = req.body;
+    const allowedFields = ['title', 'company', 'location', 'salary', 'description', 'requirements', 'mode', 'category'];
+    const jobData = {};
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) jobData[field] = req.body[field];
+    }
 
     const job = await prisma.job.update({
       where: { id },
@@ -373,6 +391,13 @@ const updateJobAsAdmin = async (req, res, next) => {
 const deleteJobAsAdmin = async (req, res, next) => {
   try {
     const { id } = req.params;
+
+    const existing = await prisma.job.findUnique({ where: { id } });
+    if (!existing) {
+      const error = new Error('Empleo no encontrado');
+      error.statusCode = 404;
+      throw error;
+    }
 
     await prisma.job.delete({
       where: { id }
@@ -447,7 +472,11 @@ const getAllCourses = async (req, res, next) => {
 const updateCourseAsAdmin = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const courseData = req.body;
+    const allowedFields = ['title', 'provider', 'description', 'category', 'level', 'duration', 'price', 'url', 'image'];
+    const courseData = {};
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) courseData[field] = req.body[field];
+    }
 
     const course = await prisma.course.update({
       where: { id },
@@ -480,6 +509,13 @@ const updateCourseAsAdmin = async (req, res, next) => {
 const deleteCourseAsAdmin = async (req, res, next) => {
   try {
     const { id } = req.params;
+
+    const existing = await prisma.course.findUnique({ where: { id } });
+    if (!existing) {
+      const error = new Error('Curso no encontrado');
+      error.statusCode = 404;
+      throw error;
+    }
 
     await prisma.course.delete({
       where: { id }

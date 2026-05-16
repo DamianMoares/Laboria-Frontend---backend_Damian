@@ -93,9 +93,16 @@ const applicationController = {
     try {
       const { jobId } = req.params;
       
-      // Verificar que el empleo es del usuario actual
+      // Verificar que el empleo existe
       const job = await prisma.job.findUnique({ where: { id: jobId } });
-      if (!job || (job.authorId !== req.user.id && req.user.role !== 'ADMIN')) {
+      if (!job) {
+        const error = new Error('Empleo no encontrado');
+        error.statusCode = 404;
+        throw error;
+      }
+
+      // Verificar que el empleo es del usuario actual
+      if (job.authorId !== req.user.id && req.user.role !== 'ADMIN') {
         const error = new Error('No autorizado');
         error.statusCode = 403;
         throw error;
@@ -120,6 +127,13 @@ const applicationController = {
     try {
       const { id } = req.params;
       const { status } = req.body; // PENDING, ACCEPTED, REJECTED
+
+      const validStatuses = ['PENDING', 'ACCEPTED', 'REJECTED'];
+      if (!validStatuses.includes(status)) {
+        const error = new Error('Estado no válido');
+        error.statusCode = 400;
+        throw error;
+      }
       
       const application = await prisma.application.findUnique({
         where: { id },

@@ -20,11 +20,6 @@ const buildAuthUrl = (url, appId, apiKey) => {
  * @param {string} context - Contexto del error
  * @throws {Error} Error con mensaje descriptivo
  */
-const handleApiError = (error, context) => {
-  console.error(`Error en ${context}:`, error);
-  throw new Error(`Error al ${context}: ${error.message}`);
-};
-
 /**
  * Parsea un RSS feed y lo convierte a formato JSON
  * @param {string} rssText - Contenido del RSS feed
@@ -892,37 +887,6 @@ const normalizeCourseDetails = (course) => {
  * @param {string} mode - Modalidad ('presencial', 'online', 'ambos')
  * @returns {Array} Cursos filtrados
  */
-const filterCoursesByLocationAndMode = (courses, location, mode) => {
-  if (!location && (!mode || mode === 'ambos')) {
-    return courses;
-  }
-
-  return courses.filter(course => {
-    // Filtro por ubicación
-    let locationMatch = true;
-    if (location) {
-      const courseLocation = (course.location || '').toLowerCase();
-      const searchLocation = location.toLowerCase();
-      locationMatch = courseLocation.includes(searchLocation) || 
-                      courseLocation.includes('españa') || 
-                      courseLocation.includes('spain');
-    }
-
-    // Filtro por modalidad
-    let modeMatch = true;
-    if (mode && mode !== 'ambos') {
-      const courseMode = (course.mode || '').toLowerCase();
-      if (mode === 'online') {
-        modeMatch = courseMode === 'online' || courseMode === 'remoto' || courseMode === 'virtual';
-      } else if (mode === 'presencial') {
-        modeMatch = courseMode === 'presencial' || courseMode === 'in-person' || courseMode === 'offline';
-      }
-    }
-
-    return locationMatch && modeMatch;
-  });
-};
-
 /**
  * Busca cursos en múltiples APIs externas y RSS feeds
  * @param {Object} filters - Filtros de búsqueda

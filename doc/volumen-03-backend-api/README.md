@@ -8,15 +8,17 @@
 4. [Middleware de autorización](#4-middleware-de-autorización)
 5. [Manejo de errores](#5-manejo-de-errores)
 6. [Rate limiting](#6-rate-limiting)
-7. [Utilidades JWT](#7-utilidades-jwt)
-8. [Controlador de usuarios](#8-controlador-de-usuarios)
-9. [Controlador de empleos](#9-controlador-de-empleos)
-10. [Controlador de cursos](#10-controlador-de-cursos)
-11. [Controlador de aplicaciones](#11-controlador-de-aplicaciones)
-12. [Controlador de administración](#12-controlador-de-administración)
-13. [Servicio de email](#13-servicio-de-email)
-14. [Rutas](#14-rutas)
-15. [Diagrama de flujo de una petición](#15-diagrama-de-flujo-de-una-petición)
+7. [Validación de entrada](#7-validación-de-entrada)
+8. [Utilidades JWT](#8-utilidades-jwt)
+9. [Controlador de usuarios](#9-controlador-de-usuarios)
+10. [Controlador de empleos](#10-controlador-de-empleos)
+11. [Controlador de cursos](#11-controlador-de-cursos)
+12. [Controlador de aplicaciones](#12-controlador-de-aplicaciones)
+13. [Controlador de administración](#13-controlador-de-administración)
+14. [Servicio de email](#14-servicio-de-email)
+15. [Rutas](#15-rutas)
+16. [Tests](#16-tests)
+17. [Diagrama de flujo de una petición](#17-diagrama-de-flujo-de-una-petición)
 
 ---
 
@@ -33,22 +35,31 @@ const dotenv = require('dotenv');
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 const errorHandler = require('./src/middleware/errorHandler');
+const prisma = require('./src/config/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// CORS dinámico
-const allowedOrigins = process.env.CORS_ORIGINS
+// CORS dinámico con soporte para patrones wildcard
+const corsOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',')
   : ['http://localhost:5173', 'http://localhost:4173'];
+const corsPatterns = corsOrigins.map(o => {
+  if (o.startsWith('*.')) return new RegExp('^https?://[a-zA-Z0-9.-]+' + o.slice(1).replace('.', '\\.') + '$');
+  return o;
+});
 app.use(cors({
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const match = corsPatterns.some(p => typeof p === 'string' ? p === origin : p.test(origin));
+    callback(null, match);
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true
 }));
 
-app.use(express.json()); // Parsear JSON en el body
+app.use(express.json()); // Parsear JSON
 
 // Rutas
 app.use('/api/users', require('./src/routes/userRoutes'));
@@ -69,22 +80,29 @@ const server = app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
 
-// Graceful shutdown
-process.on('SIGTERM', () => server.close(() => process.exit(0)));
-process.on('SIGINT', () => server.close(() => process.exit(0)));
+// Graceful shutdown con desconexión de Prisma
+const gracefulShutdown = async (signal) => {
+  console.log(`🛑 ${signal} recibido - cerrando servidor...`);
+  server.close(async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+  });
+};
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 ```
 
 **Cada elemento explicado:**
 
-| Elemento | Línea(s) | Explicación |
-|---|---|---|
-| `dotenv.config()` | 7 | Carga las variables de `backend/.env` en `process.env` |
-| `allowedOrigins` | 16-18 | Lista de orígenes permitidos por CORS. Se configura via variable de entorno `CORS_ORIGINS` (separada por comas). En desarrollo: `localhost:5173, localhost:4173` |
-| `cors()` | 19-25 | Middleware CORS. Permite peticiones desde el frontend (GitHub Pages o localhost). `credentials: true` permite enviar cookies/headers de autenticación |
-| `express.json()` | 27 | Middleware que parsea el body de las peticiones con `Content-Type: application/json`. **Sin esto, `req.body` es `undefined`** |
-| `app.use('/api/...', rutas)` | 30-34 | Monta los routers en sus respectivas rutas base |
-| `app.use(errorHandler)` | 37 | Middleware de manejo de errores. **Debe ir al final** después de todas las rutas |
-| `SIGTERM` / `SIGINT` | 44-45 | Graceful shutdown: cierra el servidor limpiamente cuando recibe señal de terminación |
+| Elemento | Explicación |
+|---|---|
+| `dotenv.config()` | Carga las variables de `backend/.env` en `process.env` |
+| `corsOrigins` | Lista de orígenes permitidos. Soporta patrones `*.vercel.app` (regex). En producción: `CORS_ORIGINS=https://laboria-frontend-backend-damian.vercel.app,*.vercel.app` |
+| `cors()` | Middleware CORS con función de verificación dinámica que acepta strings exactos o patrones regex |
+| `express.json()` | Middleware que parsea el body de las peticiones con `Content-Type: application/json` |
+| `app.use('/api/...', rutas)` | Monta los routers en sus respectivas rutas base |
+| `app.use(errorHandler)` | Middleware de manejo de errores. **Debe ir al final** después de todas las rutas |
+| `gracefulShutdown()` | Cierra el servidor y desconecta Prisma al recibir SIGTERM/SIGINT |
 
 ---
 
@@ -102,13 +120,11 @@ const prisma = new PrismaClient();
 module.exports = prisma;
 ```
 
-**Explicación:**
-
 | Elemento | Explicación |
 |---|---|
-| `dotenv.config()` | Carga el `.env` desde la raíz del backend (otra vez) para asegurar que `DATABASE_URL` está disponible antes de crear el cliente Prisma |
-| `PrismaClient` | Cliente ORM que se conecta a PostgreSQL usando `DATABASE_URL`. Proporciona métodos tipados como `prisma.user.findMany()`, `prisma.job.create()`, etc. |
-| Singleton | Se exporta una única instancia. Todos los controllers importan esta misma instancia para evitar múltiples conexiones a la BD |
+| `dotenv.config()` | Carga el `.env` desde la raíz del backend para asegurar que `DATABASE_URL` está disponible |
+| `PrismaClient` | Cliente ORM que se conecta a PostgreSQL. Proporciona métodos tipados como `prisma.user.findMany()` |
+| Singleton | Se exporta una única instancia. Todos los controllers importan esta misma instancia |
 
 ---
 
@@ -193,6 +209,8 @@ Request con header: Authorization: Bearer <token>
 
 **Archivo:** `backend/src/middleware/ownerMiddleware.js`
 
+Verifica que el usuario autenticado sea el propietario del recurso (por ID en params) o un administrador.
+
 ```javascript
 const ownerMiddleware = (req, res, next) => {
   try {
@@ -209,13 +227,13 @@ const ownerMiddleware = (req, res, next) => {
 };
 ```
 
-**Propósito:** Verifica que el usuario autenticado sea el propietario del recurso (por ID en params) o un administrador.
-
 **Uso:** Rutas como `GET /api/users/:id`, `PUT /api/users/:id`
 
 ### adminMiddleware
 
 **Archivo:** `backend/src/middleware/adminMiddleware.js`
+
+Verifica que el usuario tenga rol `ADMIN`.
 
 ```javascript
 const adminMiddleware = (req, res, next) => {
@@ -231,8 +249,6 @@ const adminMiddleware = (req, res, next) => {
   }
 };
 ```
-
-**Propósito:** Verifica que el usuario tenga rol `ADMIN`.
 
 **Uso:** Todas las rutas de administración (`/api/admin/*`)
 
@@ -255,8 +271,6 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 ```
-
-**Propósito:** Middleware centralizado de manejo de errores. Captura cualquier error lanzado con `next(error)` en los controladores.
 
 **Comportamiento:**
 
@@ -292,8 +306,6 @@ const generalLimiter = rateLimit({
 });
 ```
 
-**Limitadores disponibles:**
-
 | Limitador | Límite | Ventana | Uso |
 |---|---|---|---|
 | `authLimiter` | 30 requests | 15 minutos | Login y registro |
@@ -301,7 +313,48 @@ const generalLimiter = rateLimit({
 
 ---
 
-## 7. Utilidades JWT
+## 7. Validación de entrada
+
+**Archivo:** `backend/src/middleware/validate.js`
+
+Utiliza `express-validator` para validar los datos de entrada antes de que lleguen a los controladores.
+
+```javascript
+const { body, validationResult } = require('express-validator');
+
+const handleErrors = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error(errors.array().map(e => e.msg).join('. '));
+    error.statusCode = 400;
+    return next(error);
+  }
+  next();
+};
+```
+
+### Conjuntos de reglas (7 totales)
+
+| Regla | Método | Validaciones |
+|---|---|---|
+| `registerRules` | POST | email (formato), password (≥6 chars), name (requerido) |
+| `loginRules` | POST | email (formato), password (requerido) |
+| `updateProfileRules` | PUT | name (opcional, no vacío), email (opcional, formato) |
+| `createJobRules` | POST | title/company/description (requerido), mode (enum: REMOTE/HYBRID/ONSITE) |
+| `updateJobRules` | PUT | Mismos campos que create pero opcionales |
+| `createCourseRules` | POST | title/provider/description (requerido), level (enum), url/image (URL válida) |
+| `updateCourseRules` | PUT | Mismos campos que create pero opcionales |
+
+**Integración en rutas:**
+
+```javascript
+router.post('/register', authLimiter, registerRules, userController.register);
+router.put('/:id', authMiddleware, ownerMiddleware, updateProfileRules, userController.updateProfile);
+```
+
+---
+
+## 8. Utilidades JWT
 
 **Archivo:** `backend/src/utils/jwt.js`
 
@@ -325,8 +378,6 @@ const verifyToken = (token) => {
 };
 ```
 
-**Funciones:**
-
 | Función | Parámetros | Retorno | Descripción |
 |---|---|---|---|
 | `generateToken(userId)` | ID del usuario | String (JWT) | Crea un token firmado con `userId` en el payload |
@@ -347,7 +398,7 @@ HMACSHA256(base64UrlEncode(header) + "." + base64UrlEncode(payload), JWT_SECRET)
 
 ---
 
-## 8. Controlador de usuarios
+## 9. Controlador de usuarios
 
 **Archivo:** `backend/src/controllers/userController.js`
 
@@ -358,14 +409,10 @@ POST /api/users/register
 Body: { email, password, name, role? }
 ```
 
-**Validaciones:**
-- Campos requeridos: `email`, `password`, `name`
-- Email: formato válido (`/^[^\s@]+@[^\s@]+\.[^\s@]+$/`)
-- Password: mínimo 6 caracteres
-- Email único en BD (error 409 si ya existe)
+**Validaciones:** email formato válido, password ≥6 chars, email único en BD (error 409 si ya existe).
 
 **Proceso:**
-1. Validar campos
+1. Validar campos (express-validator)
 2. Verificar email único
 3. Hash de password con bcrypt (10 rondas)
 4. Crear usuario en BD con `prisma.user.create()`
@@ -394,20 +441,17 @@ GET /api/users/:id
 Auth: Bearer + ownerMiddleware
 ```
 
-**Proceso:**
-1. Buscar usuario por ID
-2. Si no existe → 404
-3. Responder con datos del usuario
-
 ### updateProfile(req, res, next)
 
 ```
 PUT /api/users/:id
 Auth: Bearer + ownerMiddleware
-Body: { name, email }
+Body: { name?, email? }
 ```
 
-**Nota:** Solo actualiza `name` y `email`. Los datos extendidos del perfil se manejan en localStorage del frontend.
+**Validaciones adicionales:**
+- Si se cambia el email, verifica que no esté en uso por otro usuario (error 409)
+- Solo actualiza `name` y `email` en BD
 
 ### deleteAccount(req, res, next)
 
@@ -416,11 +460,11 @@ DELETE /api/users/:id
 Auth: Bearer + ownerMiddleware (o adminMiddleware)
 ```
 
-Elimina al usuario de la base de datos. El frontend también limpia localStorage.
+Elimina al usuario de la base de datos.
 
 ---
 
-## 9. Controlador de empleos
+## 10. Controlador de empleos
 
 **Archivo:** `backend/src/controllers/jobController.js`
 
@@ -430,8 +474,6 @@ Elimina al usuario de la base de datos. El frontend también limpia localStorage
 GET /api/jobs
 Query: ?category=&location=&mode=&search=
 ```
-
-**Filtros disponibles:**
 
 | Query | Operación | Ejemplo |
 |---|---|---|
@@ -448,9 +490,7 @@ Auth: Bearer (solo COMPANY_* o ADMIN)
 Body: { title, company, location, salary?, description, requirements?, mode?, category }
 ```
 
-**Validaciones:**
-- Campos requeridos: `title`, `company`, `description`
-- Solo empresas o admin pueden crear
+**Validaciones:** title/company/description requeridos, mode debe ser REMOTE, HYBRID u ONSITE.
 
 ### update(req, res, next) / delete(req, res, next)
 
@@ -458,11 +498,9 @@ Requieren ser el autor del empleo o ADMIN.
 
 ---
 
-## 10. Controlador de cursos
+## 11. Controlador de cursos
 
 **Archivo:** `backend/src/controllers/courseController.js`
-
-Estructura idéntica al controlador de empleos, pero para cursos.
 
 ### list(req, res, next)
 
@@ -471,9 +509,19 @@ GET /api/courses
 Query: ?category=&level=&search=
 ```
 
+### create(req, res, next)
+
+```
+POST /api/courses
+Auth: Bearer (solo COMPANY_* o ADMIN)
+Body: { title, provider, description, category?, level?, duration?, price?, url?, image? }
+```
+
+**Validaciones:** title/provider/description requeridos, level enum, url/image formato URL.
+
 ---
 
-## 11. Controlador de aplicaciones
+## 12. Controlador de aplicaciones
 
 **Archivo:** `backend/src/controllers/applicationController.js`
 
@@ -486,9 +534,9 @@ Body: { jobId, message? }
 ```
 
 **Validaciones:**
-- El empleo debe existir (incluye verificar autor para notificación)
+- El empleo debe existir
 - El usuario debe ser CANDIDATE
-- No puede aplicar dos veces al mismo empleo (unique compuesto)
+- No puede aplicar dos veces al mismo empleo (unique compuesto → error 409)
 
 ### myApplications(req, res, next)
 
@@ -497,16 +545,12 @@ GET /api/applications/my
 Auth: Bearer (solo CANDIDATE)
 ```
 
-Retorna todas las aplicaciones del usuario autenticado, con datos del empleo.
-
 ### jobApplications(req, res, next)
 
 ```
 GET /api/applications/job/:jobId
 Auth: Bearer (solo autor del empleo o ADMIN)
 ```
-
-Retorna todas las aplicaciones recibidas para un empleo.
 
 ### updateStatus(req, res, next)
 
@@ -515,6 +559,8 @@ PUT /api/applications/:id/status
 Auth: Bearer (solo autor del empleo o ADMIN)
 Body: { status: "ACCEPTED" | "REJECTED" }
 ```
+
+**Validación de estado:** Solo acepta `PENDING`, `ACCEPTED` o `REJECTED` (error 400 si no coincide).
 
 ### cancel(req, res, next)
 
@@ -525,11 +571,11 @@ Auth: Bearer (solo el candidato que aplicó)
 
 ---
 
-## 12. Controlador de administración
+## 13. Controlador de administración
 
 **Archivo:** `backend/src/controllers/adminController.js`
 
-Todas las rutas requieren `authMiddleware` + `adminMiddleware`.
+Todas las rutas requieren `authMiddleware` + `adminMiddleware`. Incluye whitelist de campos permitidos para evitar actualizaciones maliciosas.
 
 ### Funciones disponibles:
 
@@ -543,15 +589,15 @@ Todas las rutas requieren `authMiddleware` + `adminMiddleware`.
 | `getAllJobs` | GET `/api/admin/jobs?category=&search=&page=&limit=` | Empleos con autor y conteo de aplicaciones |
 | `getAllCourses` | GET `/api/admin/courses?category=&level=&search=&page=&limit=` | Cursos con autor |
 | `getAllApplications` | GET `/api/admin/applications?status=&page=&limit=` | Aplicaciones con usuario y empleo |
-| `updateJobAsAdmin` | PUT `/api/admin/jobs/:id` | Actualizar cualquier empleo |
+| `updateJobAsAdmin` | PUT `/api/admin/jobs/:id` | Actualizar cualquier empleo (whitelist de campos) |
 | `deleteJobAsAdmin` | DELETE `/api/admin/jobs/:id` | Eliminar cualquier empleo |
-| `updateCourseAsAdmin` | PUT `/api/admin/courses/:id` | Actualizar cualquier curso |
+| `updateCourseAsAdmin` | PUT `/api/admin/courses/:id` | Actualizar cualquier curso (whitelist de campos) |
 | `deleteCourseAsAdmin` | DELETE `/api/admin/courses/:id` | Eliminar cualquier curso |
 | `updateApplicationStatusAsAdmin` | PUT `/api/admin/applications/:id/status` | Cambiar estado de cualquier aplicación |
 
 ---
 
-## 13. Servicio de email
+## 14. Servicio de email
 
 **Archivo:** `backend/src/services/emailService.js`
 
@@ -576,32 +622,39 @@ if (Resend && process.env.RESEND_API_KEY) {
 | `sendWelcome(to, name)` | Al registrarse un usuario | El nuevo usuario |
 | `sendApplicationReceived(to, jobTitle, applicantName)` | Cuando un candidato aplica a un empleo | La empresa que publicó el empleo |
 
-**Comportamiento:**
-
 | Situación | Acción |
 |---|---|
-| `RESEND_API_KEY` no configurada | Log "Email service no configurado" y continúa |
-| Error al enviar | Log del error y continúa (no bloquea la operación principal) |
+| `RESEND_API_KEY` no configurada | Log y continúa (no bloquea) |
+| Error al enviar | Log del error y continúa |
 | Éxito | Email enviado |
 
 ---
 
-## 14. Rutas
+## 15. Rutas
 
 **Archivo:** `backend/src/routes/`
-
-Cada archivo de rutas define los endpoints y su cadena de middlewares.
 
 ### userRoutes.js
 
 ```javascript
-router.post('/register', authLimiter, userController.register);
-router.post('/login', authLimiter, userController.login);
+// Públicas
+router.post('/register', authLimiter, registerRules, userController.register);
+router.post('/login', authLimiter, loginRules, userController.login);
+
+// Protegidas (propias)
 router.get('/profile/me', authMiddleware, (req, res) => res.json(req.user));
-router.put('/profile/me', authMiddleware, userController.updateProfile);
-router.delete('/account', authMiddleware, userController.deleteAccount);
+router.put('/profile/me', authMiddleware, updateProfileRules, (req, res, next) => {
+  req.params.id = req.user.id;
+  userController.updateProfile(req, res, next);
+});
+router.delete('/account', authMiddleware, (req, res, next) => {
+  req.params.id = req.user.id;
+  userController.deleteAccount(req, res, next);
+});
+
+// Por ID (ownerMiddleware)
 router.get('/:id', authMiddleware, ownerMiddleware, userController.getProfile);
-router.put('/:id', authMiddleware, ownerMiddleware, userController.updateProfile);
+router.put('/:id', authMiddleware, ownerMiddleware, updateProfileRules, userController.updateProfile);
 router.delete('/:id', authMiddleware, adminMiddleware, userController.deleteAccount);
 ```
 
@@ -610,12 +663,12 @@ router.delete('/:id', authMiddleware, adminMiddleware, userController.deleteAcco
 ```javascript
 router.get('/', jobController.list);          // público
 router.get('/:id', jobController.detail);     // público
-router.post('/', authMiddleware, jobController.create);
-router.put('/:id', authMiddleware, jobController.update);
+router.post('/', authMiddleware, createJobRules, jobController.create);
+router.put('/:id', authMiddleware, updateJobRules, jobController.update);
 router.delete('/:id', authMiddleware, jobController.delete);
 ```
 
-### courseRoutes.js — idéntico a jobRoutes
+### courseRoutes.js — idéntico a jobRoutes pero con createCourseRules/updateCourseRules
 
 ### applicationRoutes.js
 
@@ -631,7 +684,28 @@ router.delete('/:id', authMiddleware, applicationController.cancel);
 
 ---
 
-## 15. Diagrama de flujo de una petición
+## 16. Tests
+
+**Total:** 18 tests en 4 archivos.
+
+| Archivo | Tests | Descripción |
+|---|---|---|
+| `backend/src/__tests__/userController.test.js` | — | Tests de registro, login, perfil |
+| `backend/src/__tests__/jobController.test.js` | — | Tests de CRUD de empleos |
+| `backend/src/__tests__/courseController.test.js` | — | Tests de CRUD de cursos |
+| `backend/src/__tests__/authMiddleware.test.js` | — | Tests de autenticación JWT |
+
+**Ejecución:**
+
+```bash
+cd backend
+npx vitest run     # Una vez
+npx vitest         # Modo watch
+```
+
+---
+
+## 17. Diagrama de flujo de una petición
 
 ```
 CLIENTE (Frontend / Postman)
@@ -656,9 +730,12 @@ CLIENTE (Frontend / Postman)
 │        └─ ¿Dentro del límite?   │
 │           ├─ No → 429           │
 │           └─ Sí → Continuar     │
+│     └─ loginRules (validator)   │
+│        └─ ¿Campos válidos?      │
+│           ├─ No → 400           │
+│           └─ Sí → Continuar     │
 │                                 │
 │  4. userController.login()      │
-│     └─ Validar campos           │
 │     └─ Buscar usuario en BD     │
 │     └─ Comparar password        │
 │     └─ Generar JWT              │
