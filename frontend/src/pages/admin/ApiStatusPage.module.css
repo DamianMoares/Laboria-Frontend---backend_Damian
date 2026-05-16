@@ -1,4 +1,18 @@
 /* ApiStatusPage Styles */
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-bg-primary);
+}
+
+.admin-content {
+  flex: 1;
+  margin-left: 260px;
+  min-height: 100vh;
+  background: var(--color-bg-primary);
+}
+
 .api-status-page {
   min-height: 100vh;
   padding: var(--spacing-xl) 0;
@@ -6,6 +20,12 @@
 
 .api-status-page.admin-page {
   padding: 0;
+}
+
+@media (max-width: 768px) {
+  .admin-content {
+    margin-left: 0;
+  }
 }
 
 .status-header {

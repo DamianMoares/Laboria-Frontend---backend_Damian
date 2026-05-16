@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './FAQPage.css';
+import styles from './FAQPage.module.css';
 
 const FAQPage = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -52,37 +52,37 @@ const FAQPage = () => {
   };
 
   return (
-    <div className="faq-page">
+    <div className={styles['faq-page']}>
       <div className="container">
-        <header className="faq-header">
+        <header className={styles['faq-header']}>
           <h1>Preguntas Frecuentes</h1>
-          <p className="faq-subtitle">
+          <p className={styles['faq-subtitle']}>
             Encuentra respuestas a las dudas más comunes sobre Laboria 
           </p>
         </header>
 
-        <div className="faq-list">
+        <div className={styles['faq-list']}>
           {faqs.map((faq, index) => (
             <div 
               key={index} 
-              className={`faq-item ${openIndex === index ? 'open' : ''}`}
+              className={styles['faq-item'] + ' ' + (openIndex === index ? styles['open'] : '')}
             >
               <button 
-                className="faq-question"
+                className={styles['faq-question']}
                 onClick={() => toggleFAQ(index)}
                 aria-expanded={openIndex === index}
               >
-                <span className="question-text">{faq.question}</span>
-                <span className="faq-icon">{openIndex === index ? '−' : '+'}</span>
+                <span className={styles['question-text']}>{faq.question}</span>
+                <span className={styles['faq-icon']}>{openIndex === index ? '−' : '+'}</span>
               </button>
-              <div className={`faq-answer ${openIndex === index ? 'open' : ''}`}>
+              <div className={styles['faq-answer'] + ' ' + (openIndex === index ? styles['open'] : '')}>
                 <p>{faq.answer}</p>
               </div>
             </div>
           ))}
         </div>
 
-        <section className="faq-contact">
+        <section className={styles['faq-contact']}>
           <h2>¿No encuentras tu respuesta?</h2>
           <p>
             Si tienes alguna otra pregunta, no dudes en contactarnos.

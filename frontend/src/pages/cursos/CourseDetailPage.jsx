@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import coursesData from '../../data/courses.json';
-import './CourseDetailPage.css';
+import styles from './CourseDetailPage.module.css';
 
 const CourseDetailPage = () => {
   const { id } = useParams();
@@ -27,7 +27,7 @@ const CourseDetailPage = () => {
 
   if (!course) {
     return (
-      <div className="detail-page not-found">
+      <div className={styles['detail-page'] + ' ' + styles['not-found']}>
         <div className="container">
           <h1>Curso no encontrado</h1>
           <p>El curso que buscas no existe.</p>
@@ -75,99 +75,99 @@ const CourseDetailPage = () => {
   };
 
   return (
-    <div className="detail-page course-detail-page">
+    <div className={styles['detail-page'] + ' ' + styles['course-detail-page']}>
       <div className="container">
-        <Link to="/cursos" className="back-link">
+        <Link to="/cursos" className={styles['back-link']}>
           ← Volver a cursos
         </Link>
 
-        <div className="detail-header">
-          <h1 className="detail-title">{course.title}</h1>
-          <div className="detail-meta">
-            <span className="meta-item platform">{course.platform}</span>
-            <span className="meta-item instructor">Instructor: {course.instructor}</span>
+        <div className={styles['detail-header']}>
+          <h1 className={styles['detail-title']}>{course.title}</h1>
+          <div className={styles['detail-meta']}>
+            <span className={styles['meta-item'] + ' ' + styles['platform']}>{course.platform}</span>
+            <span className={styles['meta-item'] + ' ' + styles['instructor']}>Instructor: {course.instructor}</span>
           </div>
         </div>
 
-        <div className="detail-content">
-          <div className="detail-main">
-            <section className="detail-section">
+        <div className={styles['detail-content']}>
+          <div className={styles['detail-main']}>
+            <section className={styles['detail-section']}>
               <h2>Descripción</h2>
-              <p className="description-text">{course.description}</p>
+              <p className={styles['description-text']}>{course.description}</p>
             </section>
 
-            <section className="detail-section">
+            <section className={styles['detail-section']}>
               <h2>Competencias adquiridas</h2>
-              <ul className="skills-list">
+              <ul className={styles['skills-list']}>
                 {course.skills.map((skill, index) => (
-                  <li key={index} className="skill-item">{skill}</li>
+                  <li key={index} className={styles['skill-item']}>{skill}</li>
                 ))}
               </ul>
             </section>
 
-            <section className="detail-section">
+            <section className={styles['detail-section']}>
               <h2>Requisitos previos</h2>
-              <ul className="requirements-list">
+              <ul className={styles['requirements-list']}>
                 {course.requirements.map((req, index) => (
-                  <li key={index} className="requirement-item">{req}</li>
+                  <li key={index} className={styles['requirement-item']}>{req}</li>
                 ))}
               </ul>
             </section>
 
-            <section className="detail-section">
+            <section className={styles['detail-section']}>
               <h2>Estadísticas</h2>
-              <div className="stats-grid">
-                <div className="stat-card">
-                  <span className="stat-value">⭐ {course.rating}</span>
-                  <span className="stat-label">Rating</span>
+              <div className={styles['stats-grid']}>
+                <div className={styles['stat-card']}>
+                  <span className={styles['stat-value']}>⭐ {course.rating}</span>
+                  <span className={styles['stat-label']}>Rating</span>
                 </div>
-                <div className="stat-card">
-                  <span className="stat-value">{course.students.toLocaleString()}</span>
-                  <span className="stat-label">Estudiantes</span>
+                <div className={styles['stat-card']}>
+                  <span className={styles['stat-value']}>{course.students.toLocaleString()}</span>
+                  <span className={styles['stat-label']}>Estudiantes</span>
                 </div>
               </div>
             </section>
           </div>
 
-          <aside className="detail-sidebar">
-            <div className="sidebar-card">
+          <aside className={styles['detail-sidebar']}>
+            <div className={styles['sidebar-card']}>
               <h3>Información del curso</h3>
               
-              <div className="info-row">
-                <span className="info-label">Nivel:</span>
-                <span className="info-value">{course.level}</span>
+              <div className={styles['info-row']}>
+                <span className={styles['info-label']}>Nivel:</span>
+                <span className={styles['info-value']}>{course.level}</span>
               </div>
               
-              <div className="info-row">
-                <span className="info-label">Duración:</span>
-                <span className="info-value">{course.duration}</span>
+              <div className={styles['info-row']}>
+                <span className={styles['info-label']}>Duración:</span>
+                <span className={styles['info-value']}>{course.duration}</span>
               </div>
               
-              <div className="info-row">
-                <span className="info-label">Formato:</span>
-                <span className="info-value">{course.format}</span>
+              <div className={styles['info-row']}>
+                <span className={styles['info-label']}>Formato:</span>
+                <span className={styles['info-value']}>{course.format}</span>
               </div>
               
-              <div className="info-row">
-                <span className="info-label">Precio:</span>
-                <span className="info-value price">{course.price}</span>
+              <div className={styles['info-row']}>
+                <span className={styles['info-label']}>Precio:</span>
+                <span className={styles['info-value'] + ' ' + styles['price']}>{course.price}</span>
               </div>
               
-              <div className="info-row">
-                <span className="info-label">Tecnología:</span>
-                <span className="info-value technology">{course.technology}</span>
+              <div className={styles['info-row']}>
+                <span className={styles['info-label']}>Tecnología:</span>
+                <span className={styles['info-value'] + ' ' + styles['technology']}>{course.technology}</span>
               </div>
 
-              <div className="info-row">
-                <span className="info-label">Certificación:</span>
-                <span className="info-value">
+              <div className={styles['info-row']}>
+                <span className={styles['info-label']}>Certificación:</span>
+                <span className={styles['info-value']}>
                   {course.certification ? '✓ Incluida' : '✗ No incluida'}
                 </span>
               </div>
 
               {isCandidate() && (
                 <button 
-                  className={`btn-save-sidebar ${isSaved ? 'saved' : ''}`}
+                  className={styles['btn-save-sidebar'] + (isSaved ? ' ' + styles['saved'] : '')}
                   onClick={handleSave}
                 >
                   {isSaved ? '★ Guardado' : '☆ Guardar Curso'}
@@ -177,7 +177,7 @@ const CourseDetailPage = () => {
                 href={course.externalLink} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="btn-enroll-sidebar"
+                className={styles['btn-enroll-sidebar']}
               >
                 Ver curso en {course.platform}
               </a>

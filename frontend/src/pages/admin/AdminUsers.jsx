@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
 import AdminNavigation from './AdminNavigation';
-import './AdminUsers.css';
+import styles from './AdminUsers.module.css';
 
 const AdminUsers = ({ onAdminLogout }) => {
   const [users, setUsers] = useState([]);
@@ -113,18 +113,18 @@ const AdminUsers = ({ onAdminLogout }) => {
   };
 
   return (
-    <div className="admin-layout">
+    <div className={styles['admin-layout']}>
       <AdminNavigation onLogout={onAdminLogout} />
-      <div className="admin-content">
-    <div className="admin-users">
+      <div className={styles['admin-content']}>
+    <div className={styles['admin-users']}>
       {/* Header */}
-      <div className="admin-header">
-        <div className="header-content">
+      <div className={styles['admin-header']}>
+        <div className={styles['header-content']}>
           <div>
             <h1>👥 Gestión de Usuarios</h1>
-            <p className="subtitle">Administra los usuarios del sistema</p>
+            <p className={styles['subtitle']}>Administra los usuarios del sistema</p>
           </div>
-          <Link to="/admin" className="btn-back">
+          <Link to="/admin" className={styles['btn-back']}>
             ← Volver al Dashboard
           </Link>
         </div>
@@ -132,55 +132,55 @@ const AdminUsers = ({ onAdminLogout }) => {
 
       {/* Message */}
       {message && (
-        <div className={`message ${message.type}`}>
+        <div className={styles['message'] + ' ' + styles[message.type]}>
           {message.text}
         </div>
       )}
 
       {/* Filters */}
-      <div className="filters-section">
-        <div className="filter-group">
+      <div className={styles['filters-section']}>
+        <div className={styles['filter-group']}>
           <label>Buscar:</label>
           <input
             type="text"
             placeholder="Nombre o email..."
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            className="filter-input"
+            className={styles['filter-input']}
           />
         </div>
-        <div className="filter-group">
+        <div className={styles['filter-group']}>
           <label>Rol:</label>
           <select
             value={filters.role}
             onChange={(e) => setFilters({ ...filters, role: e.target.value })}
-            className="filter-select"
+            className={styles['filter-select']}
           >
             {roles.map(role => (
               <option key={role.value} value={role.value}>{role.label}</option>
             ))}
           </select>
         </div>
-        <button onClick={loadUsers} className="btn-refresh">
+        <button onClick={loadUsers} className={styles['btn-refresh']}>
           🔄 Actualizar
         </button>
       </div>
 
       {/* Users Table */}
       {loading ? (
-        <div className="admin-loading">
-          <div className="spinner"></div>
+        <div className={styles['admin-loading']}>
+          <div className={styles['spinner']}></div>
           <p>Cargando usuarios...</p>
         </div>
       ) : error ? (
-        <div className="admin-error">
+        <div className={styles['admin-error']}>
           <p>{error}</p>
-          <button onClick={loadUsers} className="btn-retry">Reintentar</button>
+          <button onClick={loadUsers} className={styles['btn-retry']}>Reintentar</button>
         </div>
       ) : (
         <>
-          <div className="users-table-container">
-            <table className="users-table">
+          <div className={styles['users-table-container']}>
+            <table className={styles['users-table']}>
               <thead>
                 <tr>
                   <th>Usuario</th>
@@ -195,9 +195,9 @@ const AdminUsers = ({ onAdminLogout }) => {
                 {users.map(user => (
                   <tr key={user.id}>
                     <td>
-                      <div className="user-info">
-                        <div className="user-avatar">{user.name.charAt(0).toUpperCase()}</div>
-                        <span className="user-name">{user.name}</span>
+                      <div className={styles['user-info']}>
+                        <div className={styles['user-avatar']}>{user.name.charAt(0).toUpperCase()}</div>
+                        <span className={styles['user-name']}>{user.name}</span>
                       </div>
                     </td>
                     <td>{user.email}</td>
@@ -206,7 +206,7 @@ const AdminUsers = ({ onAdminLogout }) => {
                         value={user.role}
                         onChange={(e) => handleRoleChange(user.id, e.target.value)}
                         disabled={updateLoading}
-                        className="role-select"
+                        className={styles['role-select']}
                       >
                         {roles.filter(r => r.value).map(role => (
                           <option key={role.value} value={role.value}>{role.label}</option>
@@ -215,30 +215,30 @@ const AdminUsers = ({ onAdminLogout }) => {
                     </td>
                     <td>{formatDate(user.createdAt)}</td>
                     <td>
-                      <div className="activity-badges">
-                        <span className="badge" title="Empleos publicados">
+                      <div className={styles['activity-badges']}>
+                        <span className={styles['badge']} title="Empleos publicados">
                           💼 {user._count?.jobs || 0}
                         </span>
-                        <span className="badge" title="Cursos publicados">
+                        <span className={styles['badge']} title="Cursos publicados">
                           📚 {user._count?.courses || 0}
                         </span>
-                        <span className="badge" title="Aplicaciones enviadas">
+                        <span className={styles['badge']} title="Aplicaciones enviadas">
                           📝 {user._count?.applications || 0}
                         </span>
                       </div>
                     </td>
                     <td>
-                      <div className="action-buttons">
+                      <div className={styles['action-buttons']}>
                         <button
                           onClick={() => openUserDetail(user)}
-                          className="btn-view"
+                          className={styles['btn-view']}
                           title="Ver detalles"
                         >
                           👁️
                         </button>
                         <button
                           onClick={() => confirmDelete(user)}
-                          className="btn-delete"
+                          className={styles['btn-delete']}
                           title="Eliminar usuario"
                         >
                           🗑️
@@ -252,22 +252,22 @@ const AdminUsers = ({ onAdminLogout }) => {
           </div>
 
           {/* Pagination */}
-          <div className="pagination">
+          <div className={styles['pagination']}>
             <button
               onClick={() => setPagination({ ...pagination, page: pagination.page - 1 })}
               disabled={pagination.page === 1}
-              className="btn-page"
+              className={styles['btn-page']}
             >
               ← Anterior
             </button>
-            <span className="page-info">
+            <span className={styles['page-info']}>
               Página {pagination.page} de {pagination.totalPages} 
               ({pagination.total} usuarios)
             </span>
             <button
               onClick={() => setPagination({ ...pagination, page: pagination.page + 1 })}
               disabled={pagination.page === pagination.totalPages}
-              className="btn-page"
+              className={styles['btn-page']}
             >
               Siguiente →
             </button>
@@ -277,26 +277,26 @@ const AdminUsers = ({ onAdminLogout }) => {
 
       {/* User Detail Modal */}
       {showDetailModal && selectedUser && (
-        <div className="modal-overlay" onClick={() => setShowDetailModal(false)}>
+        <div className={styles['modal-overlay']} onClick={() => setShowDetailModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
+            <div className={styles['modal-header']}>
               <h2>👤 Detalles del Usuario</h2>
-              <button onClick={() => setShowDetailModal(false)} className="btn-close">×</button>
+              <button onClick={() => setShowDetailModal(false)} className={styles['btn-close']}>×</button>
             </div>
-            <div className="modal-body">
+            <div className={styles['modal-body']}>
               <div className="user-detail-header">
-                <div className="user-avatar large">{selectedUser.name.charAt(0).toUpperCase()}</div>
+                <div className={styles['user-avatar'] + ' large'}>{selectedUser.name.charAt(0).toUpperCase()}</div>
                 <div className="user-detail-info">
                   <h3>{selectedUser.name}</h3>
                   <p>{selectedUser.email}</p>
-                  <span className={`role-badge ${selectedUser.role.toLowerCase()}`}>
+                  <span className={styles['role-badge'] + ' ' + selectedUser.role.toLowerCase()}>
                     {getRoleLabel(selectedUser.role)}
                   </span>
                 </div>
               </div>
 
               <div className="detail-sections">
-                <div className="detail-section">
+                <div className={styles['detail-section']}>
                   <h4>📊 Estadísticas</h4>
                   <div className="stats-grid">
                     <div className="stat-box">
@@ -315,7 +315,7 @@ const AdminUsers = ({ onAdminLogout }) => {
                 </div>
 
                 {selectedUser.jobs && selectedUser.jobs.length > 0 && (
-                  <div className="detail-section">
+                  <div className={styles['detail-section']}>
                     <h4>💼 Empleos Publicados ({selectedUser.jobs.length})</h4>
                     <ul className="item-list">
                       {selectedUser.jobs.map(job => (
@@ -330,7 +330,7 @@ const AdminUsers = ({ onAdminLogout }) => {
                 )}
 
                 {selectedUser.courses && selectedUser.courses.length > 0 && (
-                  <div className="detail-section">
+                  <div className={styles['detail-section']}>
                     <h4>📚 Cursos Publicados ({selectedUser.courses.length})</h4>
                     <ul className="item-list">
                       {selectedUser.courses.map(course => (
@@ -345,13 +345,13 @@ const AdminUsers = ({ onAdminLogout }) => {
                 )}
 
                 {selectedUser.applications && selectedUser.applications.length > 0 && (
-                  <div className="detail-section">
+                  <div className={styles['detail-section']}>
                     <h4>📝 Aplicaciones ({selectedUser.applications.length})</h4>
                     <ul className="item-list">
                       {selectedUser.applications.map(app => (
                         <li key={app.id}>
                           <strong>{app.job?.title}</strong>
-                          <span className={`status-badge ${app.status.toLowerCase()}`}>
+                          <span className={'status-badge ' + app.status.toLowerCase()}>
                             {app.status}
                           </span>
                           <small>{formatDate(app.createdAt)}</small>
@@ -361,7 +361,7 @@ const AdminUsers = ({ onAdminLogout }) => {
                   </div>
                 )}
 
-                <div className="detail-section">
+                <div className={styles['detail-section']}>
                   <h4>📅 Información de Cuenta</h4>
                   <p><strong>Creado:</strong> {formatDate(selectedUser.createdAt)}</p>
                   <p><strong>Última actualización:</strong> {formatDate(selectedUser.updatedAt)}</p>
@@ -375,30 +375,30 @@ const AdminUsers = ({ onAdminLogout }) => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && userToDelete && (
-        <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
-          <div className="modal-content confirm-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header warning">
+        <div className={styles['modal-overlay']} onClick={() => setShowDeleteModal(false)}>
+          <div className={styles['modal-content'] + ' ' + styles['confirm-modal']} onClick={e => e.stopPropagation()}>
+            <div className={styles['modal-header'] + ' ' + styles['warning']}>
               <h2>⚠️ Confirmar Eliminación</h2>
             </div>
-            <div className="modal-body">
-              <p className="confirm-text">
+            <div className={styles['modal-body']}>
+              <p className={styles['confirm-text']}>
                 ¿Estás seguro de que quieres eliminar al usuario <strong>{userToDelete.name}</strong>?
               </p>
-              <p className="confirm-warning">
+              <p className={styles['confirm-warning']}>
                 Esta acción no se puede deshacer. Se eliminarán todos los datos asociados:
                 empleos, cursos y aplicaciones del usuario.
               </p>
-              <div className="confirm-actions">
+              <div className={styles['confirm-actions']}>
                 <button
                   onClick={() => setShowDeleteModal(false)}
-                  className="btn-cancel"
+                  className={styles['btn-cancel']}
                   disabled={updateLoading}
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleDeleteUser}
-                  className="btn-confirm-delete"
+                  className={styles['btn-confirm-delete']}
                   disabled={updateLoading}
                 >
                   {updateLoading ? 'Eliminando...' : '🗑️ Eliminar Usuario'}

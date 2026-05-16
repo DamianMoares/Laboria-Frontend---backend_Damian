@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
 import AdminNavigation from './AdminNavigation';
-import './AdminJobs.css';
+import styles from './AdminJobs.module.css';
 
 const AdminJobs = ({ onAdminLogout }) => {
   const [jobs, setJobs] = useState([]);
@@ -127,18 +127,18 @@ const AdminJobs = ({ onAdminLogout }) => {
   };
 
   return (
-    <div className="admin-layout">
+    <div className={styles['admin-layout']}>
       <AdminNavigation onLogout={onAdminLogout} />
-      <div className="admin-content">
-    <div className="admin-jobs">
+      <div className={styles['admin-content']}>
+    <div className={styles['admin-jobs']}>
       {/* Header */}
-      <div className="admin-header">
-        <div className="header-content">
+      <div className={styles['admin-header']}>
+        <div className={styles['header-content']}>
           <div>
             <h1>💼 Gestión de Empleos</h1>
-            <p className="subtitle">Administra todos los empleos del sistema</p>
+            <p className={styles['subtitle']}>Administra todos los empleos del sistema</p>
           </div>
-          <Link to="/admin" className="btn-back">
+          <Link to="/admin" className={styles['btn-back']}>
             ← Volver al Dashboard
           </Link>
         </div>
@@ -146,55 +146,55 @@ const AdminJobs = ({ onAdminLogout }) => {
 
       {/* Message */}
       {message && (
-        <div className={`message ${message.type}`}>
+        <div className={styles['message'] + ' ' + styles[message.type]}>
           {message.text}
         </div>
       )}
 
       {/* Filters */}
-      <div className="filters-section">
-        <div className="filter-group">
+      <div className={styles['filters-section']}>
+        <div className={styles['filter-group']}>
           <label>Buscar:</label>
           <input
             type="text"
             placeholder="Título o empresa..."
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            className="filter-input"
+            className={styles['filter-input']}
           />
         </div>
-        <div className="filter-group">
+        <div className={styles['filter-group']}>
           <label>Categoría:</label>
           <select
             value={filters.category}
             onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-            className="filter-select"
+            className={styles['filter-select']}
           >
             {categories.map(cat => (
               <option key={cat.value} value={cat.value}>{cat.label}</option>
             ))}
           </select>
         </div>
-        <button onClick={loadJobs} className="btn-refresh">
+        <button onClick={loadJobs} className={styles['btn-refresh']}>
           🔄 Actualizar
         </button>
       </div>
 
       {/* Jobs Table */}
       {loading ? (
-        <div className="admin-loading">
-          <div className="spinner"></div>
+        <div className={styles['admin-loading']}>
+          <div className={styles['spinner']}></div>
           <p>Cargando empleos...</p>
         </div>
       ) : error ? (
-        <div className="admin-error">
+        <div className={styles['admin-error']}>
           <p>{error}</p>
-          <button onClick={loadJobs} className="btn-retry">Reintentar</button>
+          <button onClick={loadJobs} className={styles['btn-retry']}>Reintentar</button>
         </div>
       ) : (
         <>
-          <div className="jobs-table-container">
-            <table className="jobs-table">
+          <div className={styles['jobs-table-container']}>
+            <table className={styles['jobs-table']}>
               <thead>
                 <tr>
                   <th>Empleo</th>
@@ -211,42 +211,42 @@ const AdminJobs = ({ onAdminLogout }) => {
                 {jobs.map(job => (
                   <tr key={job.id}>
                     <td>
-                      <div className="job-title">
+                      <div className={styles['job-title']}>
                         <strong>{job.title}</strong>
                         {job.salary && (
-                          <span className="job-salary">💰 {job.salary}</span>
+                          <span className={styles['job-salary']}>💰 {job.salary}</span>
                         )}
                       </div>
                     </td>
                     <td>{job.company}</td>
                     <td>
-                      <span className="category-badge">{job.category}</span>
+                      <span className={styles['category-badge']}>{job.category}</span>
                     </td>
                     <td>{getModeLabel(job.mode)}</td>
                     <td>
-                      <div className="author-info">
-                        <span className="author-name">{job.author?.name}</span>
+                      <div className={styles['author-info']}>
+                        <span className={styles['author-name']}>{job.author?.name}</span>
                         <small>{job.author?.email}</small>
                       </div>
                     </td>
                     <td>
-                      <span className="applications-count">
+                      <span className={styles['applications-count']}>
                         {job._count?.applications || 0} aplicaciones
                       </span>
                     </td>
                     <td>{formatDate(job.createdAt)}</td>
                     <td>
-                      <div className="action-buttons">
+                      <div className={styles['action-buttons']}>
                         <button
                           onClick={() => handleEdit(job)}
-                          className="btn-edit"
+                          className={styles['btn-edit']}
                           title="Editar empleo"
                         >
                           ✏️
                         </button>
                         <button
                           onClick={() => confirmDelete(job)}
-                          className="btn-delete"
+                          className={styles['btn-delete']}
                           title="Eliminar empleo"
                         >
                           🗑️
@@ -260,22 +260,22 @@ const AdminJobs = ({ onAdminLogout }) => {
           </div>
 
           {/* Pagination */}
-          <div className="pagination">
+          <div className={styles['pagination']}>
             <button
               onClick={() => setPagination({ ...pagination, page: pagination.page - 1 })}
               disabled={pagination.page === 1}
-              className="btn-page"
+              className={styles['btn-page']}
             >
               ← Anterior
             </button>
-            <span className="page-info">
+            <span className={styles['page-info']}>
               Página {pagination.page} de {pagination.totalPages}
               ({pagination.total} empleos)
             </span>
             <button
               onClick={() => setPagination({ ...pagination, page: pagination.page + 1 })}
               disabled={pagination.page === pagination.totalPages}
-              className="btn-page"
+              className={styles['btn-page']}
             >
               Siguiente →
             </button>
@@ -285,15 +285,15 @@ const AdminJobs = ({ onAdminLogout }) => {
 
       {/* Edit Modal */}
       {showEditModal && editingJob && (
-        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
-          <div className="modal-content edit-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
+        <div className={styles['modal-overlay']} onClick={() => setShowEditModal(false)}>
+          <div className={styles['modal-content'] + ' ' + styles['edit-modal']} onClick={e => e.stopPropagation()}>
+            <div className={styles['modal-header']}>
               <h2>✏️ Editar Empleo</h2>
-              <button onClick={() => setShowEditModal(false)} className="btn-close">×</button>
+              <button onClick={() => setShowEditModal(false)} className={styles['btn-close']}>×</button>
             </div>
-            <div className="modal-body">
-              <form className="edit-form">
-                <div className="form-group">
+            <div className={styles['modal-body']}>
+              <form className={styles['edit-form']}>
+                <div className={styles['form-group']}>
                   <label>Título del puesto *</label>
                   <input
                     type="text"
@@ -303,7 +303,7 @@ const AdminJobs = ({ onAdminLogout }) => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className={styles['form-group']}>
                   <label>Empresa *</label>
                   <input
                     type="text"
@@ -313,8 +313,8 @@ const AdminJobs = ({ onAdminLogout }) => {
                   />
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
+                <div className={styles['form-row']}>
+                  <div className={styles['form-group']}>
                     <label>Categoría *</label>
                     <select
                       value={editingJob.category}
@@ -327,7 +327,7 @@ const AdminJobs = ({ onAdminLogout }) => {
                     </select>
                   </div>
 
-                  <div className="form-group">
+                  <div className={styles['form-group']}>
                     <label>Modalidad *</label>
                     <select
                       value={editingJob.mode}
@@ -341,7 +341,7 @@ const AdminJobs = ({ onAdminLogout }) => {
                   </div>
                 </div>
 
-                <div className="form-group">
+                <div className={styles['form-group']}>
                   <label>Ubicación</label>
                   <input
                     type="text"
@@ -351,7 +351,7 @@ const AdminJobs = ({ onAdminLogout }) => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className={styles['form-group']}>
                   <label>Salario</label>
                   <input
                     type="text"
@@ -361,7 +361,7 @@ const AdminJobs = ({ onAdminLogout }) => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className={styles['form-group']}>
                   <label>Descripción *</label>
                   <textarea
                     value={editingJob.description}
@@ -371,7 +371,7 @@ const AdminJobs = ({ onAdminLogout }) => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className={styles['form-group']}>
                   <label>Requisitos</label>
                   <textarea
                     value={editingJob.requirements || ''}
@@ -381,11 +381,11 @@ const AdminJobs = ({ onAdminLogout }) => {
                   />
                 </div>
 
-                <div className="form-actions">
+                <div className={styles['form-actions']}>
                   <button
                     type="button"
                     onClick={() => setShowEditModal(false)}
-                    className="btn-cancel"
+                    className={styles['btn-cancel']}
                     disabled={updateLoading}
                   >
                     Cancelar
@@ -393,7 +393,7 @@ const AdminJobs = ({ onAdminLogout }) => {
                   <button
                     type="button"
                     onClick={handleSaveEdit}
-                    className="btn-save"
+                    className={styles['btn-save']}
                     disabled={updateLoading}
                   >
                     {updateLoading ? 'Guardando...' : '💾 Guardar Cambios'}
@@ -407,29 +407,29 @@ const AdminJobs = ({ onAdminLogout }) => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && jobToDelete && (
-        <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
-          <div className="modal-content confirm-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header warning">
+        <div className={styles['modal-overlay']} onClick={() => setShowDeleteModal(false)}>
+          <div className={styles['modal-content'] + ' ' + styles['confirm-modal']} onClick={e => e.stopPropagation()}>
+            <div className={styles['modal-header'] + ' ' + styles['warning']}>
               <h2>⚠️ Confirmar Eliminación</h2>
             </div>
-            <div className="modal-body">
-              <p className="confirm-text">
+            <div className={styles['modal-body']}>
+              <p className={styles['confirm-text']}>
                 ¿Estás seguro de que quieres eliminar el empleo <strong>{jobToDelete.title}</strong> de <strong>{jobToDelete.company}</strong>?
               </p>
-              <p className="confirm-warning">
+              <p className={styles['confirm-warning']}>
                 Esta acción no se puede deshacer. Se eliminarán también todas las aplicaciones asociadas a este empleo.
               </p>
-              <div className="confirm-actions">
+              <div className={styles['confirm-actions']}>
                 <button
                   onClick={() => setShowDeleteModal(false)}
-                  className="btn-cancel"
+                  className={styles['btn-cancel']}
                   disabled={updateLoading}
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="btn-confirm-delete"
+                  className={styles['btn-confirm-delete']}
                   disabled={updateLoading}
                 >
                   {updateLoading ? 'Eliminando...' : '🗑️ Eliminar Empleo'}

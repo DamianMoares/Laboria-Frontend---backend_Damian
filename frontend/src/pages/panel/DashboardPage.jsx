@@ -2,14 +2,14 @@ import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import logoNegro from '../../assets/img/Laboria_Fondo_Negro.png';
-import './DashboardPage.css';
+import styles from './DashboardPage.module.css';
 
 const DashboardPage = () => {
   const { user, isCandidate, isCompanyEmployees, isCompanyStudents, isCompanyHybrid } = useAuth();
 
   if (!user) {
     return (
-      <div className="panel-page not-authorized">
+      <div className={styles['panel-page'] + ' ' + styles['not-authorized']}>
         <div className="container">
           <h1>No autorizado</h1>
           <p>Debes iniciar sesión para ver tu panel.</p>
@@ -66,23 +66,23 @@ const DashboardPage = () => {
   const tabs = getTabs();
 
   return (
-    <div className="panel-page">
+    <div className={styles['panel-page']}>
       <div className="container">
-        <header className="panel-header">
-          <img src={logoNegro} alt="Laboria " className="panel-logo" />
+        <header className={styles['panel-header']}>
+          <img src={logoNegro} alt="Laboria " className={styles['panel-logo']} />
           <h1>Panel de {isCandidate() ? profile.firstName || user.name : profile.companyName || user.name}</h1>
-          <p className="panel-subtitle">
+          <p className={styles['panel-subtitle']}>
             Gestiona tu cuenta y actividades
           </p>
         </header>
 
-        <div className="panel-content">
-          <div className="panel-section">
+        <div className={styles['panel-content']}>
+          <div className={styles['panel-section']}>
             <h2>Resumen</h2>
-            <div className="panel-grid">
+            <div className={styles['panel-grid']}>
               {tabs.map(tab => (
-                <Link key={tab.id} to={tab.link} className="panel-card">
-                  <div className="card-icon">{tab.icon}</div>
+                <Link key={tab.id} to={tab.link} className={styles['panel-card']}>
+                  <div className={styles['card-icon']}>{tab.icon}</div>
                   <h3>{tab.label}</h3>
                   <p>Accede a la sección de {tab.label.toLowerCase()}</p>
                 </Link>
@@ -90,70 +90,70 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          <div className="panel-stats">
+          <div className={styles['panel-stats']}>
             <h3>Estadísticas Rápidas</h3>
-            <div className="stats-grid">
+            <div className={styles['stats-grid']}>
               {isCandidate() && (
                 <>
-                  <div className="stat-item">
-                    <span className="stat-value">0</span>
-                    <span className="stat-label">Aplicaciones</span>
+                  <div className={styles['stat-item']}>
+                    <span className={styles['stat-value']}>0</span>
+                    <span className={styles['stat-label']}>Aplicaciones</span>
                   </div>
-                  <div className="stat-item">
-                    <span className="stat-value">0</span>
-                    <span className="stat-label">Cursos Guardados</span>
+                  <div className={styles['stat-item']}>
+                    <span className={styles['stat-value']}>0</span>
+                    <span className={styles['stat-label']}>Cursos Guardados</span>
                   </div>
-                  <div className="stat-item">
-                    <span className="stat-value">0</span>
-                    <span className="stat-label">Perfil Completado</span>
+                  <div className={styles['stat-item']}>
+                    <span className={styles['stat-value']}>0</span>
+                    <span className={styles['stat-label']}>Perfil Completado</span>
                   </div>
                 </>
               )}
               {isCompanyEmployees() && (
                 <>
-                  <div className="stat-item">
-                    <span className="stat-value">{profile.postedJobs?.length || 0}</span>
-                    <span className="stat-label">Ofertas Publicadas</span>
+                  <div className={styles['stat-item']}>
+                    <span className={styles['stat-value']}>{profile.postedJobs?.length || 0}</span>
+                    <span className={styles['stat-label']}>Ofertas Publicadas</span>
                   </div>
-                  <div className="stat-item">
-                    <span className="stat-value">0</span>
-                    <span className="stat-label">Candidatos</span>
+                  <div className={styles['stat-item']}>
+                    <span className={styles['stat-value']}>0</span>
+                    <span className={styles['stat-label']}>Candidatos</span>
                   </div>
-                  <div className="stat-item">
-                    <span className="stat-value">0</span>
-                    <span className="stat-label">Vistas</span>
+                  <div className={styles['stat-item']}>
+                    <span className={styles['stat-value']}>0</span>
+                    <span className={styles['stat-label']}>Vistas</span>
                   </div>
                 </>
               )}
               {isCompanyStudents() && (
                 <>
-                  <div className="stat-item">
-                    <span className="stat-value">{profile.postedCourses?.length || 0}</span>
-                    <span className="stat-label">Cursos Publicados</span>
+                  <div className={styles['stat-item']}>
+                    <span className={styles['stat-value']}>{profile.postedCourses?.length || 0}</span>
+                    <span className={styles['stat-label']}>Cursos Publicados</span>
                   </div>
-                  <div className="stat-item">
-                    <span className="stat-value">0</span>
-                    <span className="stat-label">Estudiantes</span>
+                  <div className={styles['stat-item']}>
+                    <span className={styles['stat-value']}>0</span>
+                    <span className={styles['stat-label']}>Estudiantes</span>
                   </div>
-                  <div className="stat-item">
-                    <span className="stat-value">0</span>
-                    <span className="stat-label">Inscripciones</span>
+                  <div className={styles['stat-item']}>
+                    <span className={styles['stat-value']}>0</span>
+                    <span className={styles['stat-label']}>Inscripciones</span>
                   </div>
                 </>
               )}
               {isCompanyHybrid() && (
                 <>
-                  <div className="stat-item">
-                    <span className="stat-value">{profile.postedJobs?.length || 0}</span>
-                    <span className="stat-label">Ofertas</span>
+                  <div className={styles['stat-item']}>
+                    <span className={styles['stat-value']}>{profile.postedJobs?.length || 0}</span>
+                    <span className={styles['stat-label']}>Ofertas</span>
                   </div>
-                  <div className="stat-item">
-                    <span className="stat-value">{profile.postedCourses?.length || 0}</span>
-                    <span className="stat-label">Cursos</span>
+                  <div className={styles['stat-item']}>
+                    <span className={styles['stat-value']}>{profile.postedCourses?.length || 0}</span>
+                    <span className={styles['stat-label']}>Cursos</span>
                   </div>
-                  <div className="stat-item">
-                    <span className="stat-value">0</span>
-                    <span className="stat-label">Total Interacciones</span>
+                  <div className={styles['stat-item']}>
+                    <span className={styles['stat-value']}>0</span>
+                    <span className={styles['stat-label']}>Total Interacciones</span>
                   </div>
                 </>
               )}

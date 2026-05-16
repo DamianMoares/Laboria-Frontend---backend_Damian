@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { jobService } from '../../services/jobService';
-import '../compartidos/FormPage.css';
+import styles from '../compartidos/FormPage.module.css';
 
 const PostJobPage = () => {
   const { user, isCompanyEmployees, isCompanyHybrid } = useAuth();
@@ -11,7 +11,7 @@ const PostJobPage = () => {
 
   if (!user || (!isCompanyEmployees() && !isCompanyHybrid())) {
     return (
-      <div className="form-page not-authorized">
+      <div className={styles['form-page'] + ' ' + styles['not-authorized']}>
         <div className="container">
           <h1>No autorizado</h1>
           <p>Esta página es solo para empresas que pueden publicar ofertas de empleo.</p>
@@ -75,18 +75,18 @@ const PostJobPage = () => {
   };
 
   return (
-    <div className="form-page post-job-page">
+    <div className={styles['form-page'] + ' post-job-page'}>
       <div className="container">
-        <header className="form-header">
+        <header className={styles['form-header']}>
           <h1>Publicar Oferta de Empleo</h1>
-          <p className="form-subtitle">Crea una nueva oferta de empleo para tu empresa</p>
+          <p className={styles['form-subtitle']}>Crea una nueva oferta de empleo para tu empresa</p>
         </header>
 
-        <form className="form-container" onSubmit={handleSubmit}>
-          <div className="form-section">
+        <form className={styles['form-container']} onSubmit={handleSubmit}>
+          <div className={styles['form-section']}>
             <h2>Información Básica</h2>
             
-            <div className="form-group">
+            <div className={styles['form-group']}>
               <label htmlFor="title">Título del puesto *</label>
               <input
                 type="text"
@@ -99,8 +99,8 @@ const PostJobPage = () => {
               />
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
+            <div className={styles['form-row']}>
+              <div className={styles['form-group']}>
                 <label htmlFor="location">Ubicación *</label>
                 <input
                   type="text"
@@ -113,7 +113,7 @@ const PostJobPage = () => {
                 />
               </div>
 
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label htmlFor="workMode">Modalidad *</label>
                 <select
                   id="mode"
@@ -129,8 +129,8 @@ const PostJobPage = () => {
               </div>
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
+            <div className={styles['form-row']}>
+              <div className={styles['form-group']}>
                 <label htmlFor="schedule">Jornada *</label>
                 <select
                   id="schedule"
@@ -144,7 +144,7 @@ const PostJobPage = () => {
                 </select>
               </div>
 
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label htmlFor="experienceLevel">Nivel de experiencia *</label>
                 <select
                   id="experienceLevel"
@@ -160,8 +160,8 @@ const PostJobPage = () => {
               </div>
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
+            <div className={styles['form-row']}>
+              <div className={styles['form-group']}>
                 <label htmlFor="salary">Salario</label>
                 <input
                   type="text"
@@ -173,7 +173,7 @@ const PostJobPage = () => {
                 />
               </div>
 
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label htmlFor="contractType">Tipo de contrato *</label>
                 <select
                   id="contractType"
@@ -190,8 +190,8 @@ const PostJobPage = () => {
               </div>
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
+            <div className={styles['form-row']}>
+              <div className={styles['form-group']}>
                 <label htmlFor="sector">Sector *</label>
                 <select
                   id="category"
@@ -211,7 +211,7 @@ const PostJobPage = () => {
                 </select>
               </div>
 
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label htmlFor="technology">Tecnología principal</label>
                 <input
                   type="text"
@@ -225,10 +225,10 @@ const PostJobPage = () => {
             </div>
           </div>
 
-          <div className="form-section">
+          <div className={styles['form-section']}>
             <h2>Detalles de la Oferta</h2>
 
-            <div className="form-group">
+            <div className={styles['form-group']}>
               <label htmlFor="description">Descripción *</label>
               <textarea
                 id="description"
@@ -241,7 +241,7 @@ const PostJobPage = () => {
               />
             </div>
 
-            <div className="form-group">
+            <div className={styles['form-group']}>
               <label htmlFor="requirements">Requisitos (uno por línea)</label>
               <textarea
                 id="requirements"
@@ -253,7 +253,7 @@ const PostJobPage = () => {
               />
             </div>
 
-            <div className="form-group">
+            <div className={styles['form-group']}>
               <label htmlFor="benefits">Beneficios (uno por línea)</label>
               <textarea
                 id="benefits"
@@ -266,7 +266,7 @@ const PostJobPage = () => {
             </div>
           </div>
 
-          <div className="form-actions">
+          <div className={styles['form-actions']}>
             <button type="button" className="btn btn-secondary" onClick={() => navigate(-1)}>
               Cancelar
             </button>

@@ -60,13 +60,6 @@ const jobController = {
     try {
       const { title, company, location, salary, description, requirements, mode, category } = req.body;
       
-      // Validaciones
-      if (!title || !company || !description) {
-        const error = new Error('Título, empresa y descripción son requeridos');
-        error.statusCode = 400;
-        throw error;
-      }
-      
       // Verificar que el usuario sea empresa
       const userRole = req.user.role;
       if (!['COMPANY_EMPLOYEES', 'COMPANY_STUDENTS', 'COMPANY_HYBRID', 'ADMIN'].includes(userRole)) {

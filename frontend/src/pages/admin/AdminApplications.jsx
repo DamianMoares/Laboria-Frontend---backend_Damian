@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
 import AdminNavigation from './AdminNavigation';
-import './AdminApplications.css';
+import styles from './AdminApplications.module.css';
 
 const AdminApplications = ({ onAdminLogout }) => {
   const [applications, setApplications] = useState([]);
@@ -110,18 +110,18 @@ const AdminApplications = ({ onAdminLogout }) => {
   };
 
   return (
-    <div className="admin-layout">
+    <div className={styles['admin-layout']}>
       <AdminNavigation onLogout={onAdminLogout} />
-      <div className="admin-content">
-    <div className="admin-applications">
+      <div className={styles['admin-content']}>
+    <div className={styles['admin-applications']}>
       {/* Header */}
-      <div className="admin-header">
-        <div className="header-content">
+      <div className={styles['admin-header']}>
+        <div className={styles['header-content']}>
           <div>
             <h1>📝 Gestión de Aplicaciones</h1>
-            <p className="subtitle">Administra todas las aplicaciones a empleos</p>
+            <p className={styles['subtitle']}>Administra todas las aplicaciones a empleos</p>
           </div>
-          <Link to="/admin" className="btn-back">
+          <Link to="/admin" className={styles['btn-back']}>
             ← Volver al Dashboard
           </Link>
         </div>
@@ -129,38 +129,38 @@ const AdminApplications = ({ onAdminLogout }) => {
 
       {/* Message */}
       {message && (
-        <div className={`message ${message.type}`}>
+        <div className={styles['message'] + ' ' + styles[message.type]}>
           {message.text}
         </div>
       )}
 
       {/* Filters */}
-      <div className="filters-section">
-        <div className="filter-group">
+      <div className={styles['filters-section']}>
+        <div className={styles['filter-group']}>
           <label>Filtrar por estado:</label>
           <select
             value={filters.status}
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-            className="filter-select"
+            className={styles['filter-select']}
           >
             {statuses.map(status => (
               <option key={status.value} value={status.value}>{status.label}</option>
             ))}
           </select>
         </div>
-        <button onClick={loadApplications} className="btn-refresh">
+        <button onClick={loadApplications} className={styles['btn-refresh']}>
           🔄 Actualizar
         </button>
       </div>
 
       {/* Stats Summary */}
-      <div className="stats-summary">
+      <div className={styles['stats-summary']}>
         {statuses.filter(s => s.value).map(status => {
           const count = applications.filter(a => a.status === status.value).length;
           return (
-            <div key={status.value} className={`stat-pill ${getStatusClass(status.value)}`}>
-              <span className="stat-label">{status.label}</span>
-              <span className="stat-count">{count}</span>
+            <div key={status.value} className={styles['stat-pill'] + ' ' + styles[getStatusClass(status.value)]}>
+              <span className={styles['stat-label']}>{status.label}</span>
+              <span className={styles['stat-count']}>{count}</span>
             </div>
           );
         })}
@@ -168,19 +168,19 @@ const AdminApplications = ({ onAdminLogout }) => {
 
       {/* Applications Table */}
       {loading ? (
-        <div className="admin-loading">
-          <div className="spinner"></div>
+        <div className={styles['admin-loading']}>
+          <div className={styles['spinner']}></div>
           <p>Cargando aplicaciones...</p>
         </div>
       ) : error ? (
-        <div className="admin-error">
+        <div className={styles['admin-error']}>
           <p>{error}</p>
-          <button onClick={loadApplications} className="btn-retry">Reintentar</button>
+          <button onClick={loadApplications} className={styles['btn-retry']}>Reintentar</button>
         </div>
       ) : (
         <>
-          <div className="applications-table-container">
-            <table className="applications-table">
+          <div className={styles['applications-table-container']}>
+            <table className={styles['applications-table']}>
               <thead>
                 <tr>
                   <th>Empleo</th>
@@ -196,15 +196,15 @@ const AdminApplications = ({ onAdminLogout }) => {
                 {applications.map(application => (
                   <tr key={application.id}>
                     <td>
-                      <div className="job-info">
+                      <div className={styles['job-info']}>
                         <strong>{application.job?.title}</strong>
                         <span className="job-category">{application.job?.category}</span>
                       </div>
                     </td>
                     <td>{application.job?.company}</td>
                     <td>
-                      <div className="candidate-info">
-                        <span className="candidate-name">{application.user?.name}</span>
+                      <div className={styles['candidate-info']}>
+                        <span className={styles['candidate-name']}>{application.user?.name}</span>
                         <small>{application.user?.email}</small>
                       </div>
                     </td>
@@ -213,7 +213,7 @@ const AdminApplications = ({ onAdminLogout }) => {
                         value={application.status}
                         onChange={(e) => handleStatusChange(application.id, e.target.value)}
                         disabled={updateLoading}
-                        className={`status-select ${getStatusClass(application.status)}`}
+                        className={styles['status-select'] + ' ' + styles[getStatusClass(application.status)]}
                       >
                         {statuses.filter(s => s.value).map(status => (
                           <option key={status.value} value={status.value}>
@@ -224,20 +224,20 @@ const AdminApplications = ({ onAdminLogout }) => {
                     </td>
                     <td>
                       {application.message ? (
-                        <span className="message-preview" title={application.message}>
+                        <span className={styles['message-preview']} title={application.message}>
                           {application.message.length > 50
                             ? application.message.substring(0, 50) + '...'
                             : application.message}
                         </span>
                       ) : (
-                        <span className="no-message">-</span>
+                        <span className={styles['no-message']}>-</span>
                       )}
                     </td>
                     <td>{formatDate(application.createdAt)}</td>
                     <td>
                       <button
                         onClick={() => openEditModal(application)}
-                        className="btn-view"
+                        className={styles['btn-view']}
                         title="Ver detalles"
                       >
                         👁️
@@ -250,22 +250,22 @@ const AdminApplications = ({ onAdminLogout }) => {
           </div>
 
           {/* Pagination */}
-          <div className="pagination">
+          <div className={styles['pagination']}>
             <button
               onClick={() => setPagination({ ...pagination, page: pagination.page - 1 })}
               disabled={pagination.page === 1}
-              className="btn-page"
+              className={styles['btn-page']}
             >
               ← Anterior
             </button>
-            <span className="page-info">
+            <span className={styles['page-info']}>
               Página {pagination.page} de {pagination.totalPages}
               ({pagination.total} aplicaciones)
             </span>
             <button
               onClick={() => setPagination({ ...pagination, page: pagination.page + 1 })}
               disabled={pagination.page === pagination.totalPages}
-              className="btn-page"
+              className={styles['btn-page']}
             >
               Siguiente →
             </button>
@@ -275,18 +275,18 @@ const AdminApplications = ({ onAdminLogout }) => {
 
       {/* Edit Modal */}
       {showEditModal && editingApplication && (
-        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
-          <div className="modal-content detail-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
+        <div className={styles['modal-overlay']} onClick={() => setShowEditModal(false)}>
+          <div className={styles['modal-content'] + ' detail-modal'} onClick={e => e.stopPropagation()}>
+            <div className={styles['modal-header']}>
               <h2>📝 Detalles de la Aplicación</h2>
-              <button onClick={() => setShowEditModal(false)} className="btn-close">×</button>
+              <button onClick={() => setShowEditModal(false)} className={styles['btn-close']}>×</button>
             </div>
-            <div className="modal-body">
+            <div className={styles['modal-body']}>
               <div className="application-detail">
                 {/* Job Info */}
-                <div className="detail-section">
+                <div className={styles['detail-section']}>
                   <h3>💼 Empleo</h3>
-                  <div className="detail-card">
+                  <div className={styles['detail-card']}>
                     <p><strong>Título:</strong> {editingApplication.job?.title}</p>
                     <p><strong>Empresa:</strong> {editingApplication.job?.company}</p>
                     <p><strong>Categoría:</strong> {editingApplication.job?.category}</p>
@@ -295,9 +295,9 @@ const AdminApplications = ({ onAdminLogout }) => {
                 </div>
 
                 {/* Candidate Info */}
-                <div className="detail-section">
+                <div className={styles['detail-section']}>
                   <h3>👤 Candidato</h3>
-                  <div className="detail-card">
+                  <div className={styles['detail-card']}>
                     <p><strong>Nombre:</strong> {editingApplication.user?.name}</p>
                     <p><strong>Email:</strong> {editingApplication.user?.email}</p>
                     <p><strong>ID:</strong> <code>{editingApplication.user?.id}</code></p>
@@ -305,10 +305,10 @@ const AdminApplications = ({ onAdminLogout }) => {
                 </div>
 
                 {/* Application Info */}
-                <div className="detail-section">
+                <div className={styles['detail-section']}>
                   <h3>📝 Información de la Aplicación</h3>
-                  <div className="detail-card">
-                    <div className="form-group">
+                  <div className={styles['detail-card']}>
+                    <div className={styles['form-group']}>
                       <label><strong>Estado:</strong></label>
                       <select
                         value={editingApplication.status}
@@ -316,7 +316,7 @@ const AdminApplications = ({ onAdminLogout }) => {
                           ...editingApplication,
                           status: e.target.value
                         })}
-                        className={`status-select large ${getStatusClass(editingApplication.status)}`}
+                        className={styles['status-select'] + ' ' + styles['large'] + ' ' + styles[getStatusClass(editingApplication.status)]}
                       >
                         {statuses.filter(s => s.value).map(status => (
                           <option key={status.value} value={status.value}>
@@ -339,17 +339,17 @@ const AdminApplications = ({ onAdminLogout }) => {
                   </div>
                 </div>
 
-                <div className="form-actions">
+                <div className={styles['form-actions']}>
                   <button
                     onClick={() => setShowEditModal(false)}
-                    className="btn-cancel"
+                    className={styles['btn-cancel']}
                     disabled={updateLoading}
                   >
                     Cerrar
                   </button>
                   <button
                     onClick={handleSaveStatus}
-                    className="btn-save"
+                    className={styles['btn-save']}
                     disabled={updateLoading}
                   >
                     {updateLoading ? 'Guardando...' : '💾 Guardar Cambios'}

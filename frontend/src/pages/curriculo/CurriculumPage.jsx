@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import './CurriculumPage.css';
+import styles from './CurriculumPage.module.css';
 
 const CurriculumPage = () => {
   const { user, isCandidate } = useAuth();
@@ -417,7 +417,7 @@ const CurriculumPage = () => {
 
   if (!user || !isCandidate()) {
     return (
-      <div className="curriculum-page not-authorized">
+      <div className={styles['curriculum-page'] + ' ' + styles['not-authorized']}>
         <div className="container">
           <h1>No autorizado</h1>
           <p>Esta página es solo para candidatos.</p>
@@ -427,11 +427,11 @@ const CurriculumPage = () => {
   }
 
   return (
-    <div className="curriculum-page">
+    <div className={styles['curriculum-page']}>
       <div className="container">
-        <header className="curriculum-header">
+        <header className={styles['curriculum-header']}>
           <h1>Gestión de Currículum</h1>
-          <p className="curriculum-subtitle">
+          <p className={styles['curriculum-subtitle']}>
             Agrega y gestiona los elementos de tu currículum. Marca los elementos que quieres enviar al aplicar a ofertas.
           </p>
           <button className="btn btn-primary" onClick={saveCurriculum}>
@@ -439,10 +439,10 @@ const CurriculumPage = () => {
           </button>
         </header>
 
-        <div className="curriculum-content">
+        <div className={styles['curriculum-content']}>
           {/* Experiencia Laboral */}
-          <section className="curriculum-section">
-            <div className="section-header">
+          <section className={styles['curriculum-section']}>
+            <div className={styles['section-header']}>
               <h2>Experiencia Laboral</h2>
               <button className="btn btn-secondary" onClick={addExperience}>
                 + Agregar Experiencia
@@ -451,12 +451,12 @@ const CurriculumPage = () => {
             
             {/* Formulario para nueva experiencia */}
             {newItems.experience && (
-              <div className="curriculum-item editing">
-                <div className="item-header">
-                  <span className="item-status">Nueva experiencia</span>
+              <div className={styles['curriculum-item'] + ' ' + styles['editing']}>
+                <div className={styles['item-header']}>
+                  <span className={styles['item-status']}>Nueva experiencia</span>
                 </div>
-                <div className="item-content">
-                  <div className="form-row">
+                <div className={styles['item-content']}>
+                  <div className={styles['form-row']}>
                     <input
                       type="text"
                       placeholder="Empresa"
@@ -470,7 +470,7 @@ const CurriculumPage = () => {
                       onChange={(e) => updateExperience(newItems.experience.id, 'position', e.target.value)}
                     />
                   </div>
-                  <div className="form-row">
+                  <div className={styles['form-row']}>
                     <input
                       type="date"
                       value={newItems.experience.startDate}
@@ -483,7 +483,7 @@ const CurriculumPage = () => {
                     />
                   </div>
                   {validationErrors[`experience_${newItems.experience.id}`] && (
-                    <div className="validation-error">{validationErrors[`experience_${newItems.experience.id}`]}</div>
+                    <div className={styles['validation-error']}>{validationErrors[`experience_${newItems.experience.id}`]}</div>
                   )}
                   <textarea
                     placeholder="Descripción del puesto..."
@@ -491,7 +491,7 @@ const CurriculumPage = () => {
                     onChange={(e) => updateExperience(newItems.experience.id, 'description', e.target.value)}
                     rows="3"
                   />
-                  <div className="form-actions">
+                  <div className={styles['form-actions']}>
                     <button className="btn btn-primary" onClick={saveNewExperience}>
                       Guardar
                     </button>
@@ -508,30 +508,30 @@ const CurriculumPage = () => {
               const isEditing = editingItems[`experience_${exp.id}`];
               const isExpanded = expandedItems[`experience_${exp.id}`] || isEditing;
               return (
-                <div key={exp.id} className={`curriculum-item ${isEditing ? 'editing' : 'read-only'} ${!isExpanded ? 'collapsed' : ''}`}>
-                  <div className="item-header" onClick={() => !isEditing && toggleExpanded('experience', exp.id)}>
+                <div key={exp.id} className={styles['curriculum-item'] + ' ' + (isEditing ? styles['editing'] : styles['read-only']) + (!isExpanded ? ' ' + styles['collapsed'] : '')}>
+                  <div className={styles['item-header']} onClick={() => !isEditing && toggleExpanded('experience', exp.id)}>
                     <input
                       type="checkbox"
                       checked={exp.sendToApplication}
                       onChange={(e) => { e.stopPropagation(); toggleSendToApplication(exp.id, 'experience'); }}
-                      className="send-checkbox"
+                      className={styles['send-checkbox']}
                       title="Enviar en aplicación"
                     />
-                    <span className="item-title">{exp.company || 'Sin empresa'} - {exp.position || 'Sin puesto'}</span>
+                    <span className={styles['item-title']}>{exp.company || 'Sin empresa'} - {exp.position || 'Sin puesto'}</span>
                     {isEditing ? (
-                      <button className="btn-delete" onClick={(e) => { e.stopPropagation(); removeExperience(exp.id); }}>
+                      <button className={styles['btn-delete']} onClick={(e) => { e.stopPropagation(); removeExperience(exp.id); }}>
                         🗑️ Eliminar
                       </button>
                     ) : (
-                      <button className="btn-edit" onClick={(e) => { e.stopPropagation(); startEditingExperience(exp.id); }}>
+                      <button className={styles['btn-edit']} onClick={(e) => { e.stopPropagation(); startEditingExperience(exp.id); }}>
                         ✏️ Editar
                       </button>
                     )}
                   </div>
                   
                   {isExpanded && (isEditing ? (
-                    <div className="item-content">
-                      <div className="form-row">
+                    <div className={styles['item-content']}>
+                      <div className={styles['form-row']}>
                         <input
                           type="text"
                           placeholder="Empresa"
@@ -545,7 +545,7 @@ const CurriculumPage = () => {
                           onChange={(e) => updateExperience(exp.id, 'position', e.target.value)}
                         />
                       </div>
-                      <div className="form-row">
+                      <div className={styles['form-row']}>
                         <input
                           type="date"
                           value={exp.startDate}
@@ -558,7 +558,7 @@ const CurriculumPage = () => {
                         />
                       </div>
                       {validationErrors[`experience_${exp.id}`] && (
-                        <div className="validation-error">{validationErrors[`experience_${exp.id}`]}</div>
+                        <div className={styles['validation-error']}>{validationErrors[`experience_${exp.id}`]}</div>
                       )}
                       <textarea
                         placeholder="Descripción del puesto..."
@@ -566,7 +566,7 @@ const CurriculumPage = () => {
                         onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
                         rows="3"
                       />
-                      <div className="form-actions">
+                      <div className={styles['form-actions']}>
                         <button className="btn btn-primary" onClick={() => saveExperienceEdit(exp.id)}>
                           Guardar cambios
                         </button>
@@ -576,27 +576,27 @@ const CurriculumPage = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="item-content read-view">
-                      <div className="read-row">
-                        <span className="read-label">Empresa:</span>
-                        <span className="read-value">{exp.company || 'No especificado'}</span>
+                    <div className={styles['item-content'] + ' ' + styles['read-view']}>
+                      <div className={styles['read-row']}>
+                        <span className={styles['read-label']}>Empresa:</span>
+                        <span className={styles['read-value']}>{exp.company || 'No especificado'}</span>
                       </div>
-                      <div className="read-row">
-                        <span className="read-label">Puesto:</span>
-                        <span className="read-value">{exp.position || 'No especificado'}</span>
+                      <div className={styles['read-row']}>
+                        <span className={styles['read-label']}>Puesto:</span>
+                        <span className={styles['read-value']}>{exp.position || 'No especificado'}</span>
                       </div>
-                      <div className="read-row">
-                        <span className="read-label">Periodo:</span>
-                        <span className="read-value">
+                      <div className={styles['read-row']}>
+                        <span className={styles['read-label']}>Periodo:</span>
+                        <span className={styles['read-value']}>
                           {exp.startDate ? new Date(exp.startDate).toLocaleDateString('es-ES') : 'No especificado'} 
                           {' - '}
                           {exp.endDate ? new Date(exp.endDate).toLocaleDateString('es-ES') : 'Presente'}
                         </span>
                       </div>
                       {exp.description && (
-                        <div className="read-row">
-                          <span className="read-label">Descripción:</span>
-                          <span className="read-value">{exp.description}</span>
+                        <div className={styles['read-row']}>
+                          <span className={styles['read-label']}>Descripción:</span>
+                          <span className={styles['read-value']}>{exp.description}</span>
                         </div>
                       )}
                     </div>
@@ -605,13 +605,13 @@ const CurriculumPage = () => {
               );
             })}
             {curriculum.experience.length === 0 && !newItems.experience && (
-              <p className="empty-message">No hay experiencia agregada. Agrega tu primera experiencia laboral.</p>
+              <p className={styles['empty-message']}>No hay experiencia agregada. Agrega tu primera experiencia laboral.</p>
             )}
           </section>
 
           {/* Educación */}
-          <section className="curriculum-section">
-            <div className="section-header">
+          <section className={styles['curriculum-section']}>
+            <div className={styles['section-header']}>
               <h2>Educación</h2>
               <button className="btn btn-secondary" onClick={addEducation}>
                 + Agregar Educación
@@ -619,12 +619,12 @@ const CurriculumPage = () => {
             </div>
             
             {newItems.education && (
-              <div className="curriculum-item editing">
-                <div className="item-header">
-                  <span className="item-status">Nueva educación</span>
+              <div className={styles['curriculum-item'] + ' ' + styles['editing']}>
+                <div className={styles['item-header']}>
+                  <span className={styles['item-status']}>Nueva educación</span>
                 </div>
-                <div className="item-content">
-                  <div className="form-row">
+                <div className={styles['item-content']}>
+                  <div className={styles['form-row']}>
                     <input
                       type="text"
                       placeholder="Institución"
@@ -638,7 +638,7 @@ const CurriculumPage = () => {
                       onChange={(e) => updateEducation(newItems.education.id, 'degree', e.target.value)}
                     />
                   </div>
-                  <div className="form-row">
+                  <div className={styles['form-row']}>
                     <input
                       type="text"
                       placeholder="Campo de estudio"
@@ -657,7 +657,7 @@ const CurriculumPage = () => {
                     />
                   </div>
                   {validationErrors[`education_${newItems.education.id}`] && (
-                    <div className="validation-error">{validationErrors[`education_${newItems.education.id}`]}</div>
+                    <div className={styles['validation-error']}>{validationErrors[`education_${newItems.education.id}`]}</div>
                   )}
                   <textarea
                     placeholder="Descripción..."
@@ -665,7 +665,7 @@ const CurriculumPage = () => {
                     onChange={(e) => updateEducation(newItems.education.id, 'description', e.target.value)}
                     rows="2"
                   />
-                  <div className="form-actions">
+                  <div className={styles['form-actions']}>
                     <button className="btn btn-primary" onClick={saveNewEducation}>Guardar</button>
                     <button className="btn btn-secondary" onClick={cancelNewEducation}>Cancelar</button>
                   </div>
@@ -677,62 +677,62 @@ const CurriculumPage = () => {
               const isEditing = editingItems[`education_${edu.id}`];
               const isExpanded = expandedItems[`education_${edu.id}`] || isEditing;
               return (
-                <div key={edu.id} className={`curriculum-item ${isEditing ? 'editing' : 'read-only'} ${!isExpanded ? 'collapsed' : ''}`}>
-                  <div className="item-header" onClick={() => !isEditing && toggleExpanded('education', edu.id)}>
+                <div key={edu.id} className={styles['curriculum-item'] + ' ' + (isEditing ? styles['editing'] : styles['read-only']) + (!isExpanded ? ' ' + styles['collapsed'] : '')}>
+                  <div className={styles['item-header']} onClick={() => !isEditing && toggleExpanded('education', edu.id)}>
                     <input
                       type="checkbox"
                       checked={edu.sendToApplication}
                       onChange={(e) => { e.stopPropagation(); toggleSendToApplication(edu.id, 'education'); }}
-                      className="send-checkbox"
+                      className={styles['send-checkbox']}
                       title="Enviar en aplicación"
                     />
-                    <span className="item-title">{edu.institution || 'Sin institución'} - {edu.degree || 'Sin título'}</span>
+                    <span className={styles['item-title']}>{edu.institution || 'Sin institución'} - {edu.degree || 'Sin título'}</span>
                     {isEditing ? (
-                      <button className="btn-delete" onClick={(e) => { e.stopPropagation(); removeEducation(edu.id); }}>🗑️ Eliminar</button>
+                      <button className={styles['btn-delete']} onClick={(e) => { e.stopPropagation(); removeEducation(edu.id); }}>🗑️ Eliminar</button>
                     ) : (
-                      <button className="btn-edit" onClick={(e) => { e.stopPropagation(); startEditingEducation(edu.id); }}>✏️ Editar</button>
+                      <button className={styles['btn-edit']} onClick={(e) => { e.stopPropagation(); startEditingEducation(edu.id); }}>✏️ Editar</button>
                     )}
                   </div>
                   {isExpanded && (isEditing ? (
-                    <div className="item-content">
-                      <div className="form-row">
+                    <div className={styles['item-content']}>
+                      <div className={styles['form-row']}>
                         <input type="text" placeholder="Institución" value={edu.institution} onChange={(e) => updateEducation(edu.id, 'institution', e.target.value)} />
                         <input type="text" placeholder="Título" value={edu.degree} onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)} />
                       </div>
-                      <div className="form-row">
+                      <div className={styles['form-row']}>
                         <input type="text" placeholder="Campo de estudio" value={edu.field} onChange={(e) => updateEducation(edu.id, 'field', e.target.value)} />
                         <input type="date" value={edu.startDate} onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)} />
                         <input type="date" value={edu.endDate} onChange={(e) => updateEducation(edu.id, 'endDate', e.target.value)} />
                       </div>
                       {validationErrors[`education_${edu.id}`] && (
-                        <div className="validation-error">{validationErrors[`education_${edu.id}`]}</div>
+                        <div className={styles['validation-error']}>{validationErrors[`education_${edu.id}`]}</div>
                       )}
                       <textarea placeholder="Descripción..." value={edu.description} onChange={(e) => updateEducation(edu.id, 'description', e.target.value)} rows="2" />
-                      <div className="form-actions">
+                      <div className={styles['form-actions']}>
                         <button className="btn btn-primary" onClick={() => saveEducationEdit(edu.id)}>Guardar cambios</button>
                         <button className="btn btn-secondary" onClick={() => cancelEducationEdit(edu.id)}>Cancelar</button>
                       </div>
                     </div>
                   ) : (
-                    <div className="item-content read-view">
-                      <div className="read-row"><span className="read-label">Institución:</span><span className="read-value">{edu.institution || 'No especificado'}</span></div>
-                      <div className="read-row"><span className="read-label">Título:</span><span className="read-value">{edu.degree || 'No especificado'}</span></div>
-                      <div className="read-row"><span className="read-label">Campo:</span><span className="read-value">{edu.field || 'No especificado'}</span></div>
-                      <div className="read-row"><span className="read-label">Periodo:</span><span className="read-value">{edu.startDate ? new Date(edu.startDate).toLocaleDateString('es-ES') : 'No especificado'} - {edu.endDate ? new Date(edu.endDate).toLocaleDateString('es-ES') : 'Presente'}</span></div>
-                      {edu.description && <div className="read-row"><span className="read-label">Descripción:</span><span className="read-value">{edu.description}</span></div>}
+                    <div className={styles['item-content'] + ' ' + styles['read-view']}>
+                      <div className={styles['read-row']}><span className={styles['read-label']}>Institución:</span><span className={styles['read-value']}>{edu.institution || 'No especificado'}</span></div>
+                      <div className={styles['read-row']}><span className={styles['read-label']}>Título:</span><span className={styles['read-value']}>{edu.degree || 'No especificado'}</span></div>
+                      <div className={styles['read-row']}><span className={styles['read-label']}>Campo:</span><span className={styles['read-value']}>{edu.field || 'No especificado'}</span></div>
+                      <div className={styles['read-row']}><span className={styles['read-label']}>Periodo:</span><span className={styles['read-value']}>{edu.startDate ? new Date(edu.startDate).toLocaleDateString('es-ES') : 'No especificado'} - {edu.endDate ? new Date(edu.endDate).toLocaleDateString('es-ES') : 'Presente'}</span></div>
+                      {edu.description && <div className={styles['read-row']}><span className={styles['read-label']}>Descripción:</span><span className={styles['read-value']}>{edu.description}</span></div>}
                     </div>
                   ))}
                 </div>
               );
             })}
             {curriculum.education.length === 0 && !newItems.education && (
-              <p className="empty-message">No hay educación agregada. Agrega tu educación formal.</p>
+              <p className={styles['empty-message']}>No hay educación agregada. Agrega tu educación formal.</p>
             )}
           </section>
 
           {/* Skills */}
-          <section className="curriculum-section">
-            <div className="section-header">
+          <section className={styles['curriculum-section']}>
+            <div className={styles['section-header']}>
               <h2>Habilidades (Skills)</h2>
               <button className="btn btn-secondary" onClick={addSkill}>
                 + Agregar Skill
@@ -740,10 +740,10 @@ const CurriculumPage = () => {
             </div>
             
             {newItems.skills && (
-              <div className="curriculum-item editing skill-item">
-                <div className="item-header"><span className="item-status">Nuevo skill</span></div>
-                <div className="item-content">
-                  <div className="form-row">
+              <div className={styles['curriculum-item'] + ' ' + styles['editing'] + ' ' + styles['skill-item']}>
+                <div className={styles['item-header']}><span className={styles['item-status']}>Nuevo skill</span></div>
+                <div className={styles['item-content']}>
+                  <div className={styles['form-row']}>
                     <input type="text" placeholder="Skill (ej: React, Python, JavaScript)" value={newItems.skills.name} onChange={(e) => updateSkill(newItems.skills.id, 'name', e.target.value)} />
                     <select value={newItems.skills.level} onChange={(e) => updateSkill(newItems.skills.id, 'level', e.target.value)}>
                       <option value="básico">Básico</option>
@@ -752,7 +752,7 @@ const CurriculumPage = () => {
                       <option value="experto">Experto</option>
                     </select>
                   </div>
-                  <div className="form-actions">
+                  <div className={styles['form-actions']}>
                     <button className="btn btn-primary" onClick={saveNewSkill}>Guardar</button>
                     <button className="btn btn-secondary" onClick={cancelNewSkill}>Cancelar</button>
                   </div>
@@ -764,19 +764,19 @@ const CurriculumPage = () => {
               const isEditing = editingItems[`skills_${skill.id}`];
               const isExpanded = expandedItems[`skills_${skill.id}`] || isEditing;
               return (
-                <div key={skill.id} className={`curriculum-item skill-item ${isEditing ? 'editing' : 'read-only'} ${!isExpanded ? 'collapsed' : ''}`}>
-                  <div className="item-header" onClick={() => !isEditing && toggleExpanded('skills', skill.id)}>
-                    <input type="checkbox" checked={skill.sendToApplication} onChange={(e) => { e.stopPropagation(); toggleSendToApplication(skill.id, 'skills'); }} className="send-checkbox" title="Enviar en aplicación" />
-                    <span className="item-title">{skill.name || 'Sin skill'} - {skill.level || 'Sin nivel'}</span>
+                <div key={skill.id} className={styles['curriculum-item'] + ' ' + styles['skill-item'] + ' ' + (isEditing ? styles['editing'] : styles['read-only']) + (!isExpanded ? ' ' + styles['collapsed'] : '')}>
+                  <div className={styles['item-header']} onClick={() => !isEditing && toggleExpanded('skills', skill.id)}>
+                    <input type="checkbox" checked={skill.sendToApplication} onChange={(e) => { e.stopPropagation(); toggleSendToApplication(skill.id, 'skills'); }} className={styles['send-checkbox']} title="Enviar en aplicación" />
+                    <span className={styles['item-title']}>{skill.name || 'Sin skill'} - {skill.level || 'Sin nivel'}</span>
                     {isEditing ? (
-                      <button className="btn-delete" onClick={(e) => { e.stopPropagation(); removeSkill(skill.id); }}>🗑️ Eliminar</button>
+                      <button className={styles['btn-delete']} onClick={(e) => { e.stopPropagation(); removeSkill(skill.id); }}>🗑️ Eliminar</button>
                     ) : (
-                      <button className="btn-edit" onClick={(e) => { e.stopPropagation(); startEditingSkill(skill.id); }}>✏️ Editar</button>
+                      <button className={styles['btn-edit']} onClick={(e) => { e.stopPropagation(); startEditingSkill(skill.id); }}>✏️ Editar</button>
                     )}
                   </div>
                   {isExpanded && (isEditing ? (
-                    <div className="item-content">
-                      <div className="form-row">
+                    <div className={styles['item-content']}>
+                      <div className={styles['form-row']}>
                         <input type="text" placeholder="Skill (ej: React, Python, JavaScript)" value={skill.name} onChange={(e) => updateSkill(skill.id, 'name', e.target.value)} />
                         <select value={skill.level} onChange={(e) => updateSkill(skill.id, 'level', e.target.value)}>
                           <option value="básico">Básico</option>
@@ -785,28 +785,28 @@ const CurriculumPage = () => {
                           <option value="experto">Experto</option>
                         </select>
                       </div>
-                      <div className="form-actions">
+                      <div className={styles['form-actions']}>
                         <button className="btn btn-primary" onClick={() => saveSkillEdit(skill.id)}>Guardar cambios</button>
                         <button className="btn btn-secondary" onClick={() => cancelSkillEdit(skill.id)}>Cancelar</button>
                       </div>
                     </div>
                   ) : (
-                    <div className="item-content read-view">
-                      <div className="read-row"><span className="read-label">Skill:</span><span className="read-value">{skill.name || 'No especificado'}</span></div>
-                      <div className="read-row"><span className="read-label">Nivel:</span><span className="read-value">{skill.level || 'No especificado'}</span></div>
+                    <div className={styles['item-content'] + ' ' + styles['read-view']}>
+                      <div className={styles['read-row']}><span className={styles['read-label']}>Skill:</span><span className={styles['read-value']}>{skill.name || 'No especificado'}</span></div>
+                      <div className={styles['read-row']}><span className={styles['read-label']}>Nivel:</span><span className={styles['read-value']}>{skill.level || 'No especificado'}</span></div>
                     </div>
                   ))}
                 </div>
               );
             })}
             {curriculum.skills.length === 0 && !newItems.skills && (
-              <p className="empty-message">No hay skills agregados. Agrega tus habilidades técnicas.</p>
+              <p className={styles['empty-message']}>No hay skills agregados. Agrega tus habilidades técnicas.</p>
             )}
           </section>
 
           {/* Proyectos */}
-          <section className="curriculum-section">
-            <div className="section-header">
+          <section className={styles['curriculum-section']}>
+            <div className={styles['section-header']}>
               <h2>Proyectos</h2>
               <button className="btn btn-secondary" onClick={addProject}>
                 + Agregar Proyecto
@@ -814,16 +814,16 @@ const CurriculumPage = () => {
             </div>
             
             {newItems.projects && (
-              <div className="curriculum-item editing">
-                <div className="item-header"><span className="item-status">Nuevo proyecto</span></div>
-                <div className="item-content">
+              <div className={styles['curriculum-item'] + ' ' + styles['editing']}>
+                <div className={styles['item-header']}><span className={styles['item-status']}>Nuevo proyecto</span></div>
+                <div className={styles['item-content']}>
                   <input type="text" placeholder="Nombre del proyecto" value={newItems.projects.name} onChange={(e) => updateProject(newItems.projects.id, 'name', e.target.value)} />
                   <textarea placeholder="Descripción del proyecto..." value={newItems.projects.description} onChange={(e) => updateProject(newItems.projects.id, 'description', e.target.value)} rows="2" />
-                  <div className="form-row">
+                  <div className={styles['form-row']}>
                     <input type="text" placeholder="Tecnologías (separadas por coma)" value={newItems.projects.technologies} onChange={(e) => updateProject(newItems.projects.id, 'technologies', e.target.value)} />
                     <input type="url" placeholder="Link al proyecto (opcional)" value={newItems.projects.link} onChange={(e) => updateProject(newItems.projects.id, 'link', e.target.value)} />
                   </div>
-                  <div className="form-actions">
+                  <div className={styles['form-actions']}>
                     <button className="btn btn-primary" onClick={saveNewProject}>Guardar</button>
                     <button className="btn btn-secondary" onClick={cancelNewProject}>Cancelar</button>
                   </div>
@@ -835,48 +835,48 @@ const CurriculumPage = () => {
               const isEditing = editingItems[`projects_${proj.id}`];
               const isExpanded = expandedItems[`projects_${proj.id}`] || isEditing;
               return (
-                <div key={proj.id} className={`curriculum-item ${isEditing ? 'editing' : 'read-only'} ${!isExpanded ? 'collapsed' : ''}`}>
-                  <div className="item-header" onClick={() => !isEditing && toggleExpanded('projects', proj.id)}>
-                    <input type="checkbox" checked={proj.sendToApplication} onChange={(e) => { e.stopPropagation(); toggleSendToApplication(proj.id, 'projects'); }} className="send-checkbox" title="Enviar en aplicación" />
-                    <span className="item-title">{proj.name || 'Sin nombre'}</span>
+                <div key={proj.id} className={styles['curriculum-item'] + ' ' + (isEditing ? styles['editing'] : styles['read-only']) + (!isExpanded ? ' ' + styles['collapsed'] : '')}>
+                  <div className={styles['item-header']} onClick={() => !isEditing && toggleExpanded('projects', proj.id)}>
+                    <input type="checkbox" checked={proj.sendToApplication} onChange={(e) => { e.stopPropagation(); toggleSendToApplication(proj.id, 'projects'); }} className={styles['send-checkbox']} title="Enviar en aplicación" />
+                    <span className={styles['item-title']}>{proj.name || 'Sin nombre'}</span>
                     {isEditing ? (
-                      <button className="btn-delete" onClick={(e) => { e.stopPropagation(); removeProject(proj.id); }}>🗑️ Eliminar</button>
+                      <button className={styles['btn-delete']} onClick={(e) => { e.stopPropagation(); removeProject(proj.id); }}>🗑️ Eliminar</button>
                     ) : (
-                      <button className="btn-edit" onClick={(e) => { e.stopPropagation(); startEditingProject(proj.id); }}>✏️ Editar</button>
+                      <button className={styles['btn-edit']} onClick={(e) => { e.stopPropagation(); startEditingProject(proj.id); }}>✏️ Editar</button>
                     )}
                   </div>
                   {isExpanded && (isEditing ? (
-                    <div className="item-content">
+                    <div className={styles['item-content']}>
                       <input type="text" placeholder="Nombre del proyecto" value={proj.name} onChange={(e) => updateProject(proj.id, 'name', e.target.value)} />
                       <textarea placeholder="Descripción del proyecto..." value={proj.description} onChange={(e) => updateProject(proj.id, 'description', e.target.value)} rows="2" />
-                      <div className="form-row">
+                      <div className={styles['form-row']}>
                         <input type="text" placeholder="Tecnologías (separadas por coma)" value={proj.technologies} onChange={(e) => updateProject(proj.id, 'technologies', e.target.value)} />
                         <input type="url" placeholder="Link al proyecto (opcional)" value={proj.link} onChange={(e) => updateProject(proj.id, 'link', e.target.value)} />
                       </div>
-                      <div className="form-actions">
+                      <div className={styles['form-actions']}>
                         <button className="btn btn-primary" onClick={() => saveProjectEdit(proj.id)}>Guardar cambios</button>
                         <button className="btn btn-secondary" onClick={() => cancelProjectEdit(proj.id)}>Cancelar</button>
                       </div>
                     </div>
                   ) : (
-                    <div className="item-content read-view">
-                      <div className="read-row"><span className="read-label">Nombre:</span><span className="read-value">{proj.name || 'No especificado'}</span></div>
-                      {proj.description && <div className="read-row"><span className="read-label">Descripción:</span><span className="read-value">{proj.description}</span></div>}
-                      <div className="read-row"><span className="read-label">Tecnologías:</span><span className="read-value">{proj.technologies || 'No especificado'}</span></div>
-                      {proj.link && <div className="read-row"><span className="read-label">Link:</span><span className="read-value"><a href={proj.link} target="_blank" rel="noopener noreferrer">{proj.link}</a></span></div>}
+                    <div className={styles['item-content'] + ' ' + styles['read-view']}>
+                      <div className={styles['read-row']}><span className={styles['read-label']}>Nombre:</span><span className={styles['read-value']}>{proj.name || 'No especificado'}</span></div>
+                      {proj.description && <div className={styles['read-row']}><span className={styles['read-label']}>Descripción:</span><span className={styles['read-value']}>{proj.description}</span></div>}
+                      <div className={styles['read-row']}><span className={styles['read-label']}>Tecnologías:</span><span className={styles['read-value']}>{proj.technologies || 'No especificado'}</span></div>
+                      {proj.link && <div className={styles['read-row']}><span className={styles['read-label']}>Link:</span><span className={styles['read-value']}><a href={proj.link} target="_blank" rel="noopener noreferrer">{proj.link}</a></span></div>}
                     </div>
                   ))}
                 </div>
               );
             })}
             {curriculum.projects.length === 0 && !newItems.projects && (
-              <p className="empty-message">No hay proyectos agregados. Agrega tus proyectos personales.</p>
+              <p className={styles['empty-message']}>No hay proyectos agregados. Agrega tus proyectos personales.</p>
             )}
           </section>
 
           {/* Idiomas */}
-          <section className="curriculum-section">
-            <div className="section-header">
+          <section className={styles['curriculum-section']}>
+            <div className={styles['section-header']}>
               <h2>Idiomas</h2>
               <button className="btn btn-secondary" onClick={addLanguage}>
                 + Agregar Idioma
@@ -884,10 +884,10 @@ const CurriculumPage = () => {
             </div>
             
             {newItems.languages && (
-              <div className="curriculum-item editing language-item">
-                <div className="item-header"><span className="item-status">Nuevo idioma</span></div>
-                <div className="item-content">
-                  <div className="form-row">
+              <div className={styles['curriculum-item'] + ' ' + styles['editing'] + ' ' + styles['language-item']}>
+                <div className={styles['item-header']}><span className={styles['item-status']}>Nuevo idioma</span></div>
+                <div className={styles['item-content']}>
+                  <div className={styles['form-row']}>
                     <input type="text" placeholder="Idioma (ej: Inglés, Francés)" value={newItems.languages.language} onChange={(e) => updateLanguage(newItems.languages.id, 'language', e.target.value)} />
                     <select value={newItems.languages.level} onChange={(e) => updateLanguage(newItems.languages.id, 'level', e.target.value)}>
                       <option value="básico">Básico</option>
@@ -896,7 +896,7 @@ const CurriculumPage = () => {
                       <option value="nativo">Nativo</option>
                     </select>
                   </div>
-                  <div className="form-actions">
+                  <div className={styles['form-actions']}>
                     <button className="btn btn-primary" onClick={saveNewLanguage}>Guardar</button>
                     <button className="btn btn-secondary" onClick={cancelNewLanguage}>Cancelar</button>
                   </div>
@@ -908,19 +908,19 @@ const CurriculumPage = () => {
               const isEditing = editingItems[`languages_${lang.id}`];
               const isExpanded = expandedItems[`languages_${lang.id}`] || isEditing;
               return (
-                <div key={lang.id} className={`curriculum-item language-item ${isEditing ? 'editing' : 'read-only'} ${!isExpanded ? 'collapsed' : ''}`}>
-                  <div className="item-header" onClick={() => !isEditing && toggleExpanded('languages', lang.id)}>
-                    <input type="checkbox" checked={lang.sendToApplication} onChange={(e) => { e.stopPropagation(); toggleSendToApplication(lang.id, 'languages'); }} className="send-checkbox" title="Enviar en aplicación" />
-                    <span className="item-title">{lang.language || 'Sin idioma'} - {lang.level || 'Sin nivel'}</span>
+                <div key={lang.id} className={styles['curriculum-item'] + ' ' + styles['language-item'] + ' ' + (isEditing ? styles['editing'] : styles['read-only']) + (!isExpanded ? ' ' + styles['collapsed'] : '')}>
+                  <div className={styles['item-header']} onClick={() => !isEditing && toggleExpanded('languages', lang.id)}>
+                    <input type="checkbox" checked={lang.sendToApplication} onChange={(e) => { e.stopPropagation(); toggleSendToApplication(lang.id, 'languages'); }} className={styles['send-checkbox']} title="Enviar en aplicación" />
+                    <span className={styles['item-title']}>{lang.language || 'Sin idioma'} - {lang.level || 'Sin nivel'}</span>
                     {isEditing ? (
-                      <button className="btn-delete" onClick={(e) => { e.stopPropagation(); removeLanguage(lang.id); }}>🗑️ Eliminar</button>
+                      <button className={styles['btn-delete']} onClick={(e) => { e.stopPropagation(); removeLanguage(lang.id); }}>🗑️ Eliminar</button>
                     ) : (
-                      <button className="btn-edit" onClick={(e) => { e.stopPropagation(); startEditingLanguage(lang.id); }}>✏️ Editar</button>
+                      <button className={styles['btn-edit']} onClick={(e) => { e.stopPropagation(); startEditingLanguage(lang.id); }}>✏️ Editar</button>
                     )}
                   </div>
                   {isExpanded && (isEditing ? (
-                    <div className="item-content">
-                      <div className="form-row">
+                    <div className={styles['item-content']}>
+                      <div className={styles['form-row']}>
                         <input type="text" placeholder="Idioma (ej: Inglés, Francés)" value={lang.language} onChange={(e) => updateLanguage(lang.id, 'language', e.target.value)} />
                         <select value={lang.level} onChange={(e) => updateLanguage(lang.id, 'level', e.target.value)}>
                           <option value="básico">Básico</option>
@@ -929,22 +929,22 @@ const CurriculumPage = () => {
                           <option value="nativo">Nativo</option>
                         </select>
                       </div>
-                      <div className="form-actions">
+                      <div className={styles['form-actions']}>
                         <button className="btn btn-primary" onClick={() => saveLanguageEdit(lang.id)}>Guardar cambios</button>
                         <button className="btn btn-secondary" onClick={() => cancelLanguageEdit(lang.id)}>Cancelar</button>
                       </div>
                     </div>
                   ) : (
-                    <div className="item-content read-view">
-                      <div className="read-row"><span className="read-label">Idioma:</span><span className="read-value">{lang.language || 'No especificado'}</span></div>
-                      <div className="read-row"><span className="read-label">Nivel:</span><span className="read-value">{lang.level || 'No especificado'}</span></div>
+                    <div className={styles['item-content'] + ' ' + styles['read-view']}>
+                      <div className={styles['read-row']}><span className={styles['read-label']}>Idioma:</span><span className={styles['read-value']}>{lang.language || 'No especificado'}</span></div>
+                      <div className={styles['read-row']}><span className={styles['read-label']}>Nivel:</span><span className={styles['read-value']}>{lang.level || 'No especificado'}</span></div>
                     </div>
                   ))}
                 </div>
               );
             })}
             {curriculum.languages.length === 0 && !newItems.languages && (
-              <p className="empty-message">No hay idiomas agregados. Agrega tus idiomas.</p>
+              <p className={styles['empty-message']}>No hay idiomas agregados. Agrega tus idiomas.</p>
             )}
           </section>
         </div>

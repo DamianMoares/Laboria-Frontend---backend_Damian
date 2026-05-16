@@ -8,28 +8,6 @@ const register = async (req, res, next) => {
   try {
     const { email, password, name, role } = req.body;
     
-    // Validar campos requeridos
-    if (!email || !password || !name) {
-      const error = new Error('Email, password y name son requeridos');
-      error.statusCode = 400;
-      throw error;
-    }
-    
-    // Validar formato de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      const error = new Error('Email no válido');
-      error.statusCode = 400;
-      throw error;
-    }
-    
-    // Validar longitud de password
-    if (password.length < 6) {
-      const error = new Error('Password debe tener al menos 6 caracteres');
-      error.statusCode = 400;
-      throw error;
-    }
-    
     // Verificar si email ya existe
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -71,16 +49,10 @@ const register = async (req, res, next) => {
   }
 };
 
-// LOGIN (básico, sin JWT todavía)
+// LOGIN
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    
-    if (!email || !password) {
-      const error = new Error('Email y password son requeridos');
-      error.statusCode = 400;
-      throw error;
-    }
     
     // Buscar usuario
     const user = await prisma.user.findUnique({ where: { email } });
@@ -143,9 +115,20 @@ const updateProfile = async (req, res, next) => {
     const { id } = req.params;
     const { name, email } = req.body;
     
+    const existing = await prisma.user.findUnique({ where: { id } });
+    if (!existing) {
+      const error = new Error('Usuario no encontrado');
+      error.statusCode = 404;
+      throw error;
+    }
+    
+    const data = {};
+    if (name !== undefined) data.name = name;
+    if (email !== undefined) data.email = email;
+    
     const user = await prisma.user.update({
       where: { id },
-      data: { name, email },
+      data,
       select: { id: true, email: true, name: true, role: true, updatedAt: true }
     });
     
@@ -163,6 +146,13 @@ const updateProfile = async (req, res, next) => {
 const deleteAccount = async (req, res, next) => {
   try {
     const { id } = req.params;
+    
+    const existing = await prisma.user.findUnique({ where: { id } });
+    if (!existing) {
+      const error = new Error('Usuario no encontrado');
+      error.statusCode = 404;
+      throw error;
+    }
     
     await prisma.user.delete({ where: { id } });
     

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import EditProfileModal from '../../components/EditProfileModal';
-import './ProfilePage.css';
+import styles from './ProfilePage.module.css';
 
 const CandidateProfilePage = () => {
   const { user, logout, isCandidate, deleteAccount } = useAuth();
@@ -28,7 +28,7 @@ const CandidateProfilePage = () => {
 
   if (!user || !isCandidate()) {
     return (
-      <div className="profile-page not-authorized">
+      <div className={styles['profile-page'] + ' ' + styles['not-authorized']}>
         <div className="container">
           <h1>No autorizado</h1>
           <p>Esta página es solo para candidatos.</p>
@@ -41,18 +41,18 @@ const CandidateProfilePage = () => {
   const profile = JSON.parse(localStorage.getItem(`profile_${user.id}`) || 'null') || user.profile || {};
 
   return (
-    <div className="profile-page candidate-profile-page">
+    <div className={styles['profile-page'] + ' candidate-profile-page'}>
       <div className="container">
-        <header className="profile-header">
-          <div className="profile-header-content">
-            <div className="profile-avatar">
+        <header className={styles['profile-header']}>
+          <div className={styles['profile-header-content']}>
+            <div className={styles['profile-avatar']}>
               {profile.firstName ? profile.firstName[0] : user.name[0]}
               {profile.lastName ? profile.lastName[0] : ''}
             </div>
-            <div className="profile-info">
+            <div className={styles['profile-info']}>
               <h1>{profile.firstName || user.name} {profile.lastName || ''}</h1>
-              <p className="profile-email">{profile.email}</p>
-              <p className="profile-location">{profile.location}</p>
+              <p className={styles['profile-email']}>{profile.email}</p>
+              <p className={styles['profile-location']}>{profile.location}</p>
             </div>
           </div>
           <button className="btn btn-secondary" onClick={logout}>
@@ -60,51 +60,51 @@ const CandidateProfilePage = () => {
           </button>
         </header>
 
-        <div className="profile-content">
-          <div className="profile-main">
-            <section className="profile-section">
+        <div className={styles['profile-content']}>
+          <div className={styles['profile-main']}>
+            <section className={styles['profile-section']}>
               <h2>Información Personal</h2>
-              <div className="info-grid">
-                <div className="info-item">
-                  <span className="info-label">Email:</span>
-                  <span className="info-value">{profile.email}</span>
+              <div className={styles['info-grid']}>
+                <div className={styles['info-item']}>
+                  <span className={styles['info-label']}>Email:</span>
+                  <span className={styles['info-value']}>{profile.email}</span>
                 </div>
-                <div className="info-item">
-                  <span className="info-label">Teléfono:</span>
-                  <span className="info-value">{profile.phone || 'No especificado'}</span>
+                <div className={styles['info-item']}>
+                  <span className={styles['info-label']}>Teléfono:</span>
+                  <span className={styles['info-value']}>{profile.phone || 'No especificado'}</span>
                 </div>
-                <div className="info-item">
-                  <span className="info-label">Ubicación:</span>
-                  <span className="info-value">{profile.location}</span>
+                <div className={styles['info-item']}>
+                  <span className={styles['info-label']}>Ubicación:</span>
+                  <span className={styles['info-value']}>{profile.location}</span>
                 </div>
-                <div className="info-item">
-                  <span className="info-label">Experiencia:</span>
-                  <span className="info-value">{profile.experience || 'No especificado'}</span>
+                <div className={styles['info-item']}>
+                  <span className={styles['info-label']}>Experiencia:</span>
+                  <span className={styles['info-value']}>{profile.experience || 'No especificado'}</span>
                 </div>
-                <div className="info-item">
-                  <span className="info-label">Expectativa salarial:</span>
-                  <span className="info-value">{profile.salaryExpectation || 'No especificado'}</span>
+                <div className={styles['info-item']}>
+                  <span className={styles['info-label']}>Expectativa salarial:</span>
+                  <span className={styles['info-value']}>{profile.salaryExpectation || 'No especificado'}</span>
                 </div>
-                <div className="info-item">
-                  <span className="info-label">Preferencia de trabajo:</span>
-                  <span className="info-value">{profile.workModePreference || 'No especificado'}</span>
+                <div className={styles['info-item']}>
+                  <span className={styles['info-label']}>Preferencia de trabajo:</span>
+                  <span className={styles['info-value']}>{profile.workModePreference || 'No especificado'}</span>
                 </div>
               </div>
             </section>
 
-            <section className="profile-section">
+            <section className={styles['profile-section']}>
               <h2>Biografía</h2>
-              <p className="bio-text">{profile.bio || 'No hay biografía'}</p>
+              <p className={styles['bio-text']}>{profile.bio || 'No hay biografía'}</p>
             </section>
 
             {curriculum.experience.length > 0 && (
-              <section className="profile-section">
+              <section className={styles['profile-section']}>
                 <h2>Experiencia Laboral</h2>
-                <div className="curriculum-list">
+                <div className={styles['curriculum-list']}>
                   {curriculum.experience.map((exp) => (
-                    <div key={exp.id} className="curriculum-item">
+                    <div key={exp.id} className={styles['curriculum-item']}>
                       <h4>{exp.position} - {exp.company}</h4>
-                      <p className="curriculum-date">{exp.startDate} - {exp.endDate || 'Actualidad'}</p>
+                      <p className={styles['curriculum-date']}>{exp.startDate} - {exp.endDate || 'Actualidad'}</p>
                       <p>{exp.description}</p>
                     </div>
                   ))}
@@ -113,13 +113,13 @@ const CandidateProfilePage = () => {
             )}
 
             {curriculum.education.length > 0 && (
-              <section className="profile-section">
+              <section className={styles['profile-section']}>
                 <h2>Educación</h2>
-                <div className="curriculum-list">
+                <div className={styles['curriculum-list']}>
                   {curriculum.education.map((edu) => (
-                    <div key={edu.id} className="curriculum-item">
+                    <div key={edu.id} className={styles['curriculum-item']}>
                       <h4>{edu.degree} - {edu.institution}</h4>
-                      <p className="curriculum-date">{edu.startDate} - {edu.endDate}</p>
+                      <p className={styles['curriculum-date']}>{edu.startDate} - {edu.endDate}</p>
                       {edu.field && <p>Campo: {edu.field}</p>}
                       {edu.description && <p>{edu.description}</p>}
                     </div>
@@ -128,36 +128,36 @@ const CandidateProfilePage = () => {
               </section>
             )}
 
-            <section className="profile-section">
+            <section className={styles['profile-section']}>
               <h2>Skills</h2>
-              <div className="skills-container">
+              <div className={styles['skills-container']}>
                 {curriculum.skills.length > 0 ? (
                   curriculum.skills.map((skill, index) => (
-                    <span key={index} className="skill-tag">
+                    <span key={index} className={styles['skill-tag']}>
                       {skill.name} ({skill.level})
                     </span>
                   ))
                 ) : profile.skills && profile.skills.length > 0 ? (
                   profile.skills.map((skill, index) => (
-                    <span key={index} className="skill-tag">{skill}</span>
+                    <span key={index} className={styles['skill-tag']}>{skill}</span>
                   ))
                 ) : (
-                  <p className="no-data">No hay skills especificados</p>
+                  <p className={styles['no-data']}>No hay skills especificados</p>
                 )}
               </div>
             </section>
 
             {curriculum.projects.length > 0 && (
-              <section className="profile-section">
+              <section className={styles['profile-section']}>
                 <h2>Proyectos</h2>
-                <div className="curriculum-list">
+                <div className={styles['curriculum-list']}>
                   {curriculum.projects.map((proj) => (
-                    <div key={proj.id} className="curriculum-item">
+                    <div key={proj.id} className={styles['curriculum-item']}>
                       <h4>{proj.name}</h4>
                       <p>{proj.description}</p>
                       {proj.technologies && <p>Tecnologías: {proj.technologies}</p>}
                       {proj.link && (
-                        <a href={proj.link} target="_blank" rel="noopener noreferrer" className="profile-link">
+                        <a href={proj.link} target="_blank" rel="noopener noreferrer" className={styles['profile-link']}>
                           Ver proyecto
                         </a>
                       )}
@@ -168,11 +168,11 @@ const CandidateProfilePage = () => {
             )}
 
             {curriculum.languages.length > 0 && (
-              <section className="profile-section">
+              <section className={styles['profile-section']}>
                 <h2>Idiomas</h2>
-                <div className="skills-container">
+                <div className={styles['skills-container']}>
                   {curriculum.languages.map((lang, index) => (
-                    <span key={index} className="skill-tag">
+                    <span key={index} className={styles['skill-tag']}>
                       {lang.language} ({lang.level})
                     </span>
                   ))}
@@ -180,63 +180,63 @@ const CandidateProfilePage = () => {
               </section>
             )}
 
-            <section className="profile-section">
+            <section className={styles['profile-section']}>
               <h2>Enlaces</h2>
-              <div className="links-container">
+              <div className={styles['links-container']}>
                 {profile.linkedin && (
-                  <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="profile-link">
+                  <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className={styles['profile-link']}>
                     LinkedIn
                   </a>
                 )}
                 {profile.github && (
-                  <a href={profile.github} target="_blank" rel="noopener noreferrer" className="profile-link">
+                  <a href={profile.github} target="_blank" rel="noopener noreferrer" className={styles['profile-link']}>
                     GitHub
                   </a>
                 )}
                 {profile.portfolio && (
-                  <a href={profile.portfolio} target="_blank" rel="noopener noreferrer" className="profile-link">
+                  <a href={profile.portfolio} target="_blank" rel="noopener noreferrer" className={styles['profile-link']}>
                     Portfolio
                   </a>
                 )}
                 {!profile.linkedin && !profile.github && !profile.portfolio && (
-                  <p className="no-data">No hay enlaces especificados</p>
+                  <p className={styles['no-data']}>No hay enlaces especificados</p>
                 )}
               </div>
             </section>
           </div>
 
-          <aside className="profile-sidebar">
-            <div className="sidebar-card">
+          <aside className={styles['profile-sidebar']}>
+            <div className={styles['sidebar-card']}>
               <h3>Acciones rápidas</h3>
-              <Link to="/panel" className="sidebar-action">
+              <Link to="/panel" className={styles['sidebar-action']}>
                 Resumen
               </Link>
-              <Link to="/empleos" className="sidebar-action">
+              <Link to="/empleos" className={styles['sidebar-action']}>
                 Buscar Empleo
               </Link>
-              <Link to="/cursos" className="sidebar-action">
+              <Link to="/cursos" className={styles['sidebar-action']}>
                 Buscar Cursos
               </Link>
-              <Link to="/curriculum" className="sidebar-action">
+              <Link to="/curriculum" className={styles['sidebar-action']}>
                 Gestionar Currículum
               </Link>
-              <button className="sidebar-action" onClick={() => setIsEditModalOpen(true)}>
+              <button className={styles['sidebar-action']} onClick={() => setIsEditModalOpen(true)}>
                 Editar Perfil
               </button>
-              <button className="sidebar-action delete-account" onClick={() => setIsDeleteModalOpen(true)}>
+              <button className={styles['sidebar-action'] + ' ' + styles['delete-account']} onClick={() => setIsDeleteModalOpen(true)}>
                 Eliminar Cuenta
               </button>
             </div>
 
-            <div className="sidebar-card">
+            <div className={styles['sidebar-card']}>
               <h3>Estadísticas</h3>
-              <div className="stat-item">
-                <span className="stat-value">0</span>
-                <span className="stat-label">Aplicaciones</span>
+              <div className={styles['stat-item']}>
+                <span className={styles['stat-value']}>0</span>
+                <span className={styles['stat-label']}>Aplicaciones</span>
               </div>
-              <div className="stat-item">
-                <span className="stat-value">0</span>
-                <span className="stat-label">Cursos guardados</span>
+              <div className={styles['stat-item']}>
+                <span className={styles['stat-value']}>0</span>
+                <span className={styles['stat-label']}>Cursos guardados</span>
               </div>
             </div>
           </aside>

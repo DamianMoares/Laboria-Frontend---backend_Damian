@@ -1,18 +1,35 @@
-/* Admin Jobs Styles - Tema Laboria */
+/* Admin Courses Styles - Tema Laboria */
 
-.admin-jobs {
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-bg-primary);
+}
+
+.admin-content {
+  flex: 1;
+  margin-left: 260px;
+  min-height: 100vh;
+  background: var(--color-bg-primary);
+}
+
+.admin-courses {
   min-height: 100vh;
   background: var(--color-bg-primary);
   padding: var(--spacing-xl);
 }
 
 @media (max-width: 768px) {
-  .admin-jobs {
+  .admin-content {
+    margin-left: 0;
+  }
+
+  .admin-courses {
     padding: var(--spacing-md);
   }
 }
 
-/* Header (reuses AdminUsers styles) */
+/* Header */
 .admin-header {
   background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-black-light) 100%);
   color: var(--color-text-primary);
@@ -140,8 +157,8 @@
   color: var(--color-black);
 }
 
-/* Jobs Table */
-.jobs-table-container {
+/* Courses Table */
+.courses-table-container {
   background: var(--color-bg-secondary);
   border-radius: var(--border-radius-lg);
   border: 1px solid var(--color-border);
@@ -149,12 +166,12 @@
   margin-bottom: var(--spacing-lg);
 }
 
-.jobs-table {
+.courses-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.jobs-table th {
+.courses-table th {
   background: var(--color-bg-tertiary);
   padding: var(--spacing-md);
   text-align: left;
@@ -164,33 +181,37 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-.jobs-table td {
+.courses-table td {
   padding: var(--spacing-md);
   border-bottom: 1px solid var(--color-border);
   vertical-align: middle;
   color: var(--color-text-secondary);
 }
 
-.jobs-table tr:hover {
+.courses-table tr:hover {
   background: var(--color-bg-tertiary);
 }
 
-/* Job Info */
-.job-title {
+/* Course Info */
+.course-title {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
 
-.job-title strong {
+.course-title strong {
   color: var(--color-text-primary);
   font-size: 0.95rem;
 }
 
-.job-salary {
+.course-link {
   font-size: 0.8rem;
-  color: #68d391;
-  font-weight: 500;
+  color: var(--color-gold);
+  text-decoration: none;
+}
+
+.course-link:hover {
+  text-decoration: underline;
 }
 
 .category-badge {
@@ -198,6 +219,27 @@
   background: var(--color-bg-tertiary);
   color: var(--color-text-secondary);
   border: 1px solid var(--color-border);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Price Tags */
+.price-tag {
+  display: inline-block;
+  background: rgba(72, 187, 120, 0.2);
+  color: #68d391;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.free-tag {
+  display: inline-block;
+  background: rgba(99, 179, 237, 0.2);
+  color: #63b3ed;
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
   font-size: 0.8rem;
@@ -213,22 +255,12 @@
 .author-name {
   font-weight: 500;
   color: var(--color-text-primary);
+  font-size: 0.9rem;
 }
 
 .author-info small {
   color: var(--color-text-muted);
   font-size: 0.8rem;
-}
-
-/* Applications Count */
-.applications-count {
-  display: inline-block;
-  background: rgba(72, 187, 120, 0.2);
-  color: #68d391;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
 }
 
 /* Action Buttons */
@@ -557,45 +589,49 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .admin-jobs {
-    padding: 1rem;
+  .admin-content {
+    margin-left: 0;
   }
 
+  .admin-courses {
+    padding: var(--spacing-md);
+  }
+  
   .header-content {
     flex-direction: column;
     text-align: center;
   }
-
+  
   .filters-section {
     flex-direction: column;
   }
-
+  
   .filter-group {
     width: 100%;
   }
-
+  
   .filter-input,
   .filter-select {
     min-width: 100%;
   }
-
-  .jobs-table {
+  
+  .courses-table {
     font-size: 0.85rem;
   }
-
-  .jobs-table th,
-  .jobs-table td {
-    padding: 0.75rem 0.5rem;
+  
+  .courses-table th,
+  .courses-table td {
+    padding: var(--spacing-sm);
   }
-
+  
   .form-row {
     grid-template-columns: 1fr;
   }
-
+  
   .form-actions {
     flex-direction: column;
   }
-
+  
   .confirm-actions {
     flex-direction: column;
   }

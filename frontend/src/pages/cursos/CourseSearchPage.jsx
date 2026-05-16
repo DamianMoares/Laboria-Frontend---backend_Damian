@@ -3,7 +3,7 @@ import coursesData from '../../data/courses.json';
 import { spainMunicipalities } from '../../data/searchData';
 import { searchAllCourses } from '../../context/ConexionApi';
 import CourseCard from '../../components/courses/CourseCard';
-import './CourseSearchPage.css';
+import styles from './CourseSearchPage.module.css';
 
 const CourseSearchPage = () => {
   const [courses, setCourses] = useState([]);
@@ -269,35 +269,35 @@ const CourseSearchPage = () => {
   };
 
   return (
-    <div className="course-search-page">
-      <div className="search-header">
+    <div className={styles['course-search-page']}>
+      <div className={styles['search-header']}>
         <h1>Búsqueda de Cursos</h1>
-        <p className="subtitle">Mejora tus habilidades con formación profesional en toda España</p>
+        <p className={styles['subtitle']}>Mejora tus habilidades con formación profesional en toda España</p>
       </div>
 
-      <div className="search-container">
-        <div className="search-bar">
+      <div className={styles['search-container']}>
+        <div className={styles['search-bar']}>
           <input
             type="text"
             placeholder="Buscar por curso, plataforma, tecnología..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
+            className={styles['search-input']}
             aria-label="Buscar cursos"
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
           />
         </div>
 
-        <div className="filters-sidebar">
+        <div className={styles['filters-sidebar']}>
           <h3>Filtros</h3>
           
-          <div className="filter-group">
+          <div className={styles['filter-group']}>
             <label htmlFor="location-filter">Ubicación:</label>
             <select
               id="location-filter"
               value={selectedLocation}
               onChange={(e) => setSelectedLocation(e.target.value)}
-              className="filter-select"
+              className={styles['filter-select']}
             >
               <option value="">Todas las ubicaciones</option>
               {locations.map(location => (
@@ -308,13 +308,13 @@ const CourseSearchPage = () => {
             </select>
           </div>
 
-          <div className="filter-group">
+          <div className={styles['filter-group']}>
             <label htmlFor="level-filter">Nivel:</label>
             <select
               id="level-filter"
               value={selectedLevel}
               onChange={(e) => setSelectedLevel(e.target.value)}
-              className="filter-select"
+              className={styles['filter-select']}
             >
               <option value="">Todos los niveles</option>
               {levels.map(level => (
@@ -325,13 +325,13 @@ const CourseSearchPage = () => {
             </select>
           </div>
 
-          <div className="filter-group">
+          <div className={styles['filter-group']}>
             <label htmlFor="format-filter">Formato:</label>
             <select
               id="format-filter"
               value={selectedFormat}
               onChange={(e) => setSelectedFormat(e.target.value)}
-              className="filter-select"
+              className={styles['filter-select']}
             >
               <option value="">Todos los formatos</option>
               {formats.map(format => (
@@ -342,13 +342,13 @@ const CourseSearchPage = () => {
             </select>
           </div>
 
-          <div className="filter-group">
+          <div className={styles['filter-group']}>
             <label htmlFor="certification-filter">Certificación:</label>
             <select
               id="certification-filter"
               value={selectedCertification}
               onChange={(e) => setSelectedCertification(e.target.value)}
-              className="filter-select"
+              className={styles['filter-select']}
             >
               <option value="">Todos</option>
               <option value="certified">Con certificación</option>
@@ -357,21 +357,21 @@ const CourseSearchPage = () => {
           </div>
 
           <button
-            className="btn-toggle-advanced"
+            className={styles['btn-toggle-advanced']}
             onClick={() => setShowAdvanced(!showAdvanced)}
           >
             {showAdvanced ? 'Ocultar filtros avanzados' : 'Mostrar filtros avanzados'}
           </button>
 
           {showAdvanced && (
-            <div className="advanced-filters">
-              <div className="filter-group">
+            <div className={styles['advanced-filters']}>
+              <div className={styles['filter-group']}>
                 <label htmlFor="category-filter">Categoría:</label>
                 <select
                   id="category-filter"
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="filter-select"
+                  className={styles['filter-select']}
                 >
                   <option value="">Todas las categorías</option>
                   {categories.map(category => (
@@ -382,13 +382,13 @@ const CourseSearchPage = () => {
                 </select>
               </div>
 
-              <div className="filter-group">
+              <div className={styles['filter-group']}>
                 <label htmlFor="language-filter">Idioma:</label>
                 <select
                   id="language-filter"
                   value={selectedLanguage}
                   onChange={(e) => setSelectedLanguage(e.target.value)}
-                  className="filter-select"
+                  className={styles['filter-select']}
                 >
                   <option value="">Todos los idiomas</option>
                   {languages.map(language => (
@@ -399,13 +399,13 @@ const CourseSearchPage = () => {
                 </select>
               </div>
 
-              <div className="filter-group">
+              <div className={styles['filter-group']}>
                 <label htmlFor="price-filter">Precio:</label>
                 <select
                   id="price-filter"
                   value={selectedPrice}
                   onChange={(e) => setSelectedPrice(e.target.value)}
-                  className="filter-select"
+                  className={styles['filter-select']}
                 >
                   <option value="">Todos los precios</option>
                   {priceRanges.map(range => (
@@ -416,13 +416,13 @@ const CourseSearchPage = () => {
                 </select>
               </div>
 
-              <div className="filter-group">
+              <div className={styles['filter-group']}>
                 <label htmlFor="duration-filter">Duración:</label>
                 <select
                   id="duration-filter"
                   value={selectedDuration}
                   onChange={(e) => setSelectedDuration(e.target.value)}
-                  className="filter-select"
+                  className={styles['filter-select']}
                 >
                   <option value="">Todas las duraciones</option>
                   {durations.map(duration => (
@@ -435,19 +435,19 @@ const CourseSearchPage = () => {
             </div>
           )}
 
-          <div className="filter-actions">
-            <button className="btn-search" onClick={handleSearch}>
+          <div className={styles['filter-actions']}>
+            <button className={styles['btn-search']} onClick={handleSearch}>
               Buscar
             </button>
-            <button className="btn-clear-filters" onClick={handleClearFilters}>
+            <button className={styles['btn-clear-filters']} onClick={handleClearFilters}>
               Limpiar filtros
             </button>
           </div>
         </div>
 
-        <div className="results-container">
+        <div className={styles['results-container']}>
           {loading && (
-            <div className="loading-state">
+            <div className={styles['loading-state']}>
               <p>Buscando cursos...</p>
             </div>
           )}
@@ -455,17 +455,17 @@ const CourseSearchPage = () => {
           {hasSearched && !loading && (
             <>
               {error && (
-                <div className="error-state">
+                <div className={styles['error-state']}>
                   <p>{error}</p>
                 </div>
               )}
-              <div className="results-header">
-                <span className="results-count">
+              <div className={styles['results-header']}>
+                <span className={styles['results-count']}>
                   {courses.length} {courses.length === 1 ? 'curso encontrado' : 'cursos encontrados'}
-                  {usingFallback && <span className="fallback-badge"> (Datos de ejemplo)</span>}
+                  {usingFallback && <span className={styles['fallback-badge']}> (Datos de ejemplo)</span>}
                 </span>
                 {totalPages > 1 && (
-                  <span className="pagination-info">
+                  <span className={styles['pagination-info']}>
                     Página {currentPage} de {totalPages}
                   </span>
                 )}
@@ -473,22 +473,22 @@ const CourseSearchPage = () => {
 
               {displayedCourses.length > 0 ? (
                 <>
-                  <div className="courses-list">
+                  <div className={styles['courses-list']}>
                     {displayedCourses.map(course => (
                       <CourseCard key={course.id} course={course} />
                     ))}
                   </div>
 
                   {totalPages > 1 && (
-                    <div className="pagination">
+                    <div className={styles['pagination']}>
                       <button
-                        className="pagination-btn"
+                        className={styles['pagination-btn']}
                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                         disabled={currentPage === 1}
                       >
                         Anterior
                       </button>
-                      <div className="pagination-numbers">
+                      <div className={styles['pagination-numbers']}>
                         {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                           let pageNum;
                           if (totalPages <= 5) {
@@ -503,7 +503,7 @@ const CourseSearchPage = () => {
                           return (
                             <button
                               key={pageNum}
-                              className={`pagination-number ${currentPage === pageNum ? 'active' : ''}`}
+                              className={styles['pagination-number'] + ' ' + (currentPage === pageNum ? styles['active'] : '')}
                               onClick={() => setCurrentPage(pageNum)}
                             >
                               {pageNum}
@@ -512,7 +512,7 @@ const CourseSearchPage = () => {
                         })}
                       </div>
                       <button
-                        className="pagination-btn"
+                        className={styles['pagination-btn']}
                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                         disabled={currentPage === totalPages}
                       >
@@ -522,7 +522,7 @@ const CourseSearchPage = () => {
                   )}
                 </>
               ) : (
-                <div className="no-results">
+                <div className={styles['no-results']}>
                   <p>No se encontraron cursos con los filtros seleccionados.</p>
                   <p>Intenta ajustar tus criterios de búsqueda.</p>
                 </div>
@@ -531,7 +531,7 @@ const CourseSearchPage = () => {
           )}
 
           {!hasSearched && !loading && (
-            <div className="search-prompt">
+            <div className={styles['search-prompt']}>
               <p>Usa los filtros y haz clic en "Buscar" para ver cursos.</p>
             </div>
           )}

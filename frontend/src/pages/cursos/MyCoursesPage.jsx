@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { courseService } from '../../services/courseService';
-import '../compartidos/MyListingsPage.css';
+import styles from '../compartidos/MyListingsPage.module.css';
 
 const MyCoursesPage = () => {
   const { user, isCompanyStudents, isCompanyHybrid } = useAuth();
@@ -27,7 +27,7 @@ const MyCoursesPage = () => {
 
   if (!user || (!isCompanyStudents() && !isCompanyHybrid())) {
     return (
-      <div className="my-listings-page not-authorized">
+      <div className={styles['my-listings-page'] + ' ' + styles['not-authorized']}>
         <div className="container">
           <h1>No autorizado</h1>
           <p>Esta página es solo para empresas que publican cursos.</p>
@@ -50,11 +50,11 @@ const MyCoursesPage = () => {
   };
 
   return (
-    <div className="my-courses-page my-listings-page">
+    <div className={'my-courses-page ' + styles['my-listings-page']}>
       <div className="container">
-        <header className="listings-header">
+        <header className={styles['listings-header']}>
           <h1>Mis Cursos</h1>
-          <p className="listings-subtitle">
+          <p className={styles['listings-subtitle']}>
             Gestiona los cursos que has publicado
           </p>
           <Link to="/publicar-curso" className="btn btn-primary">
@@ -65,37 +65,37 @@ const MyCoursesPage = () => {
         {loading ? (
           <div className="loading">Cargando cursos...</div>
         ) : postedCourses.length > 0 ? (
-          <div className="listings-grid">
+          <div className={styles['listings-grid']}>
             {postedCourses.map(course => (
-              <div key={course.id} className="listing-card">
-                <div className="listing-header">
+              <div key={course.id} className={styles['listing-card']}>
+                <div className={styles['listing-header']}>
                   <h3>{course.title}</h3>
                 </div>
                 
-                <div className="listing-info">
-                  <div className="info-item">
+                <div className={styles['listing-info']}>
+                  <div className={styles['info-item']}>
                     <strong>Proveedor:</strong> {course.provider}
                   </div>
-                  <div className="info-item">
+                  <div className={styles['info-item']}>
                     <strong>Nivel:</strong> {course.level}
                   </div>
-                  <div className="info-item">
+                  <div className={styles['info-item']}>
                     <strong>Duración:</strong> {course.duration || 'N/A'}
                   </div>
-                  <div className="info-item">
+                  <div className={styles['info-item']}>
                     <strong>Categoría:</strong> {course.category}
                   </div>
-                  <div className="info-item">
+                  <div className={styles['info-item']}>
                     <strong>Precio:</strong> {course.price || 'Gratuito'}
                   </div>
                 </div>
 
-                <div className="listing-actions">
+                <div className={styles['listing-actions']}>
                   <Link to={`/cursos/${course.id}`} className="btn btn-secondary">
                     Ver Detalles
                   </Link>
                   <button 
-                    className="btn btn-danger"
+                    className={'btn ' + styles['btn-danger']}
                     onClick={() => handleDelete(course.id)}
                   >
                     Eliminar
@@ -105,7 +105,7 @@ const MyCoursesPage = () => {
             ))}
           </div>
         ) : (
-          <div className="no-listings">
+          <div className={styles['no-listings']}>
             <p>No has publicado ningún curso aún.</p>
             <Link to="/publicar-curso" className="btn btn-primary">
               Publicar Tu Primer Curso

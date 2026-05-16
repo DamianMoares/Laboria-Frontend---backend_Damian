@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { courseService } from '../../services/courseService';
-import '../compartidos/FormPage.css';
+import styles from '../compartidos/FormPage.module.css';
 
 const PostCoursePage = () => {
   const { user, isCompanyStudents, isCompanyHybrid } = useAuth();
@@ -11,7 +11,7 @@ const PostCoursePage = () => {
 
   if (!user || (!isCompanyStudents() && !isCompanyHybrid())) {
     return (
-      <div className="form-page not-authorized">
+      <div className={styles['form-page'] + ' ' + styles['not-authorized']}>
         <div className="container">
           <h1>No autorizado</h1>
           <p>Esta página es solo para empresas que pueden publicar cursos.</p>
@@ -72,18 +72,18 @@ const PostCoursePage = () => {
   };
 
   return (
-    <div className="form-page post-course-page">
+    <div className={styles['form-page'] + ' post-course-page'}>
       <div className="container">
-        <header className="form-header">
+        <header className={styles['form-header']}>
           <h1>Publicar Curso</h1>
-          <p className="form-subtitle">Crea un nuevo curso de formación</p>
+          <p className={styles['form-subtitle']}>Crea un nuevo curso de formación</p>
         </header>
 
-        <form className="form-container" onSubmit={handleSubmit}>
-          <div className="form-section">
+        <form className={styles['form-container']} onSubmit={handleSubmit}>
+          <div className={styles['form-section']}>
             <h2>Información Básica</h2>
             
-            <div className="form-group">
+            <div className={styles['form-group']}>
               <label htmlFor="title">Título del curso *</label>
               <input
                 type="text"
@@ -96,8 +96,8 @@ const PostCoursePage = () => {
               />
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
+            <div className={styles['form-row']}>
+              <div className={styles['form-group']}>
                 <label htmlFor="provider">Proveedor *</label>
                 <input
                   type="text"
@@ -110,7 +110,7 @@ const PostCoursePage = () => {
                 />
               </div>
 
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label htmlFor="category">Categoría *</label>
                 <select
                   id="category"
@@ -131,8 +131,8 @@ const PostCoursePage = () => {
               </div>
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
+            <div className={styles['form-row']}>
+              <div className={styles['form-group']}>
                 <label htmlFor="level">Nivel *</label>
                 <select
                   id="level"
@@ -147,7 +147,7 @@ const PostCoursePage = () => {
                 </select>
               </div>
 
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label htmlFor="url">URL del curso</label>
                 <input
                   type="url"
@@ -160,8 +160,8 @@ const PostCoursePage = () => {
               </div>
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
+            <div className={styles['form-row']}>
+              <div className={styles['form-group']}>
                 <label htmlFor="duration">Duración *</label>
                 <input
                   type="text"
@@ -174,7 +174,7 @@ const PostCoursePage = () => {
                 />
               </div>
 
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label htmlFor="price">Precio</label>
                 <input
                   type="text"
@@ -187,7 +187,7 @@ const PostCoursePage = () => {
               </div>
             </div>
 
-            <div className="form-group">
+            <div className={styles['form-group']}>
               <label htmlFor="image">URL de imagen</label>
               <input
                 type="url"
@@ -200,10 +200,10 @@ const PostCoursePage = () => {
             </div>
           </div>
 
-          <div className="form-section">
+          <div className={styles['form-section']}>
             <h2>Detalles del Curso</h2>
 
-            <div className="form-group">
+            <div className={styles['form-group']}>
               <label htmlFor="description">Descripción *</label>
               <textarea
                 id="description"
@@ -218,7 +218,7 @@ const PostCoursePage = () => {
 
           </div>
 
-          <div className="form-actions">
+          <div className={styles['form-actions']}>
             <button type="button" className="btn btn-secondary" onClick={() => navigate(-1)}>
               Cancelar
             </button>

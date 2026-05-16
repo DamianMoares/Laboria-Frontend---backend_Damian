@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import './AdminNavigation.css';
+import styles from './AdminNavigation.module.css';
 
 const AdminNavigation = ({ onLogout }) => {
   const location = useLocation();
@@ -23,40 +23,40 @@ const AdminNavigation = ({ onLogout }) => {
   };
 
   return (
-    <aside className="admin-sidebar">
-      <div className="sidebar-header">
-        <Link to="/admin" className="sidebar-brand">
-          <span className="brand-icon">🎛️</span>
-          <span className="brand-text">Admin Laboria</span>
+    <aside className={styles['admin-sidebar']}>
+      <div className={styles['sidebar-header']}>
+        <Link to="/admin" className={styles['sidebar-brand']}>
+          <span className={styles['brand-icon']}>🎛️</span>
+          <span className={styles['brand-text']}>Admin Laboria</span>
         </Link>
       </div>
 
-      <nav className="sidebar-nav">
-        <ul className="nav-list">
+      <nav className={styles['sidebar-nav']}>
+        <ul className={styles['nav-list']}>
           {navItems.map((item) => (
-            <li key={item.path} className="nav-item">
+            <li key={item.path} className={styles['nav-item']}>
               <Link
                 to={item.path}
-                className={`nav-link ${isActive(item.path) ? 'active' : ''}`}
+                className={styles['nav-link'] + (isActive(item.path) ? ' ' + styles['active'] : '')}
               >
-                <span className="nav-icon">{item.icon}</span>
-                <span className="nav-label">{item.label}</span>
-                {isActive(item.path) && <span className="active-indicator">▶</span>}
+                <span className={styles['nav-icon']}>{item.icon}</span>
+                <span className={styles['nav-label']}>{item.label}</span>
+                {isActive(item.path) && <span className={styles['active-indicator']}>▶</span>}
               </Link>
             </li>
           ))}
         </ul>
       </nav>
 
-      <div className="sidebar-footer">
-        <Link to="/" className="nav-link home-link">
-          <span className="nav-icon">🏠</span>
-          <span className="nav-label">Ir al sitio</span>
+      <div className={styles['sidebar-footer']}>
+        <Link to="/" className={styles['nav-link'] + ' ' + styles['home-link']}>
+          <span className={styles['nav-icon']}>🏠</span>
+          <span className={styles['nav-label']}>Ir al sitio</span>
         </Link>
         {onLogout && (
-          <button onClick={onLogout} className="btn-logout-sidebar">
-            <span className="nav-icon">🔒</span>
-            <span className="nav-label">Cerrar sesión</span>
+          <button onClick={onLogout} className={styles['btn-logout-sidebar']}>
+            <span className={styles['nav-icon']}>🔒</span>
+            <span className={styles['nav-label']}>Cerrar sesión</span>
           </button>
         )}
       </div>

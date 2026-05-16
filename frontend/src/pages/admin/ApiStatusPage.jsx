@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { checkApiConnection } from '../../context/ConexionApi';
 import AdminNavigation from './AdminNavigation';
-import './ApiStatusPage.css';
+import styles from './ApiStatusPage.module.css';
 
 const ApiStatusPage = ({ onAdminLogout }) => {
   const [status, setStatus] = useState(null);
@@ -90,32 +90,32 @@ const ApiStatusPage = ({ onAdminLogout }) => {
   }, []);
 
   return (
-    <div className="admin-layout">
+    <div className={styles['admin-layout']}>
       <AdminNavigation onLogout={onAdminLogout} />
-      <div className="admin-content">
-    <div className="api-status-page admin-page">
-      <div className="status-header">
-        <div className="header-top">
-          <div className="header-title">
+      <div className={styles['admin-content']}>
+    <div className={styles['api-status-page'] + ' ' + styles['admin-page']}>
+      <div className={styles['status-header']}>
+        <div className={styles['header-top']}>
+          <div className={styles['header-title']}>
             <h1>Panel de Administración</h1>
-            <p className="subtitle">Verifica el estado de APIs y ejecuta tests del sistema</p>
+            <p className={styles['subtitle']}>Verifica el estado de APIs y ejecuta tests del sistema</p>
           </div>
           {onAdminLogout && (
-            <button className="btn-admin-logout" onClick={onAdminLogout}>
+            <button className={styles['btn-admin-logout']} onClick={onAdminLogout}>
               🔒 Cerrar Sesión Admin
             </button>
           )}
         </div>
         
-        <div className="tabs">
+        <div className={styles['tabs']}>
           <button 
-            className={`tab ${activeTab === 'apis' ? 'active' : ''}`}
+            className={styles['tab'] + (activeTab === 'apis' ? ' ' + styles['active'] : '')}
             onClick={() => setActiveTab('apis')}
           >
             Estado de APIs
           </button>
           <button 
-            className={`tab ${activeTab === 'tests' ? 'active' : ''}`}
+            className={styles['tab'] + (activeTab === 'tests' ? ' ' + styles['active'] : '')}
             onClick={() => setActiveTab('tests')}
           >
             Tests del Sistema
@@ -125,42 +125,42 @@ const ApiStatusPage = ({ onAdminLogout }) => {
 
       {activeTab === 'apis' && (
         <>
-          <div className="status-actions">
+          <div className={styles['status-actions']}>
             <button 
-              className="btn-check" 
+              className={styles['btn-check']} 
               onClick={handleCheck} 
               disabled={loading}
             >
               {loading ? 'Verificando...' : 'Verificar conexión APIs'}
             </button>
             {lastChecked && (
-              <span className="last-checked">Última verificación: {lastChecked}</span>
+              <span className={styles['last-checked']}>Última verificación: {lastChecked}</span>
             )}
           </div>
 
           {status && (
-            <div className="status-container">
+            <div className={styles['status-container']}>
               {/* Backend Laboria Status */}
-              <section className="status-section laboria-backend">
+              <section className={styles['status-section'] + ' ' + styles['laboria-backend']}>
                 <h2>🚀 Tu Backend Laboria</h2>
                 {status.laboria && (
-                  <div className={`status-item ${status.laboria.connected ? 'connected' : 'disconnected'}`}>
-                    <div className="status-info">
-                      <span className="status-name">Backend API</span>
-                      <span className={`status-badge ${status.laboria.connected ? 'success' : 'error'}`}>
+                  <div className={styles['status-item'] + ' ' + (status.laboria.connected ? styles['connected'] : styles['disconnected'])}>
+                    <div className={styles['status-info']}>
+                      <span className={styles['status-name']}>Backend API</span>
+                      <span className={styles['status-badge'] + ' ' + (status.laboria.connected ? styles['success'] : styles['error'])}>
                         {status.laboria.connected ? '✓ Conectado' : '✗ Desconectado'}
                       </span>
                     </div>
                     {status.laboria.connected ? (
                       <>
-                        <span className="status-note">{status.laboria.message}</span>
-                        <span className="status-url">URL: {status.laboria.url}</span>
+                        <span className={styles['status-note']}>{status.laboria.message}</span>
+                        <span className={styles['status-url']}>URL: {status.laboria.url}</span>
                       </>
                     ) : (
                       <>
-                        <span className="status-error">{status.laboria.error}</span>
-                        <span className="status-url">URL: {status.laboria.url}</span>
-                        <div className="status-help">
+                        <span className={styles['status-error']}>{status.laboria.error}</span>
+                        <span className={styles['status-url']}>URL: {status.laboria.url}</span>
+                        <div className={styles['status-help']}>
                           <p>💡 Para conectar el backend:</p>
                           <ol>
                             <li>Abre terminal en carpeta <code>backend/</code></li>
@@ -175,37 +175,37 @@ const ApiStatusPage = ({ onAdminLogout }) => {
                 )}
               </section>
 
-              <section className="status-section">
+              <section className={styles['status-section']}>
                 <h2>APIs de Empleo</h2>
-                <div className="status-list">
+                <div className={styles['status-list']}>
                   {status.jobs.map((api, index) => (
-                    <div key={index} className={`status-item ${api.connected ? 'connected' : 'disconnected'}`}>
-                      <div className="status-info">
-                        <span className="status-name">{api.name}</span>
-                        <span className={`status-badge ${api.connected ? 'success' : 'error'}`}>
+                    <div key={index} className={styles['status-item'] + ' ' + (api.connected ? styles['connected'] : styles['disconnected'])}>
+                      <div className={styles['status-info']}>
+                        <span className={styles['status-name']}>{api.name}</span>
+                        <span className={styles['status-badge'] + ' ' + (api.connected ? styles['success'] : styles['error'])}>
                           {api.connected ? '✓ Conectado' : '✗ Error'}
                         </span>
                       </div>
-                      {api.error && <span className="status-error">{api.error}</span>}
-                      {api.note && <span className="status-note">{api.note}</span>}
+                      {api.error && <span className={styles['status-error']}>{api.error}</span>}
+                      {api.note && <span className={styles['status-note']}>{api.note}</span>}
                     </div>
                   ))}
                 </div>
               </section>
 
-              <section className="status-section">
+              <section className={styles['status-section']}>
                 <h2>APIs de Cursos</h2>
-                <div className="status-list">
+                <div className={styles['status-list']}>
                   {status.courses.map((api, index) => (
-                    <div key={index} className={`status-item ${api.connected ? 'connected' : 'disconnected'}`}>
-                      <div className="status-info">
-                        <span className="status-name">{api.name}</span>
-                        <span className={`status-badge ${api.connected ? 'success' : 'error'}`}>
+                    <div key={index} className={styles['status-item'] + ' ' + (api.connected ? styles['connected'] : styles['disconnected'])}>
+                      <div className={styles['status-info']}>
+                        <span className={styles['status-name']}>{api.name}</span>
+                        <span className={styles['status-badge'] + ' ' + (api.connected ? styles['success'] : styles['error'])}>
                           {api.connected ? '✓ Conectado' : '✗ Error'}
                         </span>
                       </div>
-                      {api.error && <span className="status-error">{api.error}</span>}
-                      {api.note && <span className="status-note">{api.note}</span>}
+                      {api.error && <span className={styles['status-error']}>{api.error}</span>}
+                      {api.note && <span className={styles['status-note']}>{api.note}</span>}
                     </div>
                   ))}
                 </div>
@@ -214,7 +214,7 @@ const ApiStatusPage = ({ onAdminLogout }) => {
           )}
 
           {!status && !loading && (
-            <div className="no-status">
+            <div className={styles['no-status']}>
               <p>Haz clic en "Verificar conexión APIs" para comprobar el estado de las APIs.</p>
             </div>
           )}
@@ -223,55 +223,55 @@ const ApiStatusPage = ({ onAdminLogout }) => {
 
       {activeTab === 'tests' && (
         <>
-          <div className="status-actions">
+          <div className={styles['status-actions']}>
             <button 
-              className="btn-check" 
+              className={styles['btn-check']} 
               onClick={handleRunTests} 
               disabled={testLoading}
             >
               {testLoading ? 'Ejecutando tests...' : 'Ejecutar Tests'}
             </button>
             {testLastRun && (
-              <span className="last-checked">Última ejecución: {testLastRun}</span>
+              <span className={styles['last-checked']}>Última ejecución: {testLastRun}</span>
             )}
           </div>
 
           {testResults && (
-            <div className="test-results">
-              <div className="test-summary">
-                <div className="summary-card">
-                  <span className="summary-label">Total Tests</span>
-                  <span className="summary-value">{testResults.total}</span>
+            <div className={styles['test-results']}>
+              <div className={styles['test-summary']}>
+                <div className={styles['summary-card']}>
+                  <span className={styles['summary-label']}>Total Tests</span>
+                  <span className={styles['summary-value']}>{testResults.total}</span>
                 </div>
-                <div className="summary-card success">
-                  <span className="summary-label">Pasados</span>
-                  <span className="summary-value">{testResults.passed}</span>
+                <div className={styles['summary-card'] + ' ' + styles['success']}>
+                  <span className={styles['summary-label']}>Pasados</span>
+                  <span className={styles['summary-value']}>{testResults.passed}</span>
                 </div>
-                <div className="summary-card error">
-                  <span className="summary-label">Fallidos</span>
-                  <span className="summary-value">{testResults.failed}</span>
+                <div className={styles['summary-card'] + ' ' + styles['error']}>
+                  <span className={styles['summary-label']}>Fallidos</span>
+                  <span className={styles['summary-value']}>{testResults.failed}</span>
                 </div>
-                <div className="summary-card">
-                  <span className="summary-label">Duración</span>
-                  <span className="summary-value">{testLoading ? '...' : testResults.duration}</span>
+                <div className={styles['summary-card']}>
+                  <span className={styles['summary-label']}>Duración</span>
+                  <span className={styles['summary-value']}>{testLoading ? '...' : testResults.duration}</span>
                 </div>
               </div>
 
-              <div className="test-suites">
+              <div className={styles['test-suites']}>
                 {testResults.suites.map((suite, suiteIndex) => (
-                  <div key={suiteIndex} className="test-suite">
+                  <div key={suiteIndex} className={styles['test-suite']}>
                     <h3>{suite.name}</h3>
-                    <div className="test-list">
+                    <div className={styles['test-list']}>
                       {suite.tests.map((test, testIndex) => (
-                        <div key={testIndex} className={`test-item ${test.status}`}>
-                          <span className="test-icon">
+                        <div key={testIndex} className={styles['test-item'] + ' ' + styles[test.status]}>
+                          <span className={styles['test-icon']}>
                             {testLoading ? (
-                              <span className="loading-spinner">⟳</span>
+                              <span className={styles['loading-spinner']}>⟳</span>
                             ) : (
                               test.status === 'passed' ? '✓' : '✗'
                             )}
                           </span>
-                          <span className="test-name">{test.name}</span>
+                          <span className={styles['test-name']}>{test.name}</span>
                         </div>
                       ))}
                     </div>
@@ -282,7 +282,7 @@ const ApiStatusPage = ({ onAdminLogout }) => {
           )}
 
           {!testResults && !testLoading && (
-            <div className="no-status">
+            <div className={styles['no-status']}>
               <p>Haz clic en "Ejecutar Tests" para verificar el funcionamiento del sistema.</p>
             </div>
           )}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import coursesData from '../../data/courses.json';
-import '../compartidos/MyListingsPage.css';
+import styles from '../compartidos/MyListingsPage.module.css';
 
 const SavedCoursesPage = () => {
   const { user, isCandidate } = useAuth();
@@ -24,7 +24,7 @@ const SavedCoursesPage = () => {
 
   if (!user || !isCandidate()) {
     return (
-      <div className="my-listings-page not-authorized">
+      <div className={styles['my-listings-page'] + ' ' + styles['not-authorized']}>
         <div className="container">
           <h1>No autorizado</h1>
           <p>Esta página es solo para candidatos.</p>
@@ -46,11 +46,11 @@ const SavedCoursesPage = () => {
   };
 
   return (
-    <div className="my-listings-page saved-courses-page">
+    <div className={styles['my-listings-page'] + ' saved-courses-page'}>
       <div className="container">
-        <header className="listings-header">
+        <header className={styles['listings-header']}>
           <h1>Cursos Guardados</h1>
-          <p className="listings-subtitle">
+          <p className={styles['listings-subtitle']}>
             Accede a tus cursos favoritos
           </p>
           <Link to="/cursos" className="btn btn-primary">
@@ -59,54 +59,54 @@ const SavedCoursesPage = () => {
         </header>
 
         {savedCourses.length > 0 ? (
-          <div className="listings-grid">
+          <div className={styles['listings-grid']}>
             {savedCourses.map(course => (
-              <div key={course.id} className="listing-card">
-                <div className="listing-header">
+              <div key={course.id} className={styles['listing-card']}>
+                <div className={styles['listing-header']}>
                   <h3>{course.title}</h3>
                   {course.certification && (
                     <span className="badge certification">Certificación</span>
                   )}
                 </div>
                 
-                <div className="listing-info">
-                  <div className="info-item">
+                <div className={styles['listing-info']}>
+                  <div className={styles['info-item']}>
                     <strong>Plataforma:</strong> {course.platform}
                   </div>
-                  <div className="info-item">
+                  <div className={styles['info-item']}>
                     <strong>Nivel:</strong> {course.level}
                   </div>
-                  <div className="info-item">
+                  <div className={styles['info-item']}>
                     <strong>Duración:</strong> {course.duration}
                   </div>
-                  <div className="info-item">
+                  <div className={styles['info-item']}>
                     <strong>Formato:</strong> {course.format}
                   </div>
-                  <div className="info-item">
+                  <div className={styles['info-item']}>
                     <strong>Precio:</strong> {course.price}
                   </div>
-                  <div className="info-item">
+                  <div className={styles['info-item']}>
                     <strong>Guardado:</strong> {course.savedDate}
                   </div>
                 </div>
 
-                <div className="listing-stats">
-                  <div className="stat">
-                    <span className="stat-value">⭐ {course.rating}</span>
-                    <span className="stat-label">Rating</span>
+                <div className={styles['listing-stats']}>
+                  <div className={styles['stat']}>
+                    <span className={styles['stat-value']}>⭐ {course.rating}</span>
+                    <span className={styles['stat-label']}>Rating</span>
                   </div>
-                  <div className="stat">
-                    <span className="stat-value">{course.students}</span>
-                    <span className="stat-label">Estudiantes</span>
+                  <div className={styles['stat']}>
+                    <span className={styles['stat-value']}>{course.students}</span>
+                    <span className={styles['stat-label']}>Estudiantes</span>
                   </div>
                 </div>
 
-                <div className="listing-actions">
+                <div className={styles['listing-actions']}>
                   <Link to={`/cursos/${course.id}`} className="btn btn-secondary">
                     Ver Detalles
                   </Link>
                   <button 
-                    className="btn btn-danger"
+                    className={'btn ' + styles['btn-danger']}
                     onClick={() => handleRemove(course.id)}
                   >
                     Eliminar
@@ -116,7 +116,7 @@ const SavedCoursesPage = () => {
             ))}
           </div>
         ) : (
-          <div className="no-listings">
+          <div className={styles['no-listings']}>
             <p>No has guardado ningún curso aún.</p>
             <Link to="/cursos" className="btn btn-primary">
               Buscar Cursos y Guardar

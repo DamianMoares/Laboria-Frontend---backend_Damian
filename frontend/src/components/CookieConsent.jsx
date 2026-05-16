@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './CookieConsent.css';
+import styles from './CookieConsent.module.css';
 
 const CookieConsent = () => {
   const [showBanner, setShowBanner] = useState(false);
@@ -98,23 +98,23 @@ const CookieConsent = () => {
   if (!showBanner) return null;
 
   return (
-    <div className="cookie-consent-overlay" role="dialog" aria-labelledby="cookie-title" aria-describedby="cookie-description">
-      <div className="cookie-consent-banner">
+    <div className={styles['cookie-consent-overlay']} role="dialog" aria-labelledby="cookie-title" aria-describedby="cookie-description">
+      <div className={styles['cookie-consent-banner']}>
         {!showPreferences ? (
           <>
-            <div className="cookie-content">
-              <h2 id="cookie-title" className="cookie-title">🍪 Política de Cookies</h2>
-              <p id="cookie-description" className="cookie-description">
+            <div className={styles['cookie-content']}>
+              <h2 id="cookie-title" className={styles['cookie-title']}>🍪 Política de Cookies</h2>
+              <p id="cookie-description" className={styles['cookie-description']}>
                 Utilizamos cookies para mejorar su experiencia en nuestro portal. 
                 Puede aceptar todas las cookies, rechazar las no esenciales, o configurar sus preferencias.
               </p>
-              <a href="/legal/politica-privacidad.html" className="cookie-link" target="_blank" rel="noopener noreferrer">
+              <a href="/legal/politica-privacidad.html" className={styles['cookie-link']} target="_blank" rel="noopener noreferrer">
                 Más información sobre cookies
               </a>
             </div>
-            <div className="cookie-actions">
+            <div className={styles['cookie-actions']}>
               <button
-                className="cookie-button cookie-button-secondary"
+                className={styles['cookie-button'] + ' ' + styles['cookie-button-secondary']}
                 onClick={handleRejectAll}
                 onKeyDown={(e) => handleKeyDown(e, handleRejectAll)}
                 aria-label="Rechazar todas las cookies no esenciales"
@@ -122,7 +122,7 @@ const CookieConsent = () => {
                 Rechazar
               </button>
               <button
-                className="cookie-button cookie-button-secondary"
+                className={styles['cookie-button'] + ' ' + styles['cookie-button-secondary']}
                 onClick={() => setShowPreferences(true)}
                 onKeyDown={(e) => handleKeyDown(e, () => setShowPreferences(true))}
                 aria-label="Configurar preferencias de cookies"
@@ -130,7 +130,7 @@ const CookieConsent = () => {
                 Preferencias
               </button>
               <button
-                className="cookie-button cookie-button-primary"
+                className={styles['cookie-button'] + ' ' + styles['cookie-button-primary']}
                 onClick={handleAcceptAll}
                 onKeyDown={(e) => handleKeyDown(e, handleAcceptAll)}
                 aria-label="Aceptar todas las cookies"
@@ -140,14 +140,14 @@ const CookieConsent = () => {
             </div>
           </>
         ) : (
-          <div className="cookie-preferences">
-            <h2 id="cookie-title" className="cookie-title">Configurar Cookies</h2>
-            <p className="cookie-description">
+          <div className={styles['cookie-preferences']}>
+            <h2 id="cookie-title" className={styles['cookie-title']}>Configurar Cookies</h2>
+            <p className={styles['cookie-description']}>
               Seleccione las categorías de cookies que desea aceptar:
             </p>
             
-            <div className="cookie-category">
-              <div className="cookie-category-header">
+            <div className={styles['cookie-category']}>
+              <div className={styles['cookie-category-header']}>
                 <input
                   type="checkbox"
                   id="essential"
@@ -155,17 +155,17 @@ const CookieConsent = () => {
                   disabled
                   aria-label="Cookies esenciales (siempre activas)"
                 />
-                <label htmlFor="essential" className="cookie-category-label">
+                <label htmlFor="essential" className={styles['cookie-category-label']}>
                   <strong>Cookies Esenciales</strong>
-                  <span className="cookie-category-description">
+                  <span className={styles['cookie-category-description']}>
                     Necesarias para el funcionamiento básico del sitio. No se pueden desactivar.
                   </span>
                 </label>
               </div>
             </div>
 
-            <div className="cookie-category">
-              <div className="cookie-category-header">
+            <div className={styles['cookie-category']}>
+              <div className={styles['cookie-category-header']}>
                 <input
                   type="checkbox"
                   id="analytics"
@@ -173,17 +173,17 @@ const CookieConsent = () => {
                   onChange={() => handleToggle('analytics')}
                   aria-label="Cookies de análisis"
                 />
-                <label htmlFor="analytics" className="cookie-category-label">
+                <label htmlFor="analytics" className={styles['cookie-category-label']}>
                   <strong>Cookies de Análisis</strong>
-                  <span className="cookie-category-description">
+                  <span className={styles['cookie-category-description']}>
                     Nos ayudan a entender cómo usa el sitio para mejorarlo.
                   </span>
                 </label>
               </div>
             </div>
 
-            <div className="cookie-category">
-              <div className="cookie-category-header">
+            <div className={styles['cookie-category']}>
+              <div className={styles['cookie-category-header']}>
                 <input
                   type="checkbox"
                   id="marketing"
@@ -191,18 +191,18 @@ const CookieConsent = () => {
                   onChange={() => handleToggle('marketing')}
                   aria-label="Cookies de marketing"
                 />
-                <label htmlFor="marketing" className="cookie-category-label">
+                <label htmlFor="marketing" className={styles['cookie-category-label']}>
                   <strong>Cookies de Marketing</strong>
-                  <span className="cookie-category-description">
+                  <span className={styles['cookie-category-description']}>
                     Se utilizan para mostrar anuncios personalizados.
                   </span>
                 </label>
               </div>
             </div>
 
-            <div className="cookie-actions">
+            <div className={styles['cookie-actions']}>
               <button
-                className="cookie-button cookie-button-secondary"
+                className={styles['cookie-button'] + ' ' + styles['cookie-button-secondary']}
                 onClick={() => setShowPreferences(false)}
                 onKeyDown={(e) => handleKeyDown(e, () => setShowPreferences(false))}
                 aria-label="Volver al banner principal"
@@ -210,7 +210,7 @@ const CookieConsent = () => {
                 Volver
               </button>
               <button
-                className="cookie-button cookie-button-primary"
+                className={styles['cookie-button'] + ' ' + styles['cookie-button-primary']}
                 onClick={handleSavePreferences}
                 onKeyDown={(e) => handleKeyDown(e, handleSavePreferences)}
                 aria-label="Guardar preferencias de cookies"

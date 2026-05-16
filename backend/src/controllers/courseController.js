@@ -59,13 +59,6 @@ const courseController = {
     try {
       const { title, provider, description, category, level, duration, price, url, image } = req.body;
       
-      // Validaciones
-      if (!title || !provider || !description) {
-        const error = new Error('Título, proveedor y descripción son requeridos');
-        error.statusCode = 400;
-        throw error;
-      }
-      
       // Verificar que el usuario sea empresa
       const userRole = req.user.role;
       if (!['COMPANY_EMPLOYEES', 'COMPANY_STUDENTS', 'COMPANY_HYBRID', 'ADMIN'].includes(userRole)) {

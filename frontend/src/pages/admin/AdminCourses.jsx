@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
 import AdminNavigation from './AdminNavigation';
-import './AdminCourses.css';
+import styles from './AdminCourses.module.css';
 
 const AdminCourses = ({ onAdminLogout }) => {
   const [courses, setCourses] = useState([]);
@@ -127,18 +127,18 @@ const AdminCourses = ({ onAdminLogout }) => {
   };
 
   return (
-    <div className="admin-layout">
+    <div className={styles['admin-layout']}>
       <AdminNavigation onLogout={onAdminLogout} />
-      <div className="admin-content">
-    <div className="admin-courses">
+      <div className={styles['admin-content']}>
+    <div className={styles['admin-courses']}>
       {/* Header */}
-      <div className="admin-header">
-        <div className="header-content">
+      <div className={styles['admin-header']}>
+        <div className={styles['header-content']}>
           <div>
             <h1>📚 Gestión de Cursos</h1>
-            <p className="subtitle">Administra todos los cursos del sistema</p>
+            <p className={styles['subtitle']}>Administra todos los cursos del sistema</p>
           </div>
-          <Link to="/admin" className="btn-back">
+          <Link to="/admin" className={styles['btn-back']}>
             ← Volver al Dashboard
           </Link>
         </div>
@@ -146,67 +146,67 @@ const AdminCourses = ({ onAdminLogout }) => {
 
       {/* Message */}
       {message && (
-        <div className={`message ${message.type}`}>
+        <div className={styles['message'] + ' ' + styles[message.type]}>
           {message.text}
         </div>
       )}
 
       {/* Filters */}
-      <div className="filters-section">
-        <div className="filter-group">
+      <div className={styles['filters-section']}>
+        <div className={styles['filter-group']}>
           <label>Buscar:</label>
           <input
             type="text"
             placeholder="Título o proveedor..."
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            className="filter-input"
+            className={styles['filter-input']}
           />
         </div>
-        <div className="filter-group">
+        <div className={styles['filter-group']}>
           <label>Categoría:</label>
           <select
             value={filters.category}
             onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-            className="filter-select"
+            className={styles['filter-select']}
           >
             {categories.map(cat => (
               <option key={cat.value} value={cat.value}>{cat.label}</option>
             ))}
           </select>
         </div>
-        <div className="filter-group">
+        <div className={styles['filter-group']}>
           <label>Nivel:</label>
           <select
             value={filters.level}
             onChange={(e) => setFilters({ ...filters, level: e.target.value })}
-            className="filter-select"
+            className={styles['filter-select']}
           >
             {levels.map(lvl => (
               <option key={lvl.value} value={lvl.value}>{lvl.label}</option>
             ))}
           </select>
         </div>
-        <button onClick={loadCourses} className="btn-refresh">
+        <button onClick={loadCourses} className={styles['btn-refresh']}>
           🔄 Actualizar
         </button>
       </div>
 
       {/* Courses Table */}
       {loading ? (
-        <div className="admin-loading">
-          <div className="spinner"></div>
+        <div className={styles['admin-loading']}>
+          <div className={styles['spinner']}></div>
           <p>Cargando cursos...</p>
         </div>
       ) : error ? (
-        <div className="admin-error">
+        <div className={styles['admin-error']}>
           <p>{error}</p>
-          <button onClick={loadCourses} className="btn-retry">Reintentar</button>
+          <button onClick={loadCourses} className={styles['btn-retry']}>Reintentar</button>
         </div>
       ) : (
         <>
-          <div className="courses-table-container">
-            <table className="courses-table">
+          <div className={styles['courses-table-container']}>
+            <table className={styles['courses-table']}>
               <thead>
                 <tr>
                   <th>Curso</th>
@@ -224,10 +224,10 @@ const AdminCourses = ({ onAdminLogout }) => {
                 {courses.map(course => (
                   <tr key={course.id}>
                     <td>
-                      <div className="course-title">
+                      <div className={styles['course-title']}>
                         <strong>{course.title}</strong>
                         {course.url && (
-                          <a href={course.url} target="_blank" rel="noopener noreferrer" className="course-link">
+                          <a href={course.url} target="_blank" rel="noopener noreferrer" className={styles['course-link']}>
                             🔗 Ver curso
                           </a>
                         )}
@@ -235,36 +235,36 @@ const AdminCourses = ({ onAdminLogout }) => {
                     </td>
                     <td>{course.provider}</td>
                     <td>
-                      <span className="category-badge">{course.category}</span>
+                      <span className={styles['category-badge']}>{course.category}</span>
                     </td>
                     <td>{getLevelLabel(course.level)}</td>
                     <td>{course.duration || '-'}</td>
                     <td>
                       {course.price ? (
-                        <span className="price-tag">{course.price}</span>
+                        <span className={styles['price-tag']}>{course.price}</span>
                       ) : (
-                        <span className="free-tag">Gratis</span>
+                        <span className={styles['free-tag']}>Gratis</span>
                       )}
                     </td>
                     <td>
-                      <div className="author-info">
-                        <span className="author-name">{course.author?.name}</span>
+                      <div className={styles['author-info']}>
+                        <span className={styles['author-name']}>{course.author?.name}</span>
                         <small>{course.author?.email}</small>
                       </div>
                     </td>
                     <td>{formatDate(course.createdAt)}</td>
                     <td>
-                      <div className="action-buttons">
+                      <div className={styles['action-buttons']}>
                         <button
                           onClick={() => handleEdit(course)}
-                          className="btn-edit"
+                          className={styles['btn-edit']}
                           title="Editar curso"
                         >
                           ✏️
                         </button>
                         <button
                           onClick={() => confirmDelete(course)}
-                          className="btn-delete"
+                          className={styles['btn-delete']}
                           title="Eliminar curso"
                         >
                           🗑️
@@ -278,22 +278,22 @@ const AdminCourses = ({ onAdminLogout }) => {
           </div>
 
           {/* Pagination */}
-          <div className="pagination">
+          <div className={styles['pagination']}>
             <button
               onClick={() => setPagination({ ...pagination, page: pagination.page - 1 })}
               disabled={pagination.page === 1}
-              className="btn-page"
+              className={styles['btn-page']}
             >
               ← Anterior
             </button>
-            <span className="page-info">
+            <span className={styles['page-info']}>
               Página {pagination.page} de {pagination.totalPages}
               ({pagination.total} cursos)
             </span>
             <button
               onClick={() => setPagination({ ...pagination, page: pagination.page + 1 })}
               disabled={pagination.page === pagination.totalPages}
-              className="btn-page"
+              className={styles['btn-page']}
             >
               Siguiente →
             </button>
@@ -303,15 +303,15 @@ const AdminCourses = ({ onAdminLogout }) => {
 
       {/* Edit Modal */}
       {showEditModal && editingCourse && (
-        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
-          <div className="modal-content edit-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
+        <div className={styles['modal-overlay']} onClick={() => setShowEditModal(false)}>
+          <div className={styles['modal-content'] + ' ' + styles['edit-modal']} onClick={e => e.stopPropagation()}>
+            <div className={styles['modal-header']}>
               <h2>✏️ Editar Curso</h2>
-              <button onClick={() => setShowEditModal(false)} className="btn-close">×</button>
+              <button onClick={() => setShowEditModal(false)} className={styles['btn-close']}>×</button>
             </div>
-            <div className="modal-body">
-              <form className="edit-form">
-                <div className="form-group">
+            <div className={styles['modal-body']}>
+              <form className={styles['edit-form']}>
+                <div className={styles['form-group']}>
                   <label>Título del curso *</label>
                   <input
                     type="text"
@@ -321,7 +321,7 @@ const AdminCourses = ({ onAdminLogout }) => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className={styles['form-group']}>
                   <label>Proveedor/Plataforma *</label>
                   <input
                     type="text"
@@ -331,8 +331,8 @@ const AdminCourses = ({ onAdminLogout }) => {
                   />
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
+                <div className={styles['form-row']}>
+                  <div className={styles['form-group']}>
                     <label>Categoría *</label>
                     <select
                       value={editingCourse.category}
@@ -345,7 +345,7 @@ const AdminCourses = ({ onAdminLogout }) => {
                     </select>
                   </div>
 
-                  <div className="form-group">
+                  <div className={styles['form-group']}>
                     <label>Nivel *</label>
                     <select
                       value={editingCourse.level}
@@ -359,8 +359,8 @@ const AdminCourses = ({ onAdminLogout }) => {
                   </div>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
+                <div className={styles['form-row']}>
+                  <div className={styles['form-group']}>
                     <label>Duración</label>
                     <input
                       type="text"
@@ -370,7 +370,7 @@ const AdminCourses = ({ onAdminLogout }) => {
                     />
                   </div>
 
-                  <div className="form-group">
+                  <div className={styles['form-group']}>
                     <label>Precio</label>
                     <input
                       type="text"
@@ -381,7 +381,7 @@ const AdminCourses = ({ onAdminLogout }) => {
                   </div>
                 </div>
 
-                <div className="form-group">
+                <div className={styles['form-group']}>
                   <label>URL del curso</label>
                   <input
                     type="url"
@@ -391,7 +391,7 @@ const AdminCourses = ({ onAdminLogout }) => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className={styles['form-group']}>
                   <label>Descripción *</label>
                   <textarea
                     value={editingCourse.description}
@@ -401,11 +401,11 @@ const AdminCourses = ({ onAdminLogout }) => {
                   />
                 </div>
 
-                <div className="form-actions">
+                <div className={styles['form-actions']}>
                   <button
                     type="button"
                     onClick={() => setShowEditModal(false)}
-                    className="btn-cancel"
+                    className={styles['btn-cancel']}
                     disabled={updateLoading}
                   >
                     Cancelar
@@ -413,7 +413,7 @@ const AdminCourses = ({ onAdminLogout }) => {
                   <button
                     type="button"
                     onClick={handleSaveEdit}
-                    className="btn-save"
+                    className={styles['btn-save']}
                     disabled={updateLoading}
                   >
                     {updateLoading ? 'Guardando...' : '💾 Guardar Cambios'}
@@ -427,29 +427,29 @@ const AdminCourses = ({ onAdminLogout }) => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && courseToDelete && (
-        <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
-          <div className="modal-content confirm-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header warning">
+        <div className={styles['modal-overlay']} onClick={() => setShowDeleteModal(false)}>
+          <div className={styles['modal-content'] + ' ' + styles['confirm-modal']} onClick={e => e.stopPropagation()}>
+            <div className={styles['modal-header'] + ' ' + styles['warning']}>
               <h2>⚠️ Confirmar Eliminación</h2>
             </div>
-            <div className="modal-body">
-              <p className="confirm-text">
+            <div className={styles['modal-body']}>
+              <p className={styles['confirm-text']}>
                 ¿Estás seguro de que quieres eliminar el curso <strong>{courseToDelete.title}</strong> de <strong>{courseToDelete.provider}</strong>?
               </p>
-              <p className="confirm-warning">
+              <p className={styles['confirm-warning']}>
                 Esta acción no se puede deshacer.
               </p>
-              <div className="confirm-actions">
+              <div className={styles['confirm-actions']}>
                 <button
                   onClick={() => setShowDeleteModal(false)}
-                  className="btn-cancel"
+                  className={styles['btn-cancel']}
                   disabled={updateLoading}
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="btn-confirm-delete"
+                  className={styles['btn-confirm-delete']}
                   disabled={updateLoading}
                 >
                   {updateLoading ? 'Eliminando...' : '🗑️ Eliminar Curso'}

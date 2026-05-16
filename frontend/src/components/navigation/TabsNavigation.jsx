@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
-import './TabsNavigation.css';
+import styles from './TabsNavigation.module.css';
 
 const TabsNavigation = () => {
   const { user, isCandidate, isCompanyEmployees, isCompanyStudents, isCompanyHybrid } = useAuth();
@@ -58,17 +58,17 @@ const TabsNavigation = () => {
   const tabs = getTabs();
 
   return (
-    <nav className="tabs-navigation">
+    <nav className={styles['tabs-navigation']}>
       <div className="container">
-        <div className="tabs-container">
+        <div className={styles['tabs-container']}>
           {tabs.map(tab => (
             <Link
               key={tab.id}
               to={tab.link}
-              className={`tab-link ${window.location.pathname === tab.link ? 'active' : ''}`}
+              className={styles['tab-link'] + ' ' + (window.location.pathname === tab.link ? styles['active'] : '')}
             >
-              <span className="tab-icon">{tab.icon}</span>
-              <span className="tab-label">{tab.label}</span>
+              <span className={styles['tab-icon']}>{tab.icon}</span>
+              <span className={styles['tab-label']}>{tab.label}</span>
             </Link>
           ))}
         </div>

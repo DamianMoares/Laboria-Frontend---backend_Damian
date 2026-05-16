@@ -3,7 +3,7 @@ import jobsData from '../../data/jobs.json';
 import { spainMunicipalities, jobCategories, experienceLevels, contractTypes, workModes, salaryRanges } from '../../data/searchData';
 import { searchAllJobs } from '../../context/ConexionApi';
 import JobCard from '../../components/jobs/JobCard';
-import './JobSearchPage.css';
+import styles from './JobSearchPage.module.css';
 
 const JobSearchPage = () => {
   const [jobs, setJobs] = useState([]);
@@ -218,35 +218,35 @@ const JobSearchPage = () => {
   };
 
   return (
-    <div className="job-search-page">
-      <div className="search-header">
+    <div className={styles['job-search-page']}>
+      <div className={styles['search-header']}>
         <h1>Búsqueda de Empleo</h1>
-        <p className="subtitle">Encuentra tu próxima oportunidad profesional en toda España</p>
+        <p className={styles['subtitle']}>Encuentra tu próxima oportunidad profesional en toda España</p>
       </div>
 
-      <div className="search-container">
-        <div className="search-bar">
+      <div className={styles['search-container']}>
+        <div className={styles['search-bar']}>
           <input
             type="text"
             placeholder="Buscar por puesto, empresa, tecnología..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
+            className={styles['search-input']}
             aria-label="Buscar empleos"
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
           />
         </div>
 
-        <div className="filters-sidebar">
+        <div className={styles['filters-sidebar']}>
           <h3>Filtros</h3>
           
-          <div className="filter-group">
+          <div className={styles['filter-group']}>
             <label htmlFor="location-filter">Ubicación:</label>
             <select
               id="location-filter"
               value={selectedLocation}
               onChange={(e) => setSelectedLocation(e.target.value)}
-              className="filter-select"
+              className={styles['filter-select']}
             >
               <option value="">Todas las ubicaciones</option>
               {locations.map((location, index) => (
@@ -257,13 +257,13 @@ const JobSearchPage = () => {
             </select>
           </div>
 
-          <div className="filter-group">
+          <div className={styles['filter-group']}>
             <label htmlFor="schedule-filter">Jornada:</label>
             <select
               id="schedule-filter"
               value={selectedSchedule}
               onChange={(e) => setSelectedSchedule(e.target.value)}
-              className="filter-select"
+              className={styles['filter-select']}
             >
               <option value="">Todas las jornadas</option>
               {schedules.map(schedule => (
@@ -275,21 +275,21 @@ const JobSearchPage = () => {
           </div>
 
           <button
-            className="btn-toggle-advanced"
+            className={styles['btn-toggle-advanced']}
             onClick={() => setShowAdvanced(!showAdvanced)}
           >
             {showAdvanced ? 'Ocultar filtros avanzados' : 'Mostrar filtros avanzados'}
           </button>
 
           {showAdvanced && (
-            <div className="advanced-filters">
-              <div className="filter-group">
+            <div className={styles['advanced-filters']}>
+              <div className={styles['filter-group']}>
                 <label htmlFor="category-filter">Categoría:</label>
                 <select
                   id="category-filter"
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="filter-select"
+                  className={styles['filter-select']}
                 >
                   <option value="">Todas las categorías</option>
                   {jobCategories.map(category => (
@@ -300,13 +300,13 @@ const JobSearchPage = () => {
                 </select>
               </div>
 
-              <div className="filter-group">
+              <div className={styles['filter-group']}>
                 <label htmlFor="experience-filter">Experiencia:</label>
                 <select
                   id="experience-filter"
                   value={selectedExperience}
                   onChange={(e) => setSelectedExperience(e.target.value)}
-                  className="filter-select"
+                  className={styles['filter-select']}
                 >
                   <option value="">Todos los niveles</option>
                   {experienceLevels.map(level => (
@@ -317,13 +317,13 @@ const JobSearchPage = () => {
                 </select>
               </div>
 
-              <div className="filter-group">
+              <div className={styles['filter-group']}>
                 <label htmlFor="contract-filter">Tipo de contrato:</label>
                 <select
                   id="contract-filter"
                   value={selectedContract}
                   onChange={(e) => setSelectedContract(e.target.value)}
-                  className="filter-select"
+                  className={styles['filter-select']}
                 >
                   <option value="">Todos los contratos</option>
                   {contractTypes.map(type => (
@@ -334,13 +334,13 @@ const JobSearchPage = () => {
                 </select>
               </div>
 
-              <div className="filter-group">
+              <div className={styles['filter-group']}>
                 <label htmlFor="workmode-filter">Modalidad:</label>
                 <select
                   id="workmode-filter"
                   value={selectedWorkMode}
                   onChange={(e) => setSelectedWorkMode(e.target.value)}
-                  className="filter-select"
+                  className={styles['filter-select']}
                 >
                   <option value="">Todas las modalidades</option>
                   {workModes.map(mode => (
@@ -351,13 +351,13 @@ const JobSearchPage = () => {
                 </select>
               </div>
 
-              <div className="filter-group">
+              <div className={styles['filter-group']}>
                 <label htmlFor="salary-filter">Salario anual bruto:</label>
                 <select
                   id="salary-filter"
                   value={selectedSalary}
                   onChange={(e) => setSelectedSalary(e.target.value)}
-                  className="filter-select"
+                  className={styles['filter-select']}
                 >
                   <option value="">Todos los salarios</option>
                   {salaryRanges.map(range => (
@@ -370,19 +370,19 @@ const JobSearchPage = () => {
             </div>
           )}
 
-          <div className="filter-actions">
-            <button className="btn-search" onClick={handleSearch}>
+          <div className={styles['filter-actions']}>
+            <button className={styles['btn-search']} onClick={handleSearch}>
               Buscar
             </button>
-            <button className="btn-clear-filters" onClick={handleClearFilters}>
+            <button className={styles['btn-clear-filters']} onClick={handleClearFilters}>
               Limpiar filtros
             </button>
           </div>
         </div>
 
-        <div className="results-container">
+        <div className={styles['results-container']}>
           {loading && (
-            <div className="loading-state">
+            <div className={styles['loading-state']}>
               <p>Buscando ofertas de empleo...</p>
             </div>
           )}
@@ -390,17 +390,17 @@ const JobSearchPage = () => {
           {hasSearched && !loading && (
             <>
               {error && (
-                <div className="error-state">
+                <div className={styles['error-state']}>
                   <p>{error}</p>
                 </div>
               )}
-              <div className="results-header">
-                <span className="results-count">
+              <div className={styles['results-header']}>
+                <span className={styles['results-count']}>
                   {jobs.length} {jobs.length === 1 ? 'oferta encontrada' : 'ofertas encontradas'}
-                  {usingFallback && <span className="fallback-badge"> (Datos de ejemplo)</span>}
+                  {usingFallback && <span className={styles['fallback-badge']}> (Datos de ejemplo)</span>}
                 </span>
                 {totalPages > 1 && (
-                  <span className="pagination-info">
+                  <span className={styles['pagination-info']}>
                     Página {currentPage} de {totalPages}
                   </span>
                 )}
@@ -408,22 +408,22 @@ const JobSearchPage = () => {
 
               {displayedJobs.length > 0 ? (
                 <>
-                  <div className="jobs-list">
+                  <div className={styles['jobs-list']}>
                     {displayedJobs.map((job, index) => (
                       <JobCard key={job.id || `job-${index}`} job={job} />
                     ))}
                   </div>
 
                   {totalPages > 1 && (
-                    <div className="pagination">
+                    <div className={styles['pagination']}>
                       <button
-                        className="pagination-btn"
+                        className={styles['pagination-btn']}
                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                         disabled={currentPage === 1}
                       >
                         Anterior
                       </button>
-                      <div className="pagination-numbers">
+                      <div className={styles['pagination-numbers']}>
                         {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                           let pageNum;
                           if (totalPages <= 5) {
@@ -438,7 +438,7 @@ const JobSearchPage = () => {
                           return (
                             <button
                               key={pageNum}
-                              className={`pagination-number ${currentPage === pageNum ? 'active' : ''}`}
+                              className={styles['pagination-number'] + ' ' + (currentPage === pageNum ? styles['active'] : '')}
                               onClick={() => setCurrentPage(pageNum)}
                             >
                               {pageNum}
@@ -447,7 +447,7 @@ const JobSearchPage = () => {
                         })}
                       </div>
                       <button
-                        className="pagination-btn"
+                        className={styles['pagination-btn']}
                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                         disabled={currentPage === totalPages}
                       >
@@ -457,7 +457,7 @@ const JobSearchPage = () => {
                   )}
                 </>
               ) : (
-                <div className="no-results">
+                <div className={styles['no-results']}>
                   <p>No se encontraron ofertas con los filtros seleccionados.</p>
                   <p>Intenta ajustar tus criterios de búsqueda.</p>
                 </div>
@@ -466,7 +466,7 @@ const JobSearchPage = () => {
           )}
 
           {!hasSearched && !loading && (
-            <div className="search-prompt">
+            <div className={styles['search-prompt']}>
               <p>Usa los filtros y haz clic en "Buscar" para ver ofertas de empleo.</p>
             </div>
           )}

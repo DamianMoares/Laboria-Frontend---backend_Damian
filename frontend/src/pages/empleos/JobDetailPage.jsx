@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import jobsData from '../../data/jobs.json';
-import './JobDetailPage.css';
+import styles from './JobDetailPage.module.css';
 
 const JobDetailPage = () => {
   const { id } = useParams();
@@ -27,7 +27,7 @@ const JobDetailPage = () => {
 
   if (!job) {
     return (
-      <div className="detail-page not-found">
+      <div className={styles['detail-page'] + ' ' + styles['not-found']}>
         <div className="container">
           <h1>Oferta no encontrada</h1>
           <p>La oferta de empleo que buscas no existe.</p>
@@ -83,92 +83,92 @@ const JobDetailPage = () => {
   };
 
   return (
-    <div className="detail-page job-detail-page">
+    <div className={styles['detail-page'] + ' ' + styles['job-detail-page']}>
       <div className="container">
-        <Link to="/empleos" className="back-link">
+        <Link to="/empleos" className={styles['back-link']}>
           ← Volver a empleos
         </Link>
 
-        <div className="detail-header">
-          <h1 className="detail-title">{job.title}</h1>
-          <div className="detail-meta">
-            <span className="meta-item company">{job.company}</span>
-            <span className="meta-item location">{job.location}</span>
-            <span className="meta-item posted-date">Publicado: {job.postedDate}</span>
+        <div className={styles['detail-header']}>
+          <h1 className={styles['detail-title']}>{job.title}</h1>
+          <div className={styles['detail-meta']}>
+            <span className={styles['meta-item'] + ' ' + styles['company']}>{job.company}</span>
+            <span className={styles['meta-item'] + ' ' + styles['location']}>{job.location}</span>
+            <span className={styles['meta-item'] + ' ' + styles['posted-date']}>Publicado: {job.postedDate}</span>
           </div>
         </div>
 
-        <div className="detail-content">
-          <div className="detail-main">
-            <section className="detail-section">
+        <div className={styles['detail-content']}>
+          <div className={styles['detail-main']}>
+            <section className={styles['detail-section']}>
               <h2>Descripción</h2>
-              <p className="description-text">{job.description}</p>
+              <p className={styles['description-text']}>{job.description}</p>
             </section>
 
-            <section className="detail-section">
+            <section className={styles['detail-section']}>
               <h2>Requisitos</h2>
-              <ul className="requirements-list">
+              <ul className={styles['requirements-list']}>
                 {job.requirements.map((req, index) => (
-                  <li key={index} className="requirement-item">{req}</li>
+                  <li key={index} className={styles['requirement-item']}>{req}</li>
                 ))}
               </ul>
             </section>
 
-            <section className="detail-section">
+            <section className={styles['detail-section']}>
               <h2>Beneficios</h2>
-              <ul className="benefits-list">
+              <ul className={styles['benefits-list']}>
                 {job.benefits.map((benefit, index) => (
-                  <li key={index} className="benefit-item">{benefit}</li>
+                  <li key={index} className={styles['benefit-item']}>{benefit}</li>
                 ))}
               </ul>
             </section>
           </div>
 
-          <aside className="detail-sidebar">
-            <div className="sidebar-card">
+          <aside className={styles['detail-sidebar']}>
+            <div className={styles['sidebar-card']}>
               <h3>Información de la oferta</h3>
               
-              <div className="info-row">
-                <span className="info-label">Modalidad:</span>
-                <span className="info-value">{job.workMode}</span>
+              <div className={styles['info-row']}>
+                <span className={styles['info-label']}>Modalidad:</span>
+                <span className={styles['info-value']}>{job.workMode}</span>
               </div>
               
-              <div className="info-row">
-                <span className="info-label">Jornada:</span>
-                <span className="info-value">{job.schedule}</span>
+              <div className={styles['info-row']}>
+                <span className={styles['info-label']}>Jornada:</span>
+                <span className={styles['info-value']}>{job.schedule}</span>
               </div>
               
-              <div className="info-row">
-                <span className="info-label">Nivel:</span>
-                <span className="info-value">{job.experienceLevel}</span>
+              <div className={styles['info-row']}>
+                <span className={styles['info-label']}>Nivel:</span>
+                <span className={styles['info-value']}>{job.experienceLevel}</span>
               </div>
               
-              <div className="info-row">
-                <span className="info-label">Salario:</span>
-                <span className="info-value salary">{job.salary}</span>
+              <div className={styles['info-row']}>
+                <span className={styles['info-label']}>Salario:</span>
+                <span className={styles['info-value'] + ' ' + styles['salary']}>{job.salary}</span>
               </div>
               
-              <div className="info-row">
-                <span className="info-label">Contrato:</span>
-                <span className="info-value">{job.contractType}</span>
+              <div className={styles['info-row']}>
+                <span className={styles['info-label']}>Contrato:</span>
+                <span className={styles['info-value']}>{job.contractType}</span>
               </div>
               
-              <div className="info-row">
-                <span className="info-label">Sector:</span>
-                <span className="info-value">{job.sector}</span>
+              <div className={styles['info-row']}>
+                <span className={styles['info-label']}>Sector:</span>
+                <span className={styles['info-value']}>{job.sector}</span>
               </div>
 
-              <div className="info-row">
-                <span className="info-label">Tecnología:</span>
-                <span className="info-value technology">{job.technology}</span>
+              <div className={styles['info-row']}>
+                <span className={styles['info-label']}>Tecnología:</span>
+                <span className={styles['info-value'] + ' ' + styles['technology']}>{job.technology}</span>
               </div>
 
               {hasApplied ? (
-                <button className="btn-apply-sidebar applied" disabled>
+                <button className={styles['btn-apply-sidebar'] + ' ' + styles['applied']} disabled>
                   ✓ Ya has aplicado
                 </button>
               ) : (
-                <button className="btn-apply-sidebar" onClick={handleApply}>
+                <button className={styles['btn-apply-sidebar']} onClick={handleApply}>
                   Aplicar a esta oferta
                 </button>
               )}

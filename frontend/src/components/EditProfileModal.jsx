@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import './EditProfileModal.css';
+import styles from './EditProfileModal.module.css';
 
 const EditProfileModal = ({ isOpen, onClose, userType }) => {
   const { user, updateProfile } = useAuth();
@@ -136,55 +136,55 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
+    <div className={styles['modal-overlay']} onClick={onClose}>
+      <div className={styles['modal-content']} onClick={e => e.stopPropagation()}>
+        <div className={styles['modal-header']}>
           <h2>Editar Perfil</h2>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <button className={styles['modal-close']} onClick={onClose}>×</button>
         </div>
         
-        <form onSubmit={handleSubmit} className="edit-profile-form">
-          {errors.general && <div className="error-message general">{errors.general}</div>}
+        <form onSubmit={handleSubmit} className={styles['edit-profile-form']}>
+          {errors.general && <div className={styles['error-message'] + ' ' + styles['general']}>{errors.general}</div>}
           
           {userType === 'candidate' ? (
             <>
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Nombre *</label>
                 <input
                   type="text"
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
-                  className={errors.firstName ? 'error' : ''}
+                  className={errors.firstName ? styles['error'] : ''}
                 />
-                {errors.firstName && <span className="error-message">{errors.firstName}</span>}
+                {errors.firstName && <span className={styles['error-message']}>{errors.firstName}</span>}
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Apellido *</label>
                 <input
                   type="text"
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleChange}
-                  className={errors.lastName ? 'error' : ''}
+                  className={errors.lastName ? styles['error'] : ''}
                 />
-                {errors.lastName && <span className="error-message">{errors.lastName}</span>}
+                {errors.lastName && <span className={styles['error-message']}>{errors.lastName}</span>}
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Email *</label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={errors.email ? 'error' : ''}
+                  className={errors.email ? styles['error'] : ''}
                 />
-                {errors.email && <span className="error-message">{errors.email}</span>}
+                {errors.email && <span className={styles['error-message']}>{errors.email}</span>}
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Teléfono</label>
                 <input
                   type="tel"
@@ -194,7 +194,7 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
                 />
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Ubicación</label>
                 <input
                   type="text"
@@ -204,7 +204,7 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
                 />
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Experiencia</label>
                 <input
                   type="text"
@@ -214,7 +214,7 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
                 />
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Expectativa Salarial</label>
                 <input
                   type="text"
@@ -224,7 +224,7 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
                 />
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Preferencia de Trabajo</label>
                 <select
                   name="workModePreference"
@@ -238,7 +238,7 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
                 </select>
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Biografía</label>
                 <textarea
                   name="bio"
@@ -248,7 +248,7 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
                 />
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>LinkedIn</label>
                 <input
                   type="url"
@@ -259,7 +259,7 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
                 />
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>GitHub</label>
                 <input
                   type="url"
@@ -270,7 +270,7 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
                 />
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Portfolio</label>
                 <input
                   type="url"
@@ -283,31 +283,31 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
             </>
           ) : (
             <>
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Nombre de la Empresa *</label>
                 <input
                   type="text"
                   name="companyName"
                   value={formData.companyName}
                   onChange={handleChange}
-                  className={errors.companyName ? 'error' : ''}
+                  className={errors.companyName ? styles['error'] : ''}
                 />
-                {errors.companyName && <span className="error-message">{errors.companyName}</span>}
+                {errors.companyName && <span className={styles['error-message']}>{errors.companyName}</span>}
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Email *</label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={errors.email ? 'error' : ''}
+                  className={errors.email ? styles['error'] : ''}
                 />
-                {errors.email && <span className="error-message">{errors.email}</span>}
+                {errors.email && <span className={styles['error-message']}>{errors.email}</span>}
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Teléfono</label>
                 <input
                   type="tel"
@@ -317,7 +317,7 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
                 />
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Ubicación</label>
                 <input
                   type="text"
@@ -327,19 +327,19 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
                 />
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Industria *</label>
                 <input
                   type="text"
                   name="industry"
                   value={formData.industry}
                   onChange={handleChange}
-                  className={errors.industry ? 'error' : ''}
+                  className={errors.industry ? styles['error'] : ''}
                 />
-                {errors.industry && <span className="error-message">{errors.industry}</span>}
+                {errors.industry && <span className={styles['error-message']}>{errors.industry}</span>}
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Tamaño de la Empresa</label>
                 <select
                   name="size"
@@ -355,7 +355,7 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
                 </select>
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Sitio Web</label>
                 <input
                   type="url"
@@ -366,7 +366,7 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
                 />
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Descripción</label>
                 <textarea
                   name="description"
@@ -376,7 +376,7 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
                 />
               </div>
               
-              <div className="form-group">
+              <div className={styles['form-group']}>
                 <label>Enfoque</label>
                 <select
                   name="focus"
@@ -392,11 +392,11 @@ const EditProfileModal = ({ isOpen, onClose, userType }) => {
             </>
           )}
           
-          <div className="form-actions">
-            <button type="button" className="btn btn-secondary" onClick={onClose}>
+          <div className={styles['form-actions']}>
+            <button type="button" className={styles['btn'] + ' ' + styles['btn-secondary']} onClick={onClose}>
               Cancelar
             </button>
-            <button type="submit" className="btn btn-primary" disabled={saving}>
+            <button type="submit" className={styles['btn'] + ' ' + styles['btn-primary']} disabled={saving}>
               {saving ? 'Guardando...' : 'Guardar Cambios'}
             </button>
           </div>

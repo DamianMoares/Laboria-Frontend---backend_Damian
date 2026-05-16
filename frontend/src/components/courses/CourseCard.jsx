@@ -1,61 +1,61 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './CourseCard.css';
+import styles from './CourseCard.module.css';
 
 const CourseCard = ({ course }) => {
   return (
-    <div className="course-card">
-      <div className="course-card-header">
-        <Link to={`/cursos/${course.id}`} className="course-title">
+    <div className={styles['course-card']}>
+      <div className={styles['course-card-header']}>
+        <Link to={`/cursos/${course.id}`} className={styles['course-title']}>
           {course.title}
         </Link>
-        <span className="platform-name">{course.platform}</span>
+        <span className={styles['platform-name']}>{course.platform}</span>
       </div>
       
-      <div className="course-card-body">
-        <div className="course-info">
-          <span className="info-item">
+      <div className={styles['course-card-body']}>
+        <div className={styles['course-info']}>
+          <span className={styles['info-item']}>
             <strong>Nivel:</strong> {course.level}
           </span>
-          <span className="info-item">
+          <span className={styles['info-item']}>
             <strong>Duración:</strong> {course.duration}
           </span>
-          <span className="info-item">
+          <span className={styles['info-item']}>
             <strong>Formato:</strong> {course.format}
           </span>
-          <span className="info-item">
+          <span className={styles['info-item']}>
             <strong>Precio:</strong> {course.price}
           </span>
         </div>
         
-        <p className="course-description">{course.description}</p>
+        <p className={styles['course-description']}>{course.description}</p>
         
-        <div className="course-tags">
-          <span className="tag technology">{course.technology}</span>
+        <div className={styles['course-tags']}>
+          <span className={styles['tag'] + ' ' + styles['technology']}>{course.technology}</span>
           {course.certification && (
-            <span className="tag certification">Certificación incluida</span>
+            <span className={styles['tag'] + ' ' + styles['certification']}>Certificación incluida</span>
           )}
         </div>
 
-        <div className="course-stats">
-          <div className="stat">
-            <span className="stat-value">⭐ {course.rating}</span>
-            <span className="stat-label">Rating</span>
+        <div className={styles['course-stats']}>
+          <div className={styles['stat']}>
+            <span className={styles['stat-value']}>⭐ {course.rating}</span>
+            <span className={styles['stat-label']}>Rating</span>
           </div>
-          <div className="stat">
-            <span className="stat-value">{course.students.toLocaleString()}</span>
-            <span className="stat-label">Estudiantes</span>
+          <div className={styles['stat']}>
+            <span className={styles['stat-value']}>{course.students.toLocaleString()}</span>
+            <span className={styles['stat-label']}>Estudiantes</span>
           </div>
         </div>
       </div>
       
-      <div className="course-card-footer">
-        <span className="instructor">Instructor: {course.instructor}</span>
+      <div className={styles['course-card-footer']}>
+        <span className={styles['instructor']}>Instructor: {course.instructor}</span>
         <a 
           href={course.externalLink} 
           target="_blank" 
           rel="noopener noreferrer"
-          className="btn-enroll"
+          className={styles['btn-enroll']}
         >
           Ver curso
         </a>

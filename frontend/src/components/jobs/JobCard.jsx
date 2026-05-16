@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './JobCard.css';
+import styles from './JobCard.module.css';
 
 const JobCard = ({ job }) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -28,56 +28,56 @@ const JobCard = ({ job }) => {
   const cleanDescription = job.description ? stripHtml(job.description) : 'Sin descripción disponible';
 
   return (
-    <div className="job-card">
-      <div className="job-card-header">
-        <div className="job-title-section">
-          <Link to={`/empleos/${job.id}`} className="job-title">
+    <div className={styles['job-card']}>
+      <div className={styles['job-card-header']}>
+        <div className={styles['job-title-section']}>
+          <Link to={`/empleos/${job.id}`} className={styles['job-title']}>
             {job.title}
           </Link>
           {job.source && (
-            <span className="source-badge">{job.source}</span>
+            <span className={styles['source-badge']}>{job.source}</span>
           )}
         </div>
-        <span className="company-name">{job.company}</span>
+        <span className={styles['company-name']}>{job.company}</span>
       </div>
       
-      <div className="job-card-body">
-        <div className="job-info-grid-compact">
-          <div className="info-item">
-            <span className="info-label">📍 Ubicación</span>
-            <span className="info-value">{job.location}</span>
+      <div className={styles['job-card-body']}>
+        <div className={styles['job-info-grid-compact']}>
+          <div className={styles['info-item']}>
+            <span className={styles['info-label']}>📍 Ubicación</span>
+            <span className={styles['info-value']}>{job.location}</span>
           </div>
-          <div className="info-item">
-            <span className="info-label">💼 Modalidad</span>
-            <span className="info-value">{job.workMode}</span>
+          <div className={styles['info-item']}>
+            <span className={styles['info-label']}>💼 Modalidad</span>
+            <span className={styles['info-value']}>{job.workMode}</span>
           </div>
-          <div className="info-item">
-            <span className="info-label">💰 Salario</span>
-            <span className="info-value">{job.salary}</span>
+          <div className={styles['info-item']}>
+            <span className={styles['info-label']}>💰 Salario</span>
+            <span className={styles['info-value']}>{job.salary}</span>
           </div>
-          <div className="info-item">
-            <span className="info-label">⏰ Jornada</span>
-            <span className="info-value">{job.schedule}</span>
+          <div className={styles['info-item']}>
+            <span className={styles['info-label']}>⏰ Jornada</span>
+            <span className={styles['info-value']}>{job.schedule}</span>
           </div>
         </div>
         
         <button 
-          className="btn-toggle-details"
+          className={styles['btn-toggle-details']}
           onClick={() => setShowDetails(!showDetails)}
         >
           {showDetails ? 'Ocultar detalles' : 'Ver detalles'}
-          <span className={`arrow ${showDetails ? 'up' : 'down'}`}>▼</span>
+          <span className={styles['arrow'] + ' ' + (showDetails ? styles['up'] : styles['down'])}>▼</span>
         </button>
         
         {showDetails && (
-          <div className="job-details">
-            <div className="detail-section">
+          <div className={styles['job-details']}>
+            <div className={styles['detail-section']}>
               <h4>Descripción</h4>
               <p>{cleanDescription}</p>
             </div>
             
             {job.requirements && job.requirements.length > 0 && (
-              <div className="detail-section">
+              <div className={styles['detail-section']}>
                 <h4>Requisitos</h4>
                 <ul>
                   {job.requirements.map((req, index) => (
@@ -88,7 +88,7 @@ const JobCard = ({ job }) => {
             )}
             
             {job.benefits && job.benefits.length > 0 && (
-              <div className="detail-section">
+              <div className={styles['detail-section']}>
                 <h4>Beneficios</h4>
                 <ul>
                   {job.benefits.map((benefit, index) => (
@@ -98,25 +98,25 @@ const JobCard = ({ job }) => {
               </div>
             )}
             
-            <div className="detail-section">
+            <div className={styles['detail-section']}>
               <h4>Información adicional</h4>
-              <div className="additional-info">
-                <div className="info-row">
-                  <span className="label">Nivel:</span>
-                  <span className="value">{job.experienceLevel}</span>
+              <div className={styles['additional-info']}>
+                <div className={styles['info-row']}>
+                  <span className={styles['label']}>Nivel:</span>
+                  <span className={styles['value']}>{job.experienceLevel}</span>
                 </div>
-                <div className="info-row">
-                  <span className="label">Contrato:</span>
-                  <span className="value">{job.contractType}</span>
+                <div className={styles['info-row']}>
+                  <span className={styles['label']}>Contrato:</span>
+                  <span className={styles['value']}>{job.contractType}</span>
                 </div>
-                <div className="info-row">
-                  <span className="label">Sector:</span>
-                  <span className="value">{job.sector}</span>
+                <div className={styles['info-row']}>
+                  <span className={styles['label']}>Sector:</span>
+                  <span className={styles['value']}>{job.sector}</span>
                 </div>
                 {job.technology && job.technology !== 'No especificado' && (
-                  <div className="info-row">
-                    <span className="label">Tecnología:</span>
-                    <span className="value">{job.technology}</span>
+                  <div className={styles['info-row']}>
+                    <span className={styles['label']}>Tecnología:</span>
+                    <span className={styles['value']}>{job.technology}</span>
                   </div>
                 )}
               </div>
@@ -125,9 +125,9 @@ const JobCard = ({ job }) => {
         )}
       </div>
       
-      <div className="job-card-footer">
-        <span className="posted-date">📅 Publicado: {formatDate(job.postedDate)}</span>
-        <a href={job.url} target="_blank" rel="noopener noreferrer" className="btn-apply">
+      <div className={styles['job-card-footer']}>
+        <span className={styles['posted-date']}>📅 Publicado: {formatDate(job.postedDate)}</span>
+        <a href={job.url} target="_blank" rel="noopener noreferrer" className={styles['btn-apply']}>
           Aplicar
         </a>
       </div>
