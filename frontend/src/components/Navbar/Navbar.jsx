@@ -5,9 +5,16 @@ import logoSitio from '../../assets/img/Laboria_Fondo_Negro.png';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
-  const { isAuthenticated, isCandidate, logout } = useAuth();
+  const { isAuthenticated, isCandidate, isAnyCompany, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+
+  const getHomeRoute = () => {
+    if (isCandidate()) return '/perfil/candidato';
+    if (isAnyCompany()) return '/perfil/empresa';
+    if (isAdmin()) return '/admin';
+    return '/panel';
+  };
 
   const handleLogout = () => {
     logout();
@@ -46,7 +53,7 @@ const Navbar = () => {
           {isAuthenticated ? (
             <>
               <li className={styles.navbarItem}>
-                <Link to="/panel" className={styles.navbarLink} onClick={closeMobileMenu}>
+                <Link to={getHomeRoute()} className={styles.navbarLink} onClick={closeMobileMenu}>
                   Inicio
                 </Link>
               </li>
