@@ -28,11 +28,11 @@
     "express-validator": "^7.3.2",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.20.0",
-    "resend": "^3.0.0"
+    "resend": "^3.0.0",
+    "vitest": "^4.1.6"
   },
   "devDependencies": {
     "nodemon": "^3.1.14",
-    "prisma": "^6.19.3",
-    "vitest": "^4.1.6"
+    "prisma": "^6.19.3"
   }
 }

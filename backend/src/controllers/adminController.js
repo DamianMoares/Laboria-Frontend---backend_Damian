@@ -643,7 +643,8 @@ const runTests = async (req, res, next) => {
     const path = require('path');
     const backendDir = path.resolve(__dirname, '../..');
 
-    const output = execSync('npx vitest run --reporter=json', {
+    const vitestPath = path.resolve(backendDir, 'node_modules', '.bin', 'vitest');
+    const output = execSync(`"${vitestPath}" run --reporter=json`, {
       cwd: backendDir,
       timeout: 60000,
       encoding: 'utf-8'
