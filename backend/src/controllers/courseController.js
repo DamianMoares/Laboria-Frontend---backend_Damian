@@ -121,9 +121,19 @@ const courseController = {
         throw error;
       }
       
+      const allowedFields = ['title', 'provider', 'description', 'category', 'level', 'duration', 'price', 'url', 'image'];
+      const data = {};
+      for (const field of allowedFields) {
+        if (req.body[field] !== undefined) data[field] = req.body[field];
+      }
+      if (Object.keys(data).length === 0) {
+        const error = new Error('No hay campos válidos para actualizar');
+        error.statusCode = 400;
+        throw error;
+      }
       const course = await prisma.course.update({
         where: { id },
-        data: req.body,
+        data,
         include: {
           author: { select: { id: true, name: true } }
         }

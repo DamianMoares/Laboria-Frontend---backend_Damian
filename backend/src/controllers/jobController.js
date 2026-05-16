@@ -121,9 +121,19 @@ const jobController = {
         throw error;
       }
       
+      const allowedFields = ['title', 'company', 'location', 'salary', 'description', 'requirements', 'mode', 'category'];
+      const data = {};
+      for (const field of allowedFields) {
+        if (req.body[field] !== undefined) data[field] = req.body[field];
+      }
+      if (Object.keys(data).length === 0) {
+        const error = new Error('No hay campos válidos para actualizar');
+        error.statusCode = 400;
+        throw error;
+      }
       const job = await prisma.job.update({
         where: { id },
-        data: req.body,
+        data,
         include: {
           author: { select: { id: true, name: true } }
         }
