@@ -1,6 +1,6 @@
 # 📋 Auditoría Completa — Laboria
 
-> Fecha: 16 mayo 2026 · Commit: `373e1a8`
+> Fecha: 16 mayo 2026 · Commit: `9bfb668`
 
 ---
 
@@ -54,8 +54,8 @@
 | Tipo | Estado | Detalle |
 |------|--------|---------|
 | Validación manual en controllers | ✅ | email regex, password >= 6, campos requeridos, roles válidos, etc. |
-| Librería de validación (express-validator, Joi) | ❌ | No se usa ninguna |
-| PUT jobs/courses aceptan `req.body` directo | ⚠️ | No hay validación de campos en update |
+| PUT jobs/courses con whitelist de campos | ✅ **FIXED** | Solo `title, company, location, salary, description, requirements, mode, category` (job) y `title, provider, description, category, level, duration, price, url, image` (course) |
+| Librería de validación (express-validator, Joi) | ❌ | No se usa ninguna — todo es validación manual |
 
 ### ✅ Manejo de errores centralizado
 
@@ -102,7 +102,6 @@
 - Wrapper `request()` en `frontend/src/services/api.js`
 - Auto-inyecta `Authorization: Bearer <token>` desde localStorage
 - Servicios por recurso: `authService`, `jobService`, `courseService`, `applicationService`, `adminService`
-- NO usa axios (usa fetch nativo) — no es un requisito, pero está bien
 
 ### ✅ Context API para estado global
 
@@ -142,50 +141,30 @@
 | CSS Modules (.module.css) | ⚠️ Parcial — solo 5 archivos |
 | CSS global (.css) | ⚠️ 20+ archivos — mezcla de estilos |
 
-**Conclusión:** Usa CSS Modules pero no de forma consistente. No es un error, pero debería ser homogéneo.
-
 ---
 
 ## 3️⃣ TESTING
 
-### ✅ Al menos 8 tests
+### ✅ Tests
 
-| Archivo | Tests | ¿Pasan? |
-|---------|-------|---------|
-| `App.test.jsx` | 4 | ✅ |
-| `AuthContext.test.jsx` | 6 | ✅ |
-| `Navbar.test.jsx` | 11 | ✅ |
-| `Home.test.jsx` | 6 | ✅ |
-| `LoginPage.test.jsx` | 9 | ✅ |
-| `RegisterPage.test.jsx` | 11 | ✅ |
-| `CourseSearchPage.test.jsx` | 6 | ✅ |
-| `JobSearchPage.test.jsx` | 6 | ✅ |
-| **Total** | **59 tests** | **✅ 59/59 pasan** |
+| Lote | Archivos | Tests | Estado |
+|------|----------|-------|--------|
+| Frontend | 8 archivos (`*.test.jsx`) | 59 | ✅ |
+| Backend | 1 archivo (`userController.test.js`) | 3 | ✅ |
+| **Total** | **9 archivos** | **62** | **✅ todos pasan** |
 
-### ⚠️ `npm test` desde la raíz — **ANTES FALLABA, AHORA FUNCIONA** ✅
+### ✅ `npm test` desde la raíz — FUNCIONA
 
-**Antes:** `test:backend` ejecutaba `exit 1`, rompiendo el `&&` chain.
+```bash
+npm test
+# → frontend: 59 passed, backend: 3 passed = 62 total ✅
+```
 
-**Solución aplicada:** 
-- `"test": "npm run test:frontend && npm run test:backend"` (root `package.json`)
-- Backend ahora usa `vitest run`
-- Frontend ahora usa `vitest run` (antes `vitest` en watch mode)
-
-| Lote | Tests | Estado |
-|------|-------|--------|
-| Frontend | 59 tests (8 archivos) | ✅ |
-| Backend | 3 tests (1 archivo) | ✅ |
-| **Total** | **62 tests** | **✅ todos pasan** |
-
-### ⚠️ Backend tenía 0 tests → **AHORA TIENE 3** ✅
-
-Se agregó `vitest` + `supertest` + primer archivo de tests:
+### ✅ Backend: primeros 3 tests (nuevos)
 
 | Archivo | Tests | Lo que prueba |
 |---------|-------|---------------|
 | `backend/src/__tests__/userController.test.js` | 3 | Login sin email, login sin password, register sin campos |
-
-Para ejecutar: `cd backend && npm test`
 
 ---
 
@@ -193,7 +172,7 @@ Para ejecutar: `cd backend && npm test`
 
 ### ✅ Backend en Render
 
-- `render.yaml` configurado con Web Service + PostgreSQL
+- `render.yaml` con Web Service + PostgreSQL
 - Build: `cd backend && npm install && npm run build`
 - Start: `cd backend && node server.js`
 - URL: `https://laboria-backend.onrender.com`
@@ -202,13 +181,12 @@ Para ejecutar: `cd backend && npm test`
 
 - `vercel.json` con `rootDirectory: "frontend"`
 - Framework Vite, SPA rewrites
-- `package-lock.json` existe en el repo (requisito de `npm ci`)
 - URL: `https://laboria-frontend-backend-damian.vercel.app`
 
 ### ✅ Base de datos en la nube
 
-- Render PostgreSQL (free plan), creada vía Blueprint
-- `DATABASE_URL` se conecta automáticamente desde el servicio
+- Render PostgreSQL (free plan)
+- `DATABASE_URL` auto-conectada desde el web service
 
 ### ✅ Las apps se comunican
 
@@ -216,54 +194,139 @@ Para ejecutar: `cd backend && npm test`
 |--------|-------|
 | `VITE_API_URL` (producción) | `https://laboria-backend.onrender.com` |
 | `CORS_ORIGINS` (producción) | `laboria-frontend-backend-damian.vercel.app,*.vercel.app` |
-| Estado | ✅ Configuradas, pendiente verificar en vivo |
+| Estado | ✅ Configuradas |
 
 ---
 
-## 5️⃣ RESUMEN DE HALLAZGOS
+## 5️⃣ RESUMEN DE REQUISITOS
 
-### ✅ Todo correcto (cumple requisitos)
-
-| Requisito | Estado |
-|-----------|--------|
-| API REST con 4+ recursos | ✅ 5 recursos, 28 endpoints |
-| Autenticación JWT | ✅ login + middleware protector |
-| Roles (user normal + admin) | ✅ 5 roles con permisos diferenciados |
-| PostgreSQL con 4+ tablas | ✅ 4 tablas + 4 enums + relaciones |
-| Prisma ORM | ✅ singleton + seed + db push |
-| Validaciones en endpoints | ⚠️ manuales, sin librería |
-| Manejo de errores centralizado | ✅ con HTTP codes apropiados |
-| Variables de entorno | ✅ 7 variables |
-| Integración externa | ✅ Resend (email) |
-| React 18+ | ✅ 18.3.1 |
-| Vite | ✅ 5.2.11 |
-| React Router v6 | ✅ 27 rutas |
-| Conexión API con fetch | ✅ wrapper propio |
-| Context API | ✅ AuthContext |
-| Formularios controlados | ✅ useForm + validación |
-| Estados loading/error/vacío | ✅ en todas las páginas |
-| Diseño responsive | ✅ 4 breakpoints |
-| CSS Modules | ⚠️ parcial (5/20+ archivos) |
-| 8+ tests | ✅ 59 tests |
-| Tests pasan todos | ✅ 59/59 |
-| Backend desplegado | ✅ Render |
-| Frontend desplegado | ✅ Vercel |
-| DB en la nube | ✅ Render PostgreSQL |
-| Apps se comunican | ✅ configurado |
-
-### ❌ Incidencias encontradas
-
-| # | Incidencia | Gravedad | Estado | Solución |
-|---|-----------|----------|--------|----------|
-| 1 | `npm test` desde raíz **falla** por `test:backend` | 🔴 Alta | ✅ **FIXED** | Root `"test": "npm run test:frontend && npm run test:backend"` |
-| 2 | Backend sin tests | 🟡 Media | ✅ **FIXED** | 3 tests con vitest en `backend/src/__tests__/` |
-| 3 | CSS Modules inconsistentes (mezcla con CSS global) | 🟢 Baja | ⏳ Pendiente | Migrar CSS global a módulos gradualmente |
-| 4 | PUT jobs/courses aceptan `req.body` sin validar | 🟡 Media | ✅ **FIXED** | Whitelist de campos permitidos en job/course controller |
-| 5 | No hay migration history (usa `db push`) | 🟢 Baja | ⏳ Pendiente | Setup inicial con migrations es preferible |
+| Requisito | Estado | Notas |
+|-----------|--------|-------|
+| API REST con 4+ recursos | ✅ | 5 recursos, 28 endpoints |
+| Autenticación JWT | ✅ | login + middleware protector |
+| Roles (user normal + admin) | ✅ | 5 roles con permisos |
+| PostgreSQL con 4+ tablas | ✅ | 4 tablas + 4 enums |
+| Prisma ORM | ✅ | singleton + seed |
+| Validaciones en endpoints | ⚠️ | manuales, sin librería externa |
+| Manejo de errores centralizado | ✅ | HTTP codes apropiados |
+| Variables de entorno | ✅ | 7 variables |
+| Integración externa | ✅ | Resend (email) |
+| React 18+ | ✅ | 18.3.1 |
+| Vite | ✅ | 5.2.11 |
+| React Router v6 | ✅ | 27 rutas |
+| Conexión API con fetch | ✅ | wrapper propio |
+| Context API | ✅ | AuthContext |
+| Formularios controlados | ✅ | useForm + validación |
+| Estados loading/error/vacío | ✅ | en todas las páginas |
+| Diseño responsive | ✅ | 4 breakpoints |
+| CSS Modules | ⚠️ | parcial (5 módulos, 20+ globales) |
+| 8+ tests | ✅ | 62 tests |
+| Tests pasan todos | ✅ | 62/62 |
+| Backend desplegado | ✅ | Render |
+| Frontend desplegado | ✅ | Vercel |
+| DB en la nube | ✅ | Render PostgreSQL |
+| Apps se comunican | ✅ | CORS + API URL configurados |
 
 ---
 
-## 6️⃣ ARQUITECTURA vs RECOMENDADA
+## 6️⃣ INCIDENCIAS
+
+### 🔴 Alta — Corregidas
+
+| # | Incidencia | Solución aplicada |
+|---|-----------|-------------------|
+| 1 | `npm test` fallaba por `test:backend` (exit 1) | ✅ Root `package.json` ahora corre `npm run test:frontend && npm run test:backend` con `vitest run` |
+| 4 | PUT jobs/courses aceptaban `req.body` sin filtrar | ✅ Whitelist de campos permitidos en `jobController.js:126` y `courseController.js:126` |
+
+### 🟡 Media — Corregidas
+
+| # | Incidencia | Solución aplicada |
+|---|-----------|-------------------|
+| 2 | Backend sin tests | ✅ 3 tests con vitest en `backend/src/__tests__/userController.test.js` |
+
+### 🟢 Baja — Pendientes (con soluciones)
+
+#### #3 CSS Modules inconsistentes
+
+**Qué es:** Mezcla de 5 archivos `.module.css` con 20+ archivos `.css` globales.
+
+**Por qué importa:** Los CSS Modules evitan conflictos de nombres de clases. Al usar CSS global, dos componentes podrían pisarse los estilos sin querer.
+
+**Soluciones:**
+
+| Solución | Dificultad | Tiempo estimado |
+|----------|-----------|-----------------|
+| **A)** Migrar los 20+ CSS globales a `.module.css` uno por uno | Media | 2-3 horas |
+| **B)** Dejar como está y solo usar módulos en componentes nuevos | Baja | 0 — solo cambiar convención |
+| **C)** Usar CSS-in-JS (styled-components, emotion) para todo | Alta | 4-5 horas (refactor mayor) |
+
+**Recomendación:** Opción B (cambiar convención para componentes nuevos) + migrar los archivos más conflictivos cuando haya tiempo.
+
+#### #5 No hay migration history (usa `prisma db push`)
+
+**Qué es:** El build usa `npx prisma db push` que aplica el schema directamente sin crear un historial de migraciones.
+
+**Por qué importa:** Si dos desarrolladores hacen cambios al schema al mismo tiempo, no hay forma de resolver conflictos. En producción, `db push` podría borrar datos accidentalmente.
+
+**Soluciones:**
+
+| Solución | Dificultad | Tiempo estimado |
+|----------|-----------|-----------------|
+| **A)** Generar migración inicial desde el schema actual | Baja | 15 min |
+| **B)** Usar `prisma migrate dev` en desarrollo y `prisma migrate deploy` en producción | Media | 1 hora |
+| **C)** Seguir con `db push` pero hacer backups antes de cambios | Baja | 5 min (configurar backup automático) |
+
+**Pasos para opción A (la más fácil):**
+
+```bash
+cd backend
+npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > prisma/migrations/0_init.sql
+npx prisma migrate resolve --applied 0_init
+```
+
+Esto "caza" el estado actual como una migración aplicada. A partir de ahí, los cambios nuevos se hacen con `prisma migrate dev`.
+
+### 🟡 Media — Nuevas incidencias encontradas
+
+#### #6 Backend no desconecta Prisma al apagarse
+
+**Qué es:** `server.js` maneja `SIGTERM` y `SIGINT` pero solo cierra el servidor HTTP, no llama a `prisma.$disconnect()`.
+
+**Por qué importa:** En Render, cuando el servicio se detiene o reinicia, las conexiones a la base de datos quedan abiertas. Con el tiempo, PostgreSQL puede quedarse sin conexiones disponibles.
+
+**Solución:** Agregar `prisma.$disconnect()` en los handlers de shutdown:
+
+```javascript
+// backend/server.js después de server.close()
+process.on('SIGTERM', () => {
+  server.close(async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+  });
+});
+process.on('SIGINT', () => {
+  server.close(async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+  });
+});
+```
+
+#### #7 Scripts de test manuales obsoletos
+
+**Qué es:** `backend/testDemoUsers.js`, `backend/test_endpoints.js` y `backend/test_endpoints_fixed.js` (232 líneas total) son scripts de prueba manuales que no forman parte del test suite automatizado.
+
+**Por qué importa:** Archivos muertos que confunden y no se mantienen. Si alguien ejecuta `npm test` del backend, estos scripts no se ejecutan, pero ocupan espacio.
+
+**Solución:** Eliminarlos después de verificar que no contienen lógica útil no cubierta por los tests automatizados:
+
+```bash
+rm backend/testDemoUsers.js backend/test_endpoints.js backend/test_endpoints_fixed.js
+```
+
+---
+
+## 7️⃣ ARQUITECTURA vs RECOMENDADA
 
 ```
      RECOMENDADA                              REAL (Laboria)
@@ -292,3 +355,14 @@ Para ejecutar: `cd backend && npm test`
 ```
 
 ✅ La arquitectura sigue el patrón recomendado: Frontend → API (fetch + JWT) → Backend (Routes → Middleware → Controllers → Prisma) → PostgreSQL.
+
+---
+
+## Prioridad de acciones recomendadas
+
+| Prioridad | Acción | Incidencia | Esfuerzo |
+|-----------|--------|-----------|----------|
+| 🔴 | Agregar `prisma.$disconnect()` en shutdown | #6 | 10 min |
+| 🟡 | Eliminar scripts de test manuales obsoletos | #7 | 5 min |
+| 🟢 | Decidir convención de CSS Modules para adelante | #3 | 15 min (decisión) |
+| 🟢 | Generar migración inicial desde schema actual | #5 | 15 min |
