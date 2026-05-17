@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
+import { useConfirm } from '../../context/ConfirmContext';
 import coursesData from '../../data/courses.json';
 import styles from '../compartidos/MyListingsPage.module.css';
 
 const SavedCoursesPage = () => {
   const { user, isCandidate } = useAuth();
+  const confirm = useConfirm();
   const [savedCourses, setSavedCourses] = useState([]);
 
   useEffect(() => {
@@ -34,15 +37,15 @@ const SavedCoursesPage = () => {
     );
   }
 
-  const handleRemove = (courseId) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este curso de guardados?')) {
-      const savedCoursesData = JSON.parse(localStorage.getItem('user_saved_courses') || '[]');
-      const updatedSavedCourses = savedCoursesData.filter(saved => !(saved.userId === user.id && saved.courseId === courseId));
-      localStorage.setItem('user_saved_courses', JSON.stringify(updatedSavedCourses));
-      
-      setSavedCourses(savedCourses.filter(course => course.id !== courseId));
-      alert('Curso eliminado de guardados');
-    }
+  const handleRemove = async (courseId) => {
+    const ok = await confirm('¿Estás seguro de que quieres eliminar este curso de guardados?');
+    if (!ok) return;
+    const savedCoursesData = JSON.parse(localStorage.getItem('user_saved_courses') || '[]');
+    const updatedSavedCourses = savedCoursesData.filter(saved => !(saved.userId === user.id && saved.courseId === courseId));
+    localStorage.setItem('user_saved_courses', JSON.stringify(updatedSavedCourses));
+    
+    setSavedCourses(savedCourses.filter(course => course.id !== courseId));
+    toast.success('Curso eliminado de guardados');
   };
 
   return (

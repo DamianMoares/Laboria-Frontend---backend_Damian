@@ -5,7 +5,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 const adminMiddleware = require('../middleware/adminMiddleware');
 const ownerMiddleware = require('../middleware/ownerMiddleware');
 const { authLimiter } = require('../middleware/rateLimiter');
-const { registerRules, loginRules, updateProfileRules } = require('../middleware/validate');
+const { registerRules, loginRules, updateProfileRules, forgotPasswordRules, resetPasswordRules, changePasswordRules } = require('../middleware/validate');
 
 // ==========================================
 // RUTAS PÚBLICAS (no requieren autenticación)
@@ -17,11 +17,11 @@ router.post('/register', authLimiter, registerRules, userController.register);
 // POST /api/users/login (con rate limiting + validación)
 router.post('/login', authLimiter, loginRules, userController.login);
 
-// POST /api/users/forgot-password - Solicitar restablecimiento
-router.post('/forgot-password', userController.forgotPassword);
+// POST /api/users/forgot-password - Solicitar restablecimiento (con rate limiting + validación)
+router.post('/forgot-password', authLimiter, forgotPasswordRules, userController.forgotPassword);
 
-// POST /api/users/reset-password - Restablecer contraseña
-router.post('/reset-password', userController.resetPassword);
+// POST /api/users/reset-password - Restablecer contraseña (con rate limiting + validación)
+router.post('/reset-password', authLimiter, resetPasswordRules, userController.resetPassword);
 
 // ==========================================
 // RUTAS PROTEGIDAS (requieren JWT)
@@ -44,8 +44,8 @@ router.post('/logout', authMiddleware, userController.logout);
 // GET /api/users/session-stats - Estadísticas de sesiones
 router.get('/session-stats', authMiddleware, userController.sessionStats);
 
-// POST /api/users/change-password - Cambiar contraseña
-router.post('/change-password', authMiddleware, userController.changePassword);
+// POST /api/users/change-password - Cambiar contraseña (con validación)
+router.post('/change-password', authMiddleware, changePasswordRules, userController.changePassword);
 
 // GET /api/users/curriculum - Obtener curriculum
 router.get('/curriculum', authMiddleware, userController.getCurriculum);

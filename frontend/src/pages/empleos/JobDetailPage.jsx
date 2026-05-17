@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import jobsData from '../../data/jobs.json';
 import styles from './JobDetailPage.module.css';
@@ -46,7 +47,7 @@ const JobDetailPage = () => {
     }
 
     if (!isCandidate()) {
-      alert('Solo los candidatos pueden aplicar a ofertas de empleo');
+      toast.error('Solo los candidatos pueden aplicar a ofertas de empleo');
       return;
     }
 
@@ -77,7 +78,7 @@ const JobDetailPage = () => {
     setHasApplied(true);
     
     const hasCurriculum = Object.keys(curriculumToSend).some(key => curriculumToSend[key].length > 0);
-    alert(hasCurriculum 
+    toast.success(hasCurriculum 
       ? 'Has aplicado a esta oferta con tu currículum personalizado' 
       : 'Has aplicado a esta oferta (sin currículum personalizado)');
   };

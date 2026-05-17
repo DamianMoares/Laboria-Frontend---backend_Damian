@@ -2,8 +2,10 @@ import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ROLES } from './config/enums';
+import { Toaster } from 'react-hot-toast';
+import { ConfirmProvider } from './context/ConfirmContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar/Navbar';
-import TabsNavigation from './components/navigation/TabsNavigation';
 import CookieConsent from './components/CookieConsent';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/inicio/Home';
@@ -41,8 +43,10 @@ import styles from './App.module.css';
 function App() {
   return (
     <AuthProvider>
+      <ConfirmProvider>
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <div className={styles.app}>
+          <ErrorBoundary>
           <Navbar />
           <main className={styles.mainContent}>
             <Routes>
@@ -93,8 +97,22 @@ function App() {
             </div>
           </footer>
           <CookieConsent />
+          </ErrorBoundary>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: '#1a1a1a',
+                color: '#fff',
+                border: '1px solid #3a3a3a',
+              },
+              success: { iconTheme: { primary: '#22c55e', secondary: '#fff' } },
+              error: { iconTheme: { primary: '#dc2626', secondary: '#fff' } },
+            }}
+          />
         </div>
       </Router>
+      </ConfirmProvider>
     </AuthProvider>
   );
 }

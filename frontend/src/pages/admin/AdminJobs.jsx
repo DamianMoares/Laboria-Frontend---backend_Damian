@@ -241,6 +241,7 @@ const AdminJobs = ({ onAdminLogout }) => {
                           onClick={() => handleEdit(job)}
                           className={styles['btn-edit']}
                           title="Editar empleo"
+                          aria-label="Editar empleo"
                         >
                           ✏️
                         </button>
@@ -248,6 +249,7 @@ const AdminJobs = ({ onAdminLogout }) => {
                           onClick={() => confirmDelete(job)}
                           className={styles['btn-delete']}
                           title="Eliminar empleo"
+                          aria-label="Eliminar empleo"
                         >
                           🗑️
                         </button>

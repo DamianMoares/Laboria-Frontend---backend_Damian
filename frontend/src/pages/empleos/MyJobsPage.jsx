@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
+import { useConfirm } from '../../context/ConfirmContext';
 import { jobService } from '../../services/jobService';
 import styles from '../compartidos/MyListingsPage.module.css';
 
 const MyJobsPage = () => {
   const { user, isCompanyEmployees, isCompanyHybrid } = useAuth();
+  const confirm = useConfirm();
   const [postedJobs, setPostedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,14 +41,14 @@ const MyJobsPage = () => {
   }
 
   const handleDelete = async (jobId) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta oferta?')) {
-      try {
-        await jobService.delete(jobId);
-        setPostedJobs(postedJobs.filter(job => job.id !== jobId));
-        alert('Oferta eliminada');
-      } catch (error) {
-        alert('Error al eliminar oferta');
-      }
+    const ok = await confirm('¿Estás seguro de que quieres eliminar esta oferta?');
+    if (!ok) return;
+    try {
+      await jobService.delete(jobId);
+      setPostedJobs(postedJobs.filter(job => job.id !== jobId));
+      toast.success('Oferta eliminada');
+    } catch (error) {
+      toast.error('Error al eliminar oferta');
     }
   };
 

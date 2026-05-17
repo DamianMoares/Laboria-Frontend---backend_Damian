@@ -79,6 +79,23 @@ const updateCourseRules = [
   handleErrors,
 ];
 
+const forgotPasswordRules = [
+  body('email').isEmail().withMessage('Email no válido').normalizeEmail(),
+  handleErrors,
+];
+
+const resetPasswordRules = [
+  body('token').trim().notEmpty().withMessage('Token es requerido'),
+  body('password').isLength({ min: 8 }).withMessage('Password debe tener al menos 8 caracteres'),
+  handleErrors,
+];
+
+const changePasswordRules = [
+  body('currentPassword').notEmpty().withMessage('Contraseña actual es requerida'),
+  body('newPassword').isLength({ min: 8 }).withMessage('Nueva contraseña debe tener al menos 8 caracteres'),
+  handleErrors,
+];
+
 module.exports = {
   registerRules,
   loginRules,
@@ -87,4 +104,7 @@ module.exports = {
   updateJobRules,
   createCourseRules,
   updateCourseRules,
+  forgotPasswordRules,
+  resetPasswordRules,
+  changePasswordRules,
 };

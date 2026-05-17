@@ -59,6 +59,12 @@ const courseApplicationController = {
       const { id } = req.params;
       const { status } = req.body;
 
+      if (req.user.role !== 'ADMIN') {
+        const error = new Error('Solo administradores pueden cambiar el estado de inscripciones');
+        error.statusCode = 403;
+        throw error;
+      }
+
       const validStatuses = ['PENDING', 'ACCEPTED', 'REJECTED'];
       if (!validStatuses.includes(status)) {
         const error = new Error('Estado no válido');

@@ -7,7 +7,7 @@ const emailService = require('../services/emailService');
 // REGISTRO
 const register = async (req, res, next) => {
   try {
-    const { email, password, name, role } = req.body;
+    const { email, password, name } = req.body;
     
     // Verificar si email ya existe
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -26,7 +26,7 @@ const register = async (req, res, next) => {
         email,
         password: hashedPassword,
         name,
-        role: role ? role.toUpperCase() : 'CANDIDATE'
+        role: 'CANDIDATE'
       },
       select: {
         id: true,
@@ -37,12 +37,16 @@ const register = async (req, res, next) => {
       }
     });
     
+    // Generar token JWT
+    const token = generateToken(user.id);
+
     // Enviar email de bienvenida (no bloqueante)
     emailService.sendWelcome(user.email, user.name).catch(console.error);
     
     res.status(201).json({ 
       message: 'Usuario creado exitosamente',
-      user 
+      user,
+      token
     });
     
   } catch (error) {
@@ -333,12 +337,12 @@ const sessionStats = async (req, res, next) => {
   try {
     const candidates = await prisma.loginSession.aggregate({
       _avg: { duration: true },
-      where: { userRole: { startsWith: 'CANDIDATE' }, duration: { not: null } }
+      where: { userRole: 'CANDIDATE', duration: { not: null } }
     });
 
     const companies = await prisma.loginSession.aggregate({
       _avg: { duration: true },
-      where: { userRole: { startsWith: 'COMPANY' }, duration: { not: null } }
+      where: { userRole: { in: ['COMPANY_EMPLOYEES', 'COMPANY_STUDENTS', 'COMPANY_HYBRID'] }, duration: { not: null } }
     });
 
     res.json({

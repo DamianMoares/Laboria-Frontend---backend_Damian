@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import { courseService } from '../../services/courseService';
 import styles from '../compartidos/FormPage.module.css';
+
+const REQUIRED_FIELDS = ['title', 'provider', 'duration', 'description'];
+const FIELD_LABELS = { title: 'Título', provider: 'Proveedor', duration: 'Duración', description: 'Descripción' };
 
 const PostCoursePage = () => {
   const { user, isCompanyStudents, isCompanyHybrid } = useAuth();
@@ -31,17 +35,40 @@ const PostCoursePage = () => {
     description: '',
     category: 'Tecnología'
   });
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
+  const validate = (name, value) => {
+    if (!REQUIRED_FIELDS.includes(name)) return '';
+    if (!value || !value.trim()) return `${FIELD_LABELS[name] || name} es obligatorio`;
+    if (name === 'title' && value.trim().length < 5) return 'El título debe tener al menos 5 caracteres';
+    if (name === 'description' && value.trim().length < 20) return 'La descripción debe tener al menos 20 caracteres';
+    return '';
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (touched[name]) setErrors(prev => ({ ...prev, [name]: validate(name, value) }));
   };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched(prev => ({ ...prev, [name]: true }));
+    setErrors(prev => ({ ...prev, [name]: validate(name, value) }));
+  };
+
+  const isValid = () => REQUIRED_FIELDS.every(f => !validate(f, formData[f]));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const newErrors = {};
+    REQUIRED_FIELDS.forEach(f => { newErrors[f] = validate(f, formData[f]); });
+    const allTouched = {};
+    REQUIRED_FIELDS.forEach(f => { allTouched[f] = true; });
+    setErrors(newErrors);
+    setTouched(allTouched);
+    if (Object.values(newErrors).some(Boolean)) return;
     setSubmitting(true);
     
     const coursePayload = {
@@ -57,14 +84,14 @@ const PostCoursePage = () => {
 
     try {
       await courseService.create(coursePayload);
-      alert('Curso publicado con éxito');
+      toast.success('Curso publicado con éxito');
       navigate('/mis-cursos');
     } catch (error) {
       const newCourse = { id: Date.now(), ...formData };
       const postedCourses = JSON.parse(localStorage.getItem('posted_courses') || '[]');
       postedCourses.push(newCourse);
       localStorage.setItem('posted_courses', JSON.stringify(postedCourses));
-      alert('Curso guardado localmente (backend no disponible)');
+      toast.success('Curso guardado localmente (backend no disponible)');
       navigate('/mis-cursos');
     } finally {
       setSubmitting(false);
@@ -91,9 +118,12 @@ const PostCoursePage = () => {
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
+                onBlur={handleBlur}
                 placeholder="Ej: React.js: De Cero a Experto"
                 required
+                className={errors.title && touched.title ? styles['input-error'] : ''}
               />
+              {errors.title && touched.title && <span className={styles['error-text']}>{errors.title}</span>}
             </div>
 
             <div className={styles['form-row']}>
@@ -105,9 +135,12 @@ const PostCoursePage = () => {
                   name="provider"
                   value={formData.provider}
                   onChange={handleInputChange}
+                  onBlur={handleBlur}
                   placeholder="Ej: Tu empresa"
                   required
+                  className={errors.provider && touched.provider ? styles['input-error'] : ''}
                 />
+                {errors.provider && touched.provider && <span className={styles['error-text']}>{errors.provider}</span>}
               </div>
 
               <div className={styles['form-group']}>
@@ -169,9 +202,12 @@ const PostCoursePage = () => {
                   name="duration"
                   value={formData.duration}
                   onChange={handleInputChange}
+                  onBlur={handleBlur}
                   placeholder="Ej: 40 horas"
                   required
+                  className={errors.duration && touched.duration ? styles['input-error'] : ''}
                 />
+                {errors.duration && touched.duration && <span className={styles['error-text']}>{errors.duration}</span>}
               </div>
 
               <div className={styles['form-group']}>
@@ -210,10 +246,13 @@ const PostCoursePage = () => {
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
+                onBlur={handleBlur}
                 placeholder="Describe el contenido del curso..."
                 rows="4"
                 required
+                className={errors.description && touched.description ? styles['input-error'] : ''}
               />
+              {errors.description && touched.description && <span className={styles['error-text']}>{errors.description}</span>}
             </div>
 
           </div>

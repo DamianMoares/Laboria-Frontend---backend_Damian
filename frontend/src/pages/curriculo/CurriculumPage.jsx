@@ -30,7 +30,8 @@ const CurriculumPage = () => {
         if (data.curriculum) {
           setCurriculum(data.curriculum);
         }
-      }).catch(() => {
+      }).catch((err) => {
+        console.error('Error al cargar curriculum desde servidor:', err);
         const saved = JSON.parse(localStorage.getItem(`curriculum_${user.id}`) || 'null');
         if (saved) setCurriculum(saved);
       });

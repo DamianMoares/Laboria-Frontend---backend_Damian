@@ -1,4 +1,5 @@
 const prisma = require('../config/database');
+const { logAction } = require('../services/auditService');
 
 /**
  * Obtener estadísticas del dashboard
@@ -185,6 +186,15 @@ const updateUserRole = async (req, res, next) => {
       }
     });
 
+    await logAction({
+      action: 'UPDATE_ROLE',
+      entity: 'User',
+      entityId: id,
+      details: `Rol cambiado de ${targetUser.role} a ${role}`,
+      adminId: req.user.id,
+      adminName: req.user.name
+    });
+
     res.json({
       success: true,
       message: 'Rol actualizado correctamente',
@@ -219,6 +229,15 @@ const deleteUserAsAdmin = async (req, res, next) => {
 
     await prisma.user.delete({
       where: { id }
+    });
+
+    await logAction({
+      action: 'DELETE',
+      entity: 'User',
+      entityId: id,
+      details: `Usuario "${existing.name}" (${existing.email}, rol: ${existing.role}) eliminado`,
+      adminId: req.user.id,
+      adminName: req.user.name
     });
 
     res.json({
@@ -360,6 +379,13 @@ const updateJobAsAdmin = async (req, res, next) => {
       if (req.body[field] !== undefined) jobData[field] = req.body[field];
     }
 
+    const existing = await prisma.job.findUnique({ where: { id }, select: { title: true } });
+    if (!existing) {
+      const error = new Error('Empleo no encontrado');
+      error.statusCode = 404;
+      throw error;
+    }
+
     const job = await prisma.job.update({
       where: { id },
       data: jobData,
@@ -372,6 +398,15 @@ const updateJobAsAdmin = async (req, res, next) => {
           }
         }
       }
+    });
+
+    await logAction({
+      action: 'UPDATE',
+      entity: 'Job',
+      entityId: id,
+      details: `Empleo "${existing.title}" actualizado`,
+      adminId: req.user.id,
+      adminName: req.user.name
     });
 
     res.json({
@@ -392,7 +427,7 @@ const deleteJobAsAdmin = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const existing = await prisma.job.findUnique({ where: { id } });
+    const existing = await prisma.job.findUnique({ where: { id }, select: { title: true } });
     if (!existing) {
       const error = new Error('Empleo no encontrado');
       error.statusCode = 404;
@@ -401,6 +436,15 @@ const deleteJobAsAdmin = async (req, res, next) => {
 
     await prisma.job.delete({
       where: { id }
+    });
+
+    await logAction({
+      action: 'DELETE',
+      entity: 'Job',
+      entityId: id,
+      details: `Empleo "${existing.title}" eliminado`,
+      adminId: req.user.id,
+      adminName: req.user.name
     });
 
     res.json({
@@ -478,6 +522,13 @@ const updateCourseAsAdmin = async (req, res, next) => {
       if (req.body[field] !== undefined) courseData[field] = req.body[field];
     }
 
+    const existing = await prisma.course.findUnique({ where: { id }, select: { title: true } });
+    if (!existing) {
+      const error = new Error('Curso no encontrado');
+      error.statusCode = 404;
+      throw error;
+    }
+
     const course = await prisma.course.update({
       where: { id },
       data: courseData,
@@ -490,6 +541,15 @@ const updateCourseAsAdmin = async (req, res, next) => {
           }
         }
       }
+    });
+
+    await logAction({
+      action: 'UPDATE',
+      entity: 'Course',
+      entityId: id,
+      details: `Curso "${existing.title}" actualizado`,
+      adminId: req.user.id,
+      adminName: req.user.name
     });
 
     res.json({
@@ -519,6 +579,15 @@ const deleteCourseAsAdmin = async (req, res, next) => {
 
     await prisma.course.delete({
       where: { id }
+    });
+
+    await logAction({
+      action: 'DELETE',
+      entity: 'Course',
+      entityId: id,
+      details: `Curso "${existing.title}" eliminado`,
+      adminId: req.user.id,
+      adminName: req.user.name
     });
 
     res.json({
@@ -602,6 +671,16 @@ const updateApplicationStatusAsAdmin = async (req, res, next) => {
       throw error;
     }
 
+    const existing = await prisma.application.findUnique({
+      where: { id },
+      select: { status: true }
+    });
+    if (!existing) {
+      const error = new Error('Aplicación no encontrada');
+      error.statusCode = 404;
+      throw error;
+    }
+
     const application = await prisma.application.update({
       where: { id },
       data: { status },
@@ -621,6 +700,15 @@ const updateApplicationStatusAsAdmin = async (req, res, next) => {
           }
         }
       }
+    });
+
+    await logAction({
+      action: 'UPDATE_STATUS',
+      entity: 'Application',
+      entityId: id,
+      details: `Estado cambiado de ${existing.status} a ${status} (empleo: ${application.job.title})`,
+      adminId: req.user.id,
+      adminName: req.user.name
     });
 
     res.json({
@@ -703,6 +791,38 @@ const runTests = async (req, res, next) => {
   }
 };
 
+/**
+ * Listar registros de auditoría
+ * GET /api/admin/audit-logs
+ */
+const getAuditLogs = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 50 } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const logs = await prisma.auditLog.findMany({
+      skip,
+      take: parseInt(limit),
+      orderBy: { createdAt: 'desc' }
+    });
+
+    const total = await prisma.auditLog.count();
+
+    res.json({
+      success: true,
+      logs,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / parseInt(limit))
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getDashboardStats,
   getAllUsers,
@@ -717,5 +837,6 @@ module.exports = {
   deleteCourseAsAdmin,
   getAllApplications,
   updateApplicationStatusAsAdmin,
-  runTests
+  runTests,
+  getAuditLogs
 };

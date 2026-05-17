@@ -13,7 +13,7 @@
   /* Colores de texto */
   --color-text-primary: #ffffff;
   --color-text-secondary: #cccccc;
-  --color-text-muted: #888888;
+  --color-text-muted: #aaaaaa;
   
   /* Colores de fondo */
   --color-bg-primary: #0a0a0a;
@@ -104,8 +104,12 @@ button {
   font-family: inherit;
   cursor: pointer;
   border: none;
-  outline: none;
   transition: all var(--transition-fast);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
 }
 
 .btn-primary {
@@ -150,7 +154,13 @@ input, select, textarea {
   transition: border-color var(--transition-fast);
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-color: var(--color-gold);
+}
+
+input:focus:not(:focus-visible), select:focus:not(:focus-visible), textarea:focus:not(:focus-visible) {
   outline: none;
   border-color: var(--color-gold);
 }

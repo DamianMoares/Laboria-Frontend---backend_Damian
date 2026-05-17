@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import coursesData from '../../data/courses.json';
 import { spainMunicipalities } from '../../data/searchData';
 import { searchAllCourses } from '../../context/ConexionApi';
@@ -22,7 +22,7 @@ const CourseSearchPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [usingFallback, setUsingFallback] = useState(false);
-  const [debounceTimer, setDebounceTimer] = useState(null);
+  const debounceTimer = useRef(null);
 
   const RESULTS_PER_PAGE = 50;
 
@@ -33,21 +33,6 @@ const CourseSearchPage = () => {
   const languages = ['Español', 'Inglés', 'Francés', 'Alemán', 'Italiano', 'Portugués', 'Catalán', 'Euskera', 'Gallego', 'Chino', 'Japonés', 'Otros'];
   const priceRanges = ['Gratis', '0 - 50 €', '50 - 100 €', '100 - 200 €', '200 - 500 €', '500+ €'];
   const durations = ['< 10 horas', '10 - 30 horas', '30 - 60 horas', '60 - 100 horas', '100+ horas'];
-
-  // Debounce para búsqueda en tiempo real
-  const debouncedSearch = useCallback((searchValue) => {
-    if (debounceTimer) {
-      clearTimeout(debounceTimer);
-    }
-
-    const newTimer = setTimeout(() => {
-      if (searchValue.trim() !== '') {
-        handleSearch();
-      }
-    }, 500); // 500ms de debounce
-
-    setDebounceTimer(newTimer);
-  }, [debounceTimer, searchTerm, selectedCategory, selectedLevel, selectedFormat, selectedLocation, selectedLanguage]);
 
   const handleSearch = async () => {
     setLoading(true);
@@ -281,10 +266,16 @@ const CourseSearchPage = () => {
             type="text"
             placeholder="Buscar por curso, plataforma, tecnología..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              if (debounceTimer.current) clearTimeout(debounceTimer.current);
+              debounceTimer.current = setTimeout(() => {
+                if (e.target.value.trim() !== '') handleSearch();
+              }, 500);
+            }}
             className={styles['search-input']}
             aria-label="Buscar cursos"
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           />
         </div>
 
@@ -505,6 +496,7 @@ const CourseSearchPage = () => {
                               key={pageNum}
                               className={styles['pagination-number'] + ' ' + (currentPage === pageNum ? styles['active'] : '')}
                               onClick={() => setCurrentPage(pageNum)}
+                              aria-current={currentPage === pageNum ? 'page' : undefined}
                             >
                               {pageNum}
                             </button>

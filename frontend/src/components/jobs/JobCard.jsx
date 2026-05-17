@@ -19,9 +19,9 @@ const JobCard = ({ job }) => {
   // Limpiar etiquetas HTML del texto
   const stripHtml = (html) => {
     if (!html) return '';
-    const tmp = document.createElement('div');
-    tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<body>${html}</body>`, 'text/html');
+    return doc.body.textContent || '';
   };
 
   // Obtener descripción limpia

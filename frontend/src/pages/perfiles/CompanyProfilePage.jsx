@@ -1,12 +1,13 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import jobsData from '../../data/jobs.json';
 import coursesData from '../../data/courses.json';
 import styles from './ProfilePage.module.css';
 
 const CompanyProfilePage = () => {
   const { user, logout, isAnyCompany, isCompanyEmployees, isCompanyStudents, isCompanyHybrid } = useAuth();
+  const navigate = useNavigate();
 
   if (!user || !isAnyCompany()) {
     return (
@@ -50,7 +51,7 @@ const CompanyProfilePage = () => {
               </div>
             </div>
           </div>
-          <button className="btn btn-secondary" onClick={logout}>
+          <button className="btn btn-secondary" onClick={() => { logout(); navigate('/'); }}>
             Cerrar Sesión
           </button>
         </header>

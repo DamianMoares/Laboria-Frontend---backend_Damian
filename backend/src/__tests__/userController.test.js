@@ -28,6 +28,7 @@ describe('User Controller', () => {
   let originalCache;
 
   beforeAll(() => {
+    process.env.JWT_SECRET = 'test-secret';
     const dbPath = require.resolve('../config/database');
     originalCache = require.cache[dbPath];
     require.cache[dbPath] = {
@@ -39,6 +40,7 @@ describe('User Controller', () => {
   });
 
   afterAll(() => {
+    delete process.env.JWT_SECRET;
     const dbPath = require.resolve('../config/database');
     if (originalCache) {
       require.cache[dbPath] = originalCache;

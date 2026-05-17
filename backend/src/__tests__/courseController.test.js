@@ -3,6 +3,7 @@ const mockDb = {
     findMany: vi.fn(),
     findUnique: vi.fn(),
     create: vi.fn(),
+    count: vi.fn(),
   },
   job: {},
   user: {},
@@ -54,9 +55,11 @@ describe('Course Controller', () => {
   });
 
   it('lists all courses', async () => {
-    mockDb.course.findMany.mockResolvedValue([
+    const courses = [
       { id: '1', title: 'React', provider: 'U', author: { id: 'u1', name: 'A' } },
-    ]);
+    ];
+    mockDb.course.findMany.mockResolvedValue(courses);
+    mockDb.course.count.mockResolvedValue(courses.length);
 
     const courseController = require('../controllers/courseController');
     const req = mockReq();
@@ -65,6 +68,7 @@ describe('Course Controller', () => {
     await courseController.list(req, res, mockNext);
 
     expect(mockDb.course.findMany).toHaveBeenCalledOnce();
+    expect(mockDb.course.count).toHaveBeenCalledOnce();
     expect(res.json).toHaveBeenCalled();
   });
 

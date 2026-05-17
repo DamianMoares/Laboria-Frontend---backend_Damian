@@ -233,6 +233,7 @@ const AdminUsers = ({ onAdminLogout }) => {
                           onClick={() => openUserDetail(user)}
                           className={styles['btn-view']}
                           title="Ver detalles"
+                          aria-label="Ver detalles del usuario"
                         >
                           👁️
                         </button>
@@ -240,6 +241,7 @@ const AdminUsers = ({ onAdminLogout }) => {
                           onClick={() => confirmDelete(user)}
                           className={styles['btn-delete']}
                           title="Eliminar usuario"
+                          aria-label="Eliminar usuario"
                         >
                           🗑️
                         </button>

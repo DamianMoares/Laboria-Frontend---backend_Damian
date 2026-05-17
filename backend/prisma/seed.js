@@ -9,17 +9,17 @@ async function main() {
   // ─── USUARIOS ──────────────────────────────────────────────
   const usersData = [
     // Admin
-    { email: 'admin@laboria.com', password: 'admin123', name: 'Admin Laboria', role: 'ADMIN' },
+    { email: 'admin@laboria.com', password: 'Admin@2026!Secure', name: 'Admin Laboria', role: 'ADMIN' },
     // Candidatos
-    { email: 'carlos@email.com', password: 'carlos123', name: 'Carlos García López', role: 'CANDIDATE' },
-    { email: 'maria@email.com', password: 'maria123', name: 'María Rodríguez Pérez', role: 'CANDIDATE' },
-    { email: 'javier@email.com', password: 'javier123', name: 'Javier Martínez Ruiz', role: 'CANDIDATE' },
+    { email: 'carlos@email.com', password: 'Carlos@2026!Pass', name: 'Carlos García López', role: 'CANDIDATE' },
+    { email: 'maria@email.com', password: 'Maria@2026!Pass', name: 'María Rodríguez Pérez', role: 'CANDIDATE' },
+    { email: 'javier@email.com', password: 'Javier@2026!Pass', name: 'Javier Martínez Ruiz', role: 'CANDIDATE' },
     // Empresas
-    { email: 'info@techcorp.com', password: 'techcorp123', name: 'TechCorp Solutions', role: 'COMPANY_EMPLOYEES' },
-    { email: 'info@edunext.com', password: 'edunext123', name: 'EduNext Academy', role: 'COMPANY_STUDENTS' },
-    { email: 'info@innovagroup.com', password: 'innova123', name: 'InnovaGroup', role: 'COMPANY_HYBRID' },
-    { email: 'info@datasoft.com', password: 'datasoft123', name: 'DataSoft Technologies', role: 'COMPANY_EMPLOYEES' },
-    { email: 'info@cursosalfa.com', password: 'alfa123', name: 'Cursos Alfa', role: 'COMPANY_STUDENTS' },
+    { email: 'info@techcorp.com', password: 'TechCorp@2026!', name: 'TechCorp Solutions', role: 'COMPANY_EMPLOYEES' },
+    { email: 'info@edunext.com', password: 'EduNext@2026!', name: 'EduNext Academy', role: 'COMPANY_STUDENTS' },
+    { email: 'info@innovagroup.com', password: 'Innova@2026!', name: 'InnovaGroup', role: 'COMPANY_HYBRID' },
+    { email: 'info@datasoft.com', password: 'DataSoft@2026!', name: 'DataSoft Technologies', role: 'COMPANY_EMPLOYEES' },
+    { email: 'info@cursosalfa.com', password: 'Alfa@2026!Secure', name: 'Cursos Alfa', role: 'COMPANY_STUDENTS' },
   ];
 
   const users = {};

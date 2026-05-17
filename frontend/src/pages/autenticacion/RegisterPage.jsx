@@ -184,7 +184,6 @@ const RegisterPage = () => {
     const userData = {
       email: formData.email,
       password: formData.password,
-      role: roleMap[role] || role,
       name: role === 'candidate' ? `${formData.firstName} ${formData.lastName}` : formData.companyName,
     };
 

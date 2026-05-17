@@ -215,6 +215,13 @@
   border-color: var(--color-gold);
 }
 
+.item-content input:focus-visible,
+.item-content select:focus-visible,
+.item-content textarea:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
 .item-content textarea {
   resize: vertical;
   min-height: 80px;

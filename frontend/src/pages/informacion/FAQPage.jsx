@@ -70,6 +70,20 @@ const FAQPage = () => {
               <button 
                 className={styles['faq-question']}
                 onClick={() => toggleFAQ(index)}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const next = index < faqs.length - 1 ? index + 1 : 0;
+                    setOpenIndex(openIndex === next ? null : next);
+                    document.querySelectorAll(`.${styles['faq-question']}`)[next]?.focus();
+                  }
+                  if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const prev = index > 0 ? index - 1 : faqs.length - 1;
+                    setOpenIndex(openIndex === prev ? null : prev);
+                    document.querySelectorAll(`.${styles['faq-question']}`)[prev]?.focus();
+                  }
+                }}
                 aria-expanded={openIndex === index}
               >
                 <span className={styles['question-text']}>{faq.question}</span>

@@ -49,7 +49,8 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: 'dist',
-      sourcemap: true
+      sourcemap: mode !== 'production',
+      chunkSizeWarningLimit: 800
     },
     // Base path: Vercel y local usan '/', GitHub Pages necesita VITE_BASE_PATH
     base: env.VITE_BASE_PATH || '/',

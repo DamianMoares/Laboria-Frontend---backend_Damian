@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from './ProfilePage.module.css';
 
 const CandidateProfilePage = () => {
   const { user, logout, isCandidate } = useAuth();
+  const navigate = useNavigate();
   const [curriculum, setCurriculum] = useState({
     experience: [],
     education: [],
@@ -51,7 +52,7 @@ const CandidateProfilePage = () => {
               <p className={styles['profile-location']}>{profile.location}</p>
             </div>
           </div>
-          <button className="btn btn-secondary" onClick={logout}>
+          <button className="btn btn-secondary" onClick={() => { logout(); navigate('/'); }}>
             Cerrar Sesión
           </button>
         </header>

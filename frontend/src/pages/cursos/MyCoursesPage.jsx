@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
+import { useConfirm } from '../../context/ConfirmContext';
 import { courseService } from '../../services/courseService';
 import styles from '../compartidos/MyListingsPage.module.css';
 
 const MyCoursesPage = () => {
   const { user, isCompanyStudents, isCompanyHybrid } = useAuth();
+  const confirm = useConfirm();
   const [postedCourses, setPostedCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,14 +41,14 @@ const MyCoursesPage = () => {
   }
 
   const handleDelete = async (courseId) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este curso?')) {
-      try {
-        await courseService.delete(courseId);
-        setPostedCourses(postedCourses.filter(course => course.id !== courseId));
-        alert('Curso eliminado');
-      } catch (error) {
-        alert('Error al eliminar curso');
-      }
+    const ok = await confirm('¿Estás seguro de que quieres eliminar este curso?');
+    if (!ok) return;
+    try {
+      await courseService.delete(courseId);
+      setPostedCourses(postedCourses.filter(course => course.id !== courseId));
+      toast.success('Curso eliminado');
+    } catch (error) {
+      toast.error('Error al eliminar curso');
     }
   };
 

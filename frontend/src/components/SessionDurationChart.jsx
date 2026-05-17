@@ -15,7 +15,8 @@ const SessionDurationChart = () => {
           { name: 'Empresas', duracion: stats.companies }
         ]);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('Error al obtener estadísticas de sesión:', err);
         setData([
           { name: 'Candidatos', duracion: 0 },
           { name: 'Empresas', duracion: 0 }

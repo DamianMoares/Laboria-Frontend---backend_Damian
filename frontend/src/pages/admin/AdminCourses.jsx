@@ -259,6 +259,7 @@ const AdminCourses = ({ onAdminLogout }) => {
                           onClick={() => handleEdit(course)}
                           className={styles['btn-edit']}
                           title="Editar curso"
+                          aria-label="Editar curso"
                         >
                           ✏️
                         </button>
@@ -266,6 +267,7 @@ const AdminCourses = ({ onAdminLogout }) => {
                           onClick={() => confirmDelete(course)}
                           className={styles['btn-delete']}
                           title="Eliminar curso"
+                          aria-label="Eliminar curso"
                         >
                           🗑️
                         </button>

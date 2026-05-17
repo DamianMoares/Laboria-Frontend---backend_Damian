@@ -1,4 +1,5 @@
 const express = require('express');
+const helmet = require('helmet');
 const cors = require('cors');
 const path = require('path');
 const dotenv = require('dotenv');
@@ -8,10 +9,14 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 
 // Importar middleware
 const errorHandler = require('./src/middleware/errorHandler');
+const { writeLimiter } = require('./src/middleware/rateLimiter');
 const prisma = require('./src/config/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Seguridad HTTP
+app.use(helmet());
 
 // Middleware CORS
 const corsOrigins = process.env.CORS_ORIGINS
@@ -33,6 +38,14 @@ app.use(cors({
 }));
 app.use(express.json()); // Parsear JSON
 
+// Rate limiting global para escrituras (POST, PUT, DELETE)
+app.use((req, res, next) => {
+  if (['POST', 'PUT', 'DELETE'].includes(req.method)) {
+    return writeLimiter(req, res, next);
+  }
+  next();
+});
+
 // Rutas API
 app.use('/api/users', require('./src/routes/userRoutes'));
 app.use('/api/jobs', require('./src/routes/jobRoutes'));
@@ -44,6 +57,11 @@ app.use('/api/admin', require('./src/routes/adminRoutes')); // Rutas de administ
 // Ruta de prueba
 app.get('/', (req, res) => {
   res.json({ message: '¡Backend de Laboria funcionando!' });
+});
+
+// Healthcheck
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Manejo de errores (siempre al final)

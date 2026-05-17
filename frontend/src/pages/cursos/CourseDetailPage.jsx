@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import { courseApplicationService } from '../../services/courseApplicationService';
 import coursesData from '../../data/courses.json';
@@ -28,20 +29,22 @@ const CourseDetailPage = () => {
       courseApplicationService.getMyApplications().then(data => {
         const alreadyApplied = data.some(a => a.courseId === String(id));
         setApplied(alreadyApplied);
-      }).catch(() => {});
+      }).catch((err) => {
+        console.error('Error al cargar aplicaciones del curso:', err);
+      });
     }
   }, [id, user, isCandidate]);
 
   const handleApply = async () => {
     if (!isAuthenticated) { navigate('/login'); return; }
-    if (!isCandidate()) { alert('Solo candidatos pueden inscribirse'); return; }
+    if (!isCandidate()) { toast.error('Solo candidatos pueden inscribirse'); return; }
     setApplying(true);
     try {
       await courseApplicationService.apply(String(id), '');
       setApplied(true);
-      alert('Inscripción enviada exitosamente');
+      toast.success('Inscripción enviada exitosamente');
     } catch (err) {
-      alert(err.message || 'Error al inscribirse');
+      toast.error(err.message || 'Error al inscribirse');
     }
     setApplying(false);
   };
@@ -67,22 +70,20 @@ const CourseDetailPage = () => {
     }
 
     if (!isCandidate()) {
-      alert('Solo los candidatos pueden guardar cursos');
+      toast.error('Solo los candidatos pueden guardar cursos');
       return;
     }
 
     const savedCourses = JSON.parse(localStorage.getItem('user_saved_courses') || '[]');
     
     if (isSaved) {
-      // Remove from saved
       const updatedSavedCourses = savedCourses.filter(
         saved => !(saved.userId === user.id && saved.courseId === course.id)
       );
       localStorage.setItem('user_saved_courses', JSON.stringify(updatedSavedCourses));
       setIsSaved(false);
-      alert('Curso eliminado de guardados');
+      toast.success('Curso eliminado de guardados');
     } else {
-      // Add to saved
       const newSavedCourse = {
         userId: user.id,
         courseId: course.id,
@@ -91,7 +92,7 @@ const CourseDetailPage = () => {
       savedCourses.push(newSavedCourse);
       localStorage.setItem('user_saved_courses', JSON.stringify(savedCourses));
       setIsSaved(true);
-      alert('Curso guardado con éxito');
+      toast.success('Curso guardado con éxito');
     }
   };
 

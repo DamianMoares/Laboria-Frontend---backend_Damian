@@ -36,12 +36,16 @@ jobs:
       working-directory: frontend
       run: npm ci
 
+    - name: Run tests
+      working-directory: frontend
+      run: npm test
+
     - name: Build frontend
       working-directory: frontend
       run: npm run build
       env:
         VITE_BASE_PATH: /Laboria-Frontend---backend_Damian/
-        VITE_API_URL: http://localhost:3000
+        VITE_API_URL: https://laboria-backend.onrender.com
 
     - name: Configure Pages
       uses: actions/configure-pages@v5

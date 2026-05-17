@@ -5,6 +5,9 @@ const courseController = {
   list: async (req, res, next) => {
     try {
       const { category, level, search } = req.query;
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 50));
+      const skip = (page - 1) * limit;
       
       const where = {};
       if (category) where.category = category;
@@ -16,15 +19,20 @@ const courseController = {
         ];
       }
       
-      const courses = await prisma.course.findMany({
-        where,
-        include: {
-          author: { select: { id: true, name: true } }
-        },
-        orderBy: { createdAt: 'desc' }
-      });
+      const [courses, total] = await Promise.all([
+        prisma.course.findMany({
+          where,
+          skip,
+          take: limit,
+          include: {
+            author: { select: { id: true, name: true } }
+          },
+          orderBy: { createdAt: 'desc' }
+        }),
+        prisma.course.count({ where })
+      ]);
       
-      res.json(courses);
+      res.json({ data: courses, total, page, limit, totalPages: Math.ceil(total / limit) });
     } catch (error) {
       next(error);
     }

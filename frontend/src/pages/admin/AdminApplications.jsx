@@ -239,6 +239,7 @@ const AdminApplications = ({ onAdminLogout }) => {
                         onClick={() => openEditModal(application)}
                         className={styles['btn-view']}
                         title="Ver detalles"
+                        aria-label="Ver detalles de la aplicación"
                       >
                         👁️
                       </button>

@@ -61,6 +61,12 @@ router.get('/applications', adminController.getAllApplications);
 router.put('/applications/:id/status', adminController.updateApplicationStatusAsAdmin);
 
 // ==========================================
+// AUDITORÍA
+// ==========================================
+// Ver registro de acciones admin
+router.get('/audit-logs', adminController.getAuditLogs);
+
+// ==========================================
 // TESTS DEL BACKEND
 // ==========================================
 // Ejecutar tests (vitest) del backend

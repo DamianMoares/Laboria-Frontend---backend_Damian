@@ -22,7 +22,14 @@
     "deploy:frontend": "cd frontend && npm run build",
     "deploy": "npm run deploy:frontend"
   },
-  "keywords": ["laboria", "empleo", "formacion", "react", "nodejs", "prisma"],
+  "keywords": [
+    "laboria",
+    "empleo",
+    "formacion",
+    "react",
+    "nodejs",
+    "prisma"
+  ],
   "author": "Damian Moares",
   "license": "ISC",
   "devDependencies": {

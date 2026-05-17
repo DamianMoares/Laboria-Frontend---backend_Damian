@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import logoSitio from '../../assets/img/Laboria_Fondo_Negro.png';
@@ -8,6 +8,29 @@ const Navbar = () => {
   const { isAuthenticated, isCandidate, isAnyCompany, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const menuRef = useRef(null);
+  const toggleRef = useRef(null);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const menu = menuRef.current;
+    if (!menu) return;
+    const focusable = menu.querySelectorAll('a, button, [tabindex]:not([tabindex="-1"])');
+    if (focusable.length) focusable[0].focus();
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') { setMobileMenuOpen(false); toggleRef.current?.focus(); return; }
+      if (e.key !== 'Tab') return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
 
   const getHomeRoute = () => {
     if (isCandidate()) return '/perfil/candidato';
@@ -33,12 +56,15 @@ const Navbar = () => {
     <nav className={styles.navbar}>
       <div className={styles.navbarContainer}>
         <Link to="/" className={styles.navbarLogo} onClick={closeMobileMenu}>
-          <img src={logoSitio} alt="Laboria " className={styles.navbarLogoImg} />
+          <img src={logoSitio} alt="Laboria" className={styles.navbarLogoImg} />
         </Link>
         <button 
+          ref={toggleRef}
           className={styles.navbarToggle} 
           onClick={toggleMobileMenu}
-          aria-label="Toggle menu"
+          aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-menu"
         >
           <span className={`hamburger ${mobileMenuOpen ? 'open' : ''}`}>
             <span></span>
@@ -49,7 +75,7 @@ const Navbar = () => {
         {mobileMenuOpen && (
           <div className={styles.navbarOverlay} onClick={closeMobileMenu}></div>
         )}
-        <ul className={`${styles.navbarMenu} ${mobileMenuOpen ? styles.open : ''}`}>
+        <ul id="mobile-menu" ref={menuRef} className={`${styles.navbarMenu} ${mobileMenuOpen ? styles.open : ''}`}>
           {isAuthenticated ? (
             <>
               <li className={styles.navbarItem}>

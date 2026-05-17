@@ -60,7 +60,21 @@ export const authService = {
     return response.data;
   },
 
-  isAuthenticated: () => !!localStorage.getItem('token'),
+  isAuthenticated: () => {
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.exp && Date.now() >= payload.exp * 1000) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        return false;
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  },
 
   getCurrentUser: () => {
     const user = localStorage.getItem('user');

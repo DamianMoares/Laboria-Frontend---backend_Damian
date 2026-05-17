@@ -5,6 +5,9 @@ const jobController = {
   list: async (req, res, next) => {
     try {
       const { category, location, mode, search } = req.query;
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 50));
+      const skip = (page - 1) * limit;
       
       const where = {};
       if (category) where.category = category;
@@ -17,15 +20,20 @@ const jobController = {
         ];
       }
       
-      const jobs = await prisma.job.findMany({
-        where,
-        include: {
-          author: { select: { id: true, name: true } }
-        },
-        orderBy: { createdAt: 'desc' }
-      });
+      const [jobs, total] = await Promise.all([
+        prisma.job.findMany({
+          where,
+          skip,
+          take: limit,
+          include: {
+            author: { select: { id: true, name: true } }
+          },
+          orderBy: { createdAt: 'desc' }
+        }),
+        prisma.job.count({ where })
+      ]);
       
-      res.json(jobs);
+      res.json({ data: jobs, total, page, limit, totalPages: Math.ceil(total / limit) });
     } catch (error) {
       next(error);
     }

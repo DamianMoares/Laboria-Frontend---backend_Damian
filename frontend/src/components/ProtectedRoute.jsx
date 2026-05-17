@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = ({ children, roles }) => {
@@ -19,7 +19,7 @@ const ProtectedRoute = ({ children, roles }) => {
         <div className="container">
           <h1>No autorizado</h1>
           <p>No tienes permisos para acceder a esta página.</p>
-          <a href="/" className="btn btn-primary">Volver al inicio</a>
+          <Link to="/" className="btn btn-primary">Volver al inicio</Link>
         </div>
       </div>
     );

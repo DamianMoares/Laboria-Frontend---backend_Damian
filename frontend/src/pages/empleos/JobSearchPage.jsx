@@ -229,7 +229,7 @@ const JobSearchPage = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className={styles['search-input']}
             aria-label="Buscar empleos"
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           />
         </div>
 
@@ -436,6 +436,7 @@ const JobSearchPage = () => {
                               key={pageNum}
                               className={styles['pagination-number'] + ' ' + (currentPage === pageNum ? styles['active'] : '')}
                               onClick={() => setCurrentPage(pageNum)}
+                              aria-current={currentPage === pageNum ? 'page' : undefined}
                             >
                               {pageNum}
                             </button>

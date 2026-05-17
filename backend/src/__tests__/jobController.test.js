@@ -3,6 +3,7 @@ const mockDb = {
     findMany: vi.fn(),
     findUnique: vi.fn(),
     create: vi.fn(),
+    count: vi.fn(),
   },
   course: {},
   user: {},
@@ -54,9 +55,11 @@ describe('Job Controller', () => {
   });
 
   it('lists all jobs', async () => {
-    mockDb.job.findMany.mockResolvedValue([
+    const jobs = [
       { id: '1', title: 'Dev', company: 'Co', author: { id: 'u1', name: 'A' } },
-    ]);
+    ];
+    mockDb.job.findMany.mockResolvedValue(jobs);
+    mockDb.job.count.mockResolvedValue(jobs.length);
 
     const jobController = require('../controllers/jobController');
     const req = mockReq();
@@ -65,6 +68,7 @@ describe('Job Controller', () => {
     await jobController.list(req, res, mockNext);
 
     expect(mockDb.job.findMany).toHaveBeenCalledOnce();
+    expect(mockDb.job.count).toHaveBeenCalledOnce();
     expect(res.json).toHaveBeenCalled();
   });
 

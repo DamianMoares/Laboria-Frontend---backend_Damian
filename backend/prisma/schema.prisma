@@ -40,6 +40,12 @@ model Job {
   authorId     String
   applications Application[]
   author       User          @relation(fields: [authorId], references: [id])
+
+  @@index([category])
+  @@index([location])
+  @@index([mode])
+  @@index([authorId])
+  @@index([createdAt])
 }
 
 model Course {
@@ -57,16 +63,25 @@ model Course {
   updatedAt   DateTime @updatedAt
   authorId    String
   author      User     @relation(fields: [authorId], references: [id])
+  courseApplications CourseApplication[]
+
+  @@index([category])
+  @@index([level])
+  @@index([authorId])
+  @@index([createdAt])
 }
 
 model LoginSession {
   id        String    @id @default(uuid())
   userId    String
-  userRole  String
+  userRole  Role
   loginAt   DateTime  @default(now())
   logoutAt  DateTime?
   duration  Int?
   user      User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([loginAt])
 }
 
 model Application {
@@ -100,9 +115,24 @@ model CourseApplication {
   updatedAt DateTime          @updatedAt
   userId    String
   courseId  String
+  course    Course            @relation(fields: [courseId], references: [id])
   user      User              @relation(fields: [userId], references: [id])
 
   @@unique([userId, courseId])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  entity    String
+  entityId  String?
+  details   String?
+  adminId   String
+  adminName String?
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+  @@index([entity, entityId])
 }
 
 enum Role {

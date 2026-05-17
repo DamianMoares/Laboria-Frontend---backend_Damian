@@ -1,4 +1,5 @@
 import API_URL from '../config/api';
+import toast from 'react-hot-toast';
 
 const BASE_URL = `${API_URL}/api`;
 
@@ -12,9 +13,10 @@ const handleResponse = async (response) => {
     } catch (e) {}
 
     if (response.status === 401 && localStorage.getItem('token')) {
+      toast.error('Sesión expirada. Redirigiendo al inicio de sesión...');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      setTimeout(() => { window.location.href = '/login'; }, 2000);
     }
 
     throw new Error(message);

@@ -105,7 +105,7 @@ describe('Navbar Component', () => {
       </BrowserRouter>
     );
 
-    const toggleButton = screen.getByLabelText(/Toggle menu/i);
+    const toggleButton = screen.getByLabelText(/Abrir menú/i);
     const menu = screen.getByRole('list');
 
     fireEvent.click(toggleButton);
@@ -122,7 +122,7 @@ describe('Navbar Component', () => {
       </BrowserRouter>
     );
 
-    const toggleButton = screen.getByLabelText(/Toggle menu/i);
+    const toggleButton = screen.getByLabelText(/Abrir menú/i);
     const homeLink = screen.getByText(/Inicio/i);
     const menu = screen.getByRole('list');
 
@@ -140,7 +140,7 @@ describe('Navbar Component', () => {
       </BrowserRouter>
     );
 
-    const toggleButton = screen.getByLabelText(/Toggle menu/i);
+    const toggleButton = screen.getByLabelText(/Abrir menú/i);
     const menu = screen.getByRole('list');
 
     fireEvent.click(toggleButton);

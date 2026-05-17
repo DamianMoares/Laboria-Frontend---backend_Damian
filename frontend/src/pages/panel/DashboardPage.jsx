@@ -70,7 +70,7 @@ const DashboardPage = () => {
     <div className={styles['panel-page']}>
       <div className="container">
         <header className={styles['panel-header']}>
-          <img src={logoNegro} alt="Laboria " className={styles['panel-logo']} />
+          <img src={logoNegro} alt="Laboria" className={styles['panel-logo']} />
           <h1>Panel de {isCandidate() ? profile.firstName || user.name : profile.companyName || user.name}</h1>
           <p className={styles['panel-subtitle']}>
             Gestiona tu cuenta y actividades

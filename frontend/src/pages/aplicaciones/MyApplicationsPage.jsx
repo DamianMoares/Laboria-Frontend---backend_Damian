@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
+import { useConfirm } from '../../context/ConfirmContext';
 import { applicationService } from '../../services/applicationService';
 import { courseApplicationService } from '../../services/courseApplicationService';
 import styles from '../compartidos/MyListingsPage.module.css';
 
 const MyApplicationsPage = () => {
   const { user, isCandidate } = useAuth();
+  const confirm = useConfirm();
   const [applications, setApplications] = useState([]);
   const [courseApps, setCourseApps] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,26 +49,26 @@ const MyApplicationsPage = () => {
   }
 
   const handleWithdraw = async (appId) => {
-    if (window.confirm('¿Estás seguro de que quieres retirar esta aplicación?')) {
-      try {
-        await applicationService.cancel(appId);
-        setApplications(applications.filter(app => app.id !== appId));
-        alert('Aplicación retirada');
-      } catch (error) {
-        alert('Error al retirar aplicación');
-      }
+    const ok = await confirm('¿Estás seguro de que quieres retirar esta aplicación?');
+    if (!ok) return;
+    try {
+      await applicationService.cancel(appId);
+      setApplications(applications.filter(app => app.id !== appId));
+      toast.success('Aplicación retirada');
+    } catch (error) {
+      toast.error('Error al retirar aplicación');
     }
   };
 
   const handleCancelCourse = async (appId) => {
-    if (window.confirm('¿Cancelar inscripción en este curso?')) {
-      try {
-        await courseApplicationService.cancel(appId);
-        setCourseApps(courseApps.filter(a => a.id !== appId));
-        alert('Inscripción cancelada');
-      } catch {
-        alert('Error al cancelar inscripción');
-      }
+    const ok = await confirm('¿Cancelar inscripción en este curso?');
+    if (!ok) return;
+    try {
+      await courseApplicationService.cancel(appId);
+      setCourseApps(courseApps.filter(a => a.id !== appId));
+      toast.success('Inscripción cancelada');
+    } catch {
+      toast.error('Error al cancelar inscripción');
     }
   };
 
