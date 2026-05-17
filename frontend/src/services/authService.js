@@ -15,7 +15,12 @@ export const authService = {
     return response.data;
   },
 
-  logout: () => {
+  logout: async () => {
+    try {
+      await api.post('/users/logout');
+    } catch {
+      // si falla la API, igual limpiamos localStorage
+    }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   },

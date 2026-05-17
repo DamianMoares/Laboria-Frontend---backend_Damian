@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import logoNegro from '../../assets/img/Laboria_Fondo_Negro.png';
+import SessionDurationChart from '../../components/SessionDurationChart';
 import styles from './DashboardPage.module.css';
 
 const DashboardPage = () => {
@@ -159,6 +160,8 @@ const DashboardPage = () => {
               )}
             </div>
           </div>
+
+          <SessionDurationChart />
         </div>
       </div>
     </div>

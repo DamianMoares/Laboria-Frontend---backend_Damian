@@ -22,6 +22,7 @@ model User {
   courses              Course[]
   jobs                 Job[]
   curriculum           Curriculum?
+  loginSessions        LoginSession[]
 }
 
 model Job {
@@ -56,6 +57,16 @@ model Course {
   updatedAt   DateTime @updatedAt
   authorId    String
   author      User     @relation(fields: [authorId], references: [id])
+}
+
+model LoginSession {
+  id        String    @id @default(uuid())
+  userId    String
+  userRole  String
+  loginAt   DateTime  @default(now())
+  logoutAt  DateTime?
+  duration  Int?
+  user      User      @relation(fields: [userId], references: [id])
 }
 
 model Application {

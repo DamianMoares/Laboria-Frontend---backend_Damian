@@ -1,0 +1,21 @@
+.card {
+  background-color: var(--color-bg-secondary, #1a1a2e);
+  border: 1px solid var(--color-border, #333);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.title {
+  color: var(--color-gold, #d4a843);
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-border, #333);
+}
+
+.loading {
+  text-align: center;
+  color: var(--color-text-secondary, #999);
+  padding: 1rem 0;
+}

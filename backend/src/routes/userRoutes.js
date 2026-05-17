@@ -38,6 +38,12 @@ router.put('/profile/me', authMiddleware, updateProfileRules, (req, res, next) =
   userController.updateProfile(req, res, next);
 });
 
+// POST /api/users/logout - Cerrar sesión
+router.post('/logout', authMiddleware, userController.logout);
+
+// GET /api/users/session-stats - Estadísticas de sesiones
+router.get('/session-stats', authMiddleware, userController.sessionStats);
+
 // POST /api/users/change-password - Cambiar contraseña
 router.post('/change-password', authMiddleware, userController.changePassword);
 

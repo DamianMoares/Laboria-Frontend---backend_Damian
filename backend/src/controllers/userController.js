@@ -71,6 +71,14 @@ const login = async (req, res, next) => {
       throw error;
     }
     
+    // Registrar sesión
+    await prisma.loginSession.create({
+      data: {
+        userId: user.id,
+        userRole: user.role
+      }
+    });
+
     // Retornar usuario (sin password) + JWT token
     const { password: _, ...userWithoutPassword } = user;
     const token = generateToken(user.id);
@@ -297,9 +305,56 @@ const saveCurriculum = async (req, res, next) => {
   }
 };
 
+// CERRAR SESIÓN
+const logout = async (req, res, next) => {
+  try {
+    const openSession = await prisma.loginSession.findFirst({
+      where: { userId: req.user.id, logoutAt: null },
+      orderBy: { loginAt: 'desc' }
+    });
+
+    if (openSession) {
+      const now = new Date();
+      const duration = Math.floor((now - openSession.loginAt) / 1000);
+      await prisma.loginSession.update({
+        where: { id: openSession.id },
+        data: { logoutAt: now, duration }
+      });
+    }
+
+    res.json({ message: 'Sesión cerrada' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ESTADÍSTICAS DE SESIONES
+const sessionStats = async (req, res, next) => {
+  try {
+    const candidates = await prisma.loginSession.aggregate({
+      _avg: { duration: true },
+      where: { userRole: { startsWith: 'CANDIDATE' }, duration: { not: null } }
+    });
+
+    const companies = await prisma.loginSession.aggregate({
+      _avg: { duration: true },
+      where: { userRole: { startsWith: 'COMPANY' }, duration: { not: null } }
+    });
+
+    res.json({
+      candidates: candidates._avg.duration ? Math.round(candidates._avg.duration) : 0,
+      companies: companies._avg.duration ? Math.round(companies._avg.duration) : 0
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
+  logout,
+  sessionStats,
   getProfile,
   updateProfile,
   deleteAccount,
