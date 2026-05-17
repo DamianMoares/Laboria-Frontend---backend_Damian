@@ -37,16 +37,25 @@ const CurriculumPage = () => {
     }
   }, [user, isCandidate]);
 
+  const persistCurriculum = async (data) => {
+    if (user) {
+      try {
+        await curriculumService.save(data);
+      } catch {
+        // fallback a localStorage si falla API
+      }
+      localStorage.setItem(`curriculum_${user.id}`, JSON.stringify(data));
+    }
+  };
+
   const saveCurriculum = async () => {
     if (user) {
       setSaving(true);
       try {
         await curriculumService.save(curriculum);
         localStorage.setItem(`curriculum_${user.id}`, JSON.stringify(curriculum));
-        alert('Currículum guardado con éxito');
       } catch {
         localStorage.setItem(`curriculum_${user.id}`, JSON.stringify(curriculum));
-        alert('Currículum guardado localmente');
       }
       setSaving(false);
     }
@@ -102,10 +111,12 @@ const CurriculumPage = () => {
       if (!validateDates(newItems.experience.startDate, newItems.experience.endDate, 'experience', newItems.experience.id)) {
         return;
       }
-      setCurriculum({
+      const updated = {
         ...curriculum,
         experience: [...curriculum.experience, newItems.experience]
-      });
+      };
+      setCurriculum(updated);
+      persistCurriculum(updated);
       setNewItems({ ...newItems, experience: null });
     }
   };
@@ -145,6 +156,7 @@ const CurriculumPage = () => {
 
   const saveExperienceEdit = (id) => {
     setEditingItems({ ...editingItems, [`experience_${id}`]: false });
+    persistCurriculum(curriculum);
   };
 
   const cancelExperienceEdit = (id) => {
@@ -152,10 +164,12 @@ const CurriculumPage = () => {
   };
 
   const removeExperience = (id) => {
-    setCurriculum({
+    const updated = {
       ...curriculum,
       experience: curriculum.experience.filter(exp => exp.id !== id)
-    });
+    };
+    setCurriculum(updated);
+    persistCurriculum(updated);
   };
 
   const toggleSendToApplication = (id, section) => {
@@ -188,10 +202,12 @@ const CurriculumPage = () => {
       if (!validateDates(newItems.education.startDate, newItems.education.endDate, 'education', newItems.education.id)) {
         return;
       }
-      setCurriculum({
+      const updated = {
         ...curriculum,
         education: [...curriculum.education, newItems.education]
-      });
+      };
+      setCurriculum(updated);
+      persistCurriculum(updated);
       setNewItems({ ...newItems, education: null });
     }
   };
@@ -231,6 +247,7 @@ const CurriculumPage = () => {
 
   const saveEducationEdit = (id) => {
     setEditingItems({ ...editingItems, [`education_${id}`]: false });
+    persistCurriculum(curriculum);
   };
 
   const cancelEducationEdit = (id) => {
@@ -238,10 +255,12 @@ const CurriculumPage = () => {
   };
 
   const removeEducation = (id) => {
-    setCurriculum({
+    const updated = {
       ...curriculum,
       education: curriculum.education.filter(edu => edu.id !== id)
-    });
+    };
+    setCurriculum(updated);
+    persistCurriculum(updated);
   };
 
   const addSkill = () => {
@@ -258,10 +277,12 @@ const CurriculumPage = () => {
 
   const saveNewSkill = () => {
     if (newItems.skills) {
-      setCurriculum({
+      const updated = {
         ...curriculum,
         skills: [...curriculum.skills, newItems.skills]
-      });
+      };
+      setCurriculum(updated);
+      persistCurriculum(updated);
       setNewItems({ ...newItems, skills: null });
     }
   };
@@ -292,6 +313,7 @@ const CurriculumPage = () => {
 
   const saveSkillEdit = (id) => {
     setEditingItems({ ...editingItems, [`skills_${id}`]: false });
+    persistCurriculum(curriculum);
   };
 
   const cancelSkillEdit = (id) => {
@@ -299,10 +321,12 @@ const CurriculumPage = () => {
   };
 
   const removeSkill = (id) => {
-    setCurriculum({
+    const updated = {
       ...curriculum,
       skills: curriculum.skills.filter(skill => skill.id !== id)
-    });
+    };
+    setCurriculum(updated);
+    persistCurriculum(updated);
   };
 
   const addProject = () => {
@@ -321,10 +345,12 @@ const CurriculumPage = () => {
 
   const saveNewProject = () => {
     if (newItems.projects) {
-      setCurriculum({
+      const updated = {
         ...curriculum,
         projects: [...curriculum.projects, newItems.projects]
-      });
+      };
+      setCurriculum(updated);
+      persistCurriculum(updated);
       setNewItems({ ...newItems, projects: null });
     }
   };
@@ -355,6 +381,7 @@ const CurriculumPage = () => {
 
   const saveProjectEdit = (id) => {
     setEditingItems({ ...editingItems, [`projects_${id}`]: false });
+    persistCurriculum(curriculum);
   };
 
   const cancelProjectEdit = (id) => {
@@ -362,10 +389,12 @@ const CurriculumPage = () => {
   };
 
   const removeProject = (id) => {
-    setCurriculum({
+    const updated = {
       ...curriculum,
       projects: curriculum.projects.filter(proj => proj.id !== id)
-    });
+    };
+    setCurriculum(updated);
+    persistCurriculum(updated);
   };
 
   const addLanguage = () => {
@@ -382,10 +411,12 @@ const CurriculumPage = () => {
 
   const saveNewLanguage = () => {
     if (newItems.languages) {
-      setCurriculum({
+      const updated = {
         ...curriculum,
         languages: [...curriculum.languages, newItems.languages]
-      });
+      };
+      setCurriculum(updated);
+      persistCurriculum(updated);
       setNewItems({ ...newItems, languages: null });
     }
   };
@@ -416,6 +447,7 @@ const CurriculumPage = () => {
 
   const saveLanguageEdit = (id) => {
     setEditingItems({ ...editingItems, [`languages_${id}`]: false });
+    persistCurriculum(curriculum);
   };
 
   const cancelLanguageEdit = (id) => {
@@ -423,10 +455,12 @@ const CurriculumPage = () => {
   };
 
   const removeLanguage = (id) => {
-    setCurriculum({
+    const updated = {
       ...curriculum,
       languages: curriculum.languages.filter(lang => lang.id !== id)
-    });
+    };
+    setCurriculum(updated);
+    persistCurriculum(updated);
   };
 
   if (!user || !isCandidate()) {

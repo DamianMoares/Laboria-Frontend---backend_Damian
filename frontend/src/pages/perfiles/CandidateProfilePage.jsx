@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Link, useNavigate } from 'react-router-dom';
-import EditProfileModal from '../../components/EditProfileModal';
+import { Link } from 'react-router-dom';
 import styles from './ProfilePage.module.css';
 
 const CandidateProfilePage = () => {
-  const { user, logout, isCandidate, deleteAccount } = useAuth();
-  const navigate = useNavigate();
+  const { user, logout, isCandidate } = useAuth();
   const [curriculum, setCurriculum] = useState({
     experience: [],
     education: [],
@@ -14,8 +12,6 @@ const CandidateProfilePage = () => {
     projects: [],
     languages: []
   });
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     if (user && isCandidate()) {
@@ -207,28 +203,6 @@ const CandidateProfilePage = () => {
 
           <aside className={styles['profile-sidebar']}>
             <div className={styles['sidebar-card']}>
-              <h3>Acciones rápidas</h3>
-              <Link to="/panel" className={styles['sidebar-action']}>
-                Resumen
-              </Link>
-              <Link to="/empleos" className={styles['sidebar-action']}>
-                Buscar Empleo
-              </Link>
-              <Link to="/cursos" className={styles['sidebar-action']}>
-                Buscar Cursos
-              </Link>
-              <Link to="/curriculum" className={styles['sidebar-action']}>
-                Gestionar Currículum
-              </Link>
-              <button className={styles['sidebar-action']} onClick={() => setIsEditModalOpen(true)}>
-                Editar Perfil
-              </button>
-              <button className={styles['sidebar-action'] + ' ' + styles['delete-account']} onClick={() => setIsDeleteModalOpen(true)}>
-                Eliminar Cuenta
-              </button>
-            </div>
-
-            <div className={styles['sidebar-card']}>
               <h3>Estadísticas</h3>
               <div className={styles['stat-item']}>
                 <span className={styles['stat-value']}>0</span>
@@ -243,39 +217,6 @@ const CandidateProfilePage = () => {
         </div>
       </div>
 
-      <EditProfileModal 
-        isOpen={isEditModalOpen} 
-        onClose={() => setIsEditModalOpen(false)} 
-        userType="candidate" 
-      />
-
-      {isDeleteModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsDeleteModalOpen(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Eliminar Cuenta</h2>
-              <button className="modal-close" onClick={() => setIsDeleteModalOpen(false)}>×</button>
-            </div>
-            <div className="modal-body">
-              <p>¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible y se perderán todos tus datos.</p>
-              <div className="form-actions">
-                <button className="btn btn-secondary" onClick={() => setIsDeleteModalOpen(false)}>
-                  Cancelar
-                </button>
-                <button 
-                  className="btn btn-danger" 
-                  onClick={async () => {
-                    await deleteAccount();
-                    navigate('/');
-                  }}
-                >
-                  Confirmar Eliminación
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

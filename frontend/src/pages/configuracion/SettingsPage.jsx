@@ -22,7 +22,14 @@ const SettingsPage = () => {
         name: user.name || '',
         email: user.email || '',
         phone: saved.phone || '',
-        location: saved.location || ''
+        location: saved.location || '',
+        bio: saved.bio || '',
+        experience: saved.experience || '',
+        salaryExpectation: saved.salaryExpectation || '',
+        workModePreference: saved.workModePreference || '',
+        linkedin: saved.linkedin || '',
+        github: saved.github || '',
+        portfolio: saved.portfolio || ''
       });
     }
   }, [user]);
@@ -63,7 +70,14 @@ const SettingsPage = () => {
       lastName: formData.name?.split(' ').slice(1).join(' ') || '',
       email: formData.email,
       phone: formData.phone,
-      location: formData.location
+      location: formData.location,
+      bio: formData.bio,
+      experience: formData.experience,
+      salaryExpectation: formData.salaryExpectation,
+      workModePreference: formData.workModePreference,
+      linkedin: formData.linkedin,
+      github: formData.github,
+      portfolio: formData.portfolio
     };
     localStorage.setItem(`profile_${user.id}`, JSON.stringify(profileData));
 
@@ -142,6 +156,39 @@ const SettingsPage = () => {
             <div className={styles.formGroup}>
               <label>Ubicación</label>
               <input type="text" name="location" value={formData.location || ''} onChange={handleChange} />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Experiencia</label>
+              <input type="text" name="experience" value={formData.experience || ''} onChange={handleChange} />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Expectativa Salarial</label>
+              <input type="text" name="salaryExpectation" value={formData.salaryExpectation || ''} onChange={handleChange} />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Preferencia de Trabajo</label>
+              <select name="workModePreference" value={formData.workModePreference || ''} onChange={handleChange}>
+                <option value="">Seleccionar...</option>
+                <option value="Remoto">Remoto</option>
+                <option value="Presencial">Presencial</option>
+                <option value="Híbrido">Híbrido</option>
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <label>Biografía</label>
+              <textarea name="bio" value={formData.bio || ''} onChange={handleChange} rows="4" />
+            </div>
+            <div className={styles.formGroup}>
+              <label>LinkedIn</label>
+              <input type="url" name="linkedin" value={formData.linkedin || ''} onChange={handleChange} placeholder="https://linkedin.com/in/..." />
+            </div>
+            <div className={styles.formGroup}>
+              <label>GitHub</label>
+              <input type="url" name="github" value={formData.github || ''} onChange={handleChange} placeholder="https://github.com/..." />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Portfolio</label>
+              <input type="url" name="portfolio" value={formData.portfolio || ''} onChange={handleChange} placeholder="https://..." />
             </div>
             <button type="submit" className="btn btn-primary" disabled={saving}>
               {saving ? 'Guardando...' : 'Guardar cambios'}

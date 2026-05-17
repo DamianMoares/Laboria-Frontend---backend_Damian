@@ -1,16 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import jobsData from '../../data/jobs.json';
 import coursesData from '../../data/courses.json';
-import EditProfileModal from '../../components/EditProfileModal';
 import styles from './ProfilePage.module.css';
 
 const CompanyProfilePage = () => {
-  const { user, logout, isAnyCompany, isCompanyEmployees, isCompanyStudents, isCompanyHybrid, deleteAccount } = useAuth();
-  const navigate = useNavigate();
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const { user, logout, isAnyCompany, isCompanyEmployees, isCompanyStudents, isCompanyHybrid } = useAuth();
 
   if (!user || !isAnyCompany()) {
     return (
@@ -143,29 +139,6 @@ const CompanyProfilePage = () => {
 
           <aside className={styles['profile-sidebar']}>
             <div className={styles['sidebar-card']}>
-              <h3>Acciones rápidas</h3>
-              <Link to="/panel" className={styles['sidebar-action']}>
-                Resumen
-              </Link>
-              {(isCompanyEmployees() || isCompanyHybrid()) && (
-                <Link to="/empleos" className={styles['sidebar-action']}>
-                  Ver ofertas de empleo
-                </Link>
-              )}
-              {(isCompanyStudents() || isCompanyHybrid()) && (
-                <Link to="/cursos" className={styles['sidebar-action']}>
-                  Ver cursos
-                </Link>
-              )}
-              <button className={styles['sidebar-action']} onClick={() => setIsEditModalOpen(true)}>
-                Editar Perfil
-              </button>
-              <button className={styles['sidebar-action'] + ' ' + styles['delete-account']} onClick={() => setIsDeleteModalOpen(true)}>
-                Eliminar Cuenta
-              </button>
-            </div>
-
-            <div className={styles['sidebar-card']}>
               <h3>Estadísticas</h3>
               <div className={styles['stat-item']}>
                 <span className={styles['stat-value']}>{postedJobs.length}</span>
@@ -180,39 +153,6 @@ const CompanyProfilePage = () => {
         </div>
       </div>
 
-      <EditProfileModal 
-        isOpen={isEditModalOpen} 
-        onClose={() => setIsEditModalOpen(false)} 
-        userType="company" 
-      />
-
-      {isDeleteModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsDeleteModalOpen(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Eliminar Cuenta</h2>
-              <button className="modal-close" onClick={() => setIsDeleteModalOpen(false)}>×</button>
-            </div>
-            <div className="modal-body">
-              <p>¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible y se perderán todos tus datos.</p>
-              <div className="form-actions">
-                <button className="btn btn-secondary" onClick={() => setIsDeleteModalOpen(false)}>
-                  Cancelar
-                </button>
-                <button 
-                  className="btn btn-danger" 
-                  onClick={async () => {
-                    await deleteAccount();
-                    navigate('/');
-                  }}
-                >
-                  Confirmar Eliminación
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
