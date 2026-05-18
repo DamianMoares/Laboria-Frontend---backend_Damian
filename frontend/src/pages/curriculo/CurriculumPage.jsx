@@ -67,17 +67,17 @@ const CurriculumPage = () => {
   const [expandedItems, setExpandedItems] = useState({});
   const [saving, setSaving] = useState(false);
 
-  const hooks = {};
-  SECTIONS.forEach(key => {
-    hooks[key] = useCurriculumSection(key, curriculum, setCurriculum, persistCurriculum);
-  });
-
   const persistCurriculum = (data) => {
     if (user) {
       curriculumService.save(data).catch(() => {});
       localStorage.setItem(`curriculum_${user.id}`, JSON.stringify(data));
     }
   };
+
+  const hooks = {};
+  SECTIONS.forEach(key => {
+    hooks[key] = useCurriculumSection(key, curriculum, setCurriculum, persistCurriculum);
+  });
 
   useEffect(() => {
     if (user && isCandidate()) {
