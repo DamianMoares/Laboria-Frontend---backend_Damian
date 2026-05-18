@@ -3,7 +3,7 @@ services:
     name: laboria-backend
     runtime: node
     plan: free
-    buildCommand: cd backend && npm install --include=dev && npx prisma generate && npx prisma migrate deploy
+    buildCommand: cd backend && npm install --include=dev && (npx prisma migrate resolve --rolled-back 20260517214627_change_user_role_to_enum 2>/dev/null || true) && npx prisma generate && npx prisma migrate deploy
     startCommand: cd backend && node server.js
     healthCheckPath: /
     envVars:

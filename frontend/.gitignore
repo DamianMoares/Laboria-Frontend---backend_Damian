@@ -9,13 +9,14 @@ lerna-debug.log*
 
 node_modules
 # DOC - Uncomment to exclude from git
-doc
+docs
 .env
 .emv.production
 .env.example
 dist
 dist-ssr
 *.local
+
 
 # Editor directories and files
 .vscode/*
