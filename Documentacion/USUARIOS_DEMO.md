@@ -5,16 +5,16 @@
 ## CREDENCIALES
 
 | Email | Contraseña | Nombre | Rol |
-|---|---|---|---|
-| `admin@laboria.com` | `admin123` | Admin Laboria | ADMIN |
-| `carlos@email.com` | `carlos123` | Carlos García López | CANDIDATE |
-| `maria@email.com` | `maria123` | María Rodríguez Pérez | CANDIDATE |
-| `javier@email.com` | `javier123` | Javier Martínez Ruiz | CANDIDATE |
-| `info@techcorp.com` | `techcorp123` | TechCorp Solutions | COMPANY_EMPLOYEES |
-| `info@edunext.com` | `edunext123` | EduNext Academy | COMPANY_STUDENTS |
-| `info@innovagroup.com` | `innova123` | InnovaGroup | COMPANY_HYBRID |
-| `info@datasoft.com` | `datasoft123` | DataSoft Technologies | COMPANY_EMPLOYEES |
-| `info@cursosalfa.com` | `alfa123` | Cursos Alfa | COMPANY_STUDENTS |
+|---|---|---|---|---|
+| `admin@laboria.com` | `Admin@2026!Secure` | Admin Laboria | ADMIN |
+| `carlos@email.com` | `Carlos@2026!Pass` | Carlos García López | CANDIDATE |
+| `maria@email.com` | `Maria@2026!Pass` | María Rodríguez Pérez | CANDIDATE |
+| `javier@email.com` | `Javier@2026!Pass` | Javier Martínez Ruiz | CANDIDATE |
+| `info@techcorp.com` | `TechCorp@2026!` | TechCorp Solutions | COMPANY_EMPLOYEES |
+| `info@edunext.com` | `EduNext@2026!` | EduNext Academy | COMPANY_STUDENTS |
+| `info@innovagroup.com` | `Innova@2026!` | InnovaGroup | COMPANY_HYBRID |
+| `info@datasoft.com` | `DataSoft@2026!` | DataSoft Technologies | COMPANY_EMPLOYEES |
+| `info@cursosalfa.com` | `Alfa@2026!Secure` | Cursos Alfa | COMPANY_STUDENTS |
 
 ---
 
@@ -105,12 +105,12 @@ Abrir http://localhost:5173
 # Login
 curl -X POST http://localhost:3000/api/users/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@laboria.com","password":"admin123"}'
+  -d '{"email":"admin@laboria.com","password":"Admin@2026!Secure"}'
 
 # Probar en producción
 curl -X POST https://laboria-backend.onrender.com/api/users/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@laboria.com","password":"admin123"}'
+  -d '{"email":"admin@laboria.com","password":"Admin@2026!Secure"}'
 ```
 
 ---

@@ -5,6 +5,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useConfirm } from '../../context/ConfirmContext';
 import { applicationService } from '../../services/applicationService';
 import { courseApplicationService } from '../../services/courseApplicationService';
+import Spinner from '../../components/Spinner';
+import EmptyState from '../../components/EmptyState';
 import styles from '../compartidos/MyListingsPage.module.css';
 
 const MyApplicationsPage = () => {
@@ -99,10 +101,11 @@ const MyApplicationsPage = () => {
           ))}
         </div>
       ) : (
-        <div className={styles['no-listings']}>
-          <p>No has aplicado a ofertas de empleo aún.</p>
-          <Link to="/empleos" className="btn btn-primary">Buscar Ofertas</Link>
-        </div>
+        <EmptyState
+            title="Sin postulaciones"
+            message="No has aplicado a ofertas de empleo aún."
+            action={<Link to="/empleos" className="btn btn-primary">Buscar Ofertas</Link>}
+          />
       )}
     </>
   );
@@ -133,10 +136,11 @@ const MyApplicationsPage = () => {
           ))}
         </div>
       ) : (
-        <div className={styles['no-listings']}>
-          <p>No te has inscrito en ningún curso aún.</p>
-          <Link to="/cursos" className="btn btn-primary">Buscar Cursos</Link>
-        </div>
+        <EmptyState
+            title="Sin inscripciones"
+            message="No te has inscrito en ningún curso aún."
+            action={<Link to="/cursos" className="btn btn-primary">Buscar Cursos</Link>}
+          />
       )}
     </>
   );
@@ -161,7 +165,7 @@ const MyApplicationsPage = () => {
         </div>
 
         {loading ? (
-          <div className="loading">Cargando...</div>
+          <div className="loading"><Spinner /></div>
         ) : tab === 'jobs' ? renderJobApps() : renderCourseApps()}
       </div>
     </div>

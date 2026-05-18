@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import { useConfirm } from '../../context/ConfirmContext';
 import { jobService } from '../../services/jobService';
+import Spinner from '../../components/Spinner';
+import EmptyState from '../../components/EmptyState';
 import styles from '../compartidos/MyListingsPage.module.css';
 
 const MyJobsPage = () => {
@@ -66,7 +68,7 @@ const MyJobsPage = () => {
         </header>
 
         {loading ? (
-          <div className="loading">Cargando ofertas...</div>
+          <div className="loading"><Spinner /></div>
         ) : postedJobs.length > 0 ? (
           <div className={styles['listings-grid']}>
             {postedJobs.map(job => (
@@ -109,12 +111,11 @@ const MyJobsPage = () => {
             ))}
           </div>
         ) : (
-          <div className={styles['no-listings']}>
-            <p>No has publicado ninguna oferta de empleo aún.</p>
-            <Link to="/publicar-oferta" className="btn btn-primary">
-              Publicar Tu Primera Oferta
-            </Link>
-          </div>
+          <EmptyState
+              title="Sin ofertas publicadas"
+              message="No has publicado ninguna oferta de empleo aún."
+              action={<Link to="/publicar-oferta" className="btn btn-primary">Publicar Tu Primera Oferta</Link>}
+            />
         )}
       </div>
     </div>

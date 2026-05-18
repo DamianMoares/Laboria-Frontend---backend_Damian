@@ -727,6 +727,9 @@ const updateApplicationStatusAsAdmin = async (req, res, next) => {
  */
 const runTests = async (req, res, next) => {
   try {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({ error: 'Tests solo disponibles en desarrollo' });
+    }
     const { execSync } = require('child_process');
     const path = require('path');
     const backendDir = path.resolve(__dirname, '../..');

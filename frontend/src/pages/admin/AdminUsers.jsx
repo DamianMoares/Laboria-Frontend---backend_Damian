@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
 import AdminNavigation from './AdminNavigation';
+import EmptyState from '../../components/EmptyState';
 import styles from './AdminUsers.module.css';
 
 const AdminUsers = ({ onAdminLogout }) => {
@@ -192,63 +193,67 @@ const AdminUsers = ({ onAdminLogout }) => {
                 </tr>
               </thead>
               <tbody>
-                {users.map(user => (
-                  <tr key={user.id}>
-                    <td>
-                      <div className={styles['user-info']}>
-                        <div className={styles['user-avatar']}>{user.name.charAt(0).toUpperCase()}</div>
-                        <span className={styles['user-name']}>{user.name}</span>
-                      </div>
-                    </td>
-                    <td>{user.email}</td>
-                    <td>
-                      <select
-                        value={user.role}
-                        onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                        disabled={updateLoading}
-                        className={styles['role-select']}
-                      >
-                        {roles.filter(r => r.value).map(role => (
-                          <option key={role.value} value={role.value}>{role.label}</option>
-                        ))}
-                      </select>
-                    </td>
-                    <td>{formatDate(user.createdAt)}</td>
-                    <td>
-                      <div className={styles['activity-badges']}>
-                        <span className={styles['badge']} title="Empleos publicados">
-                          💼 {user._count?.jobs || 0}
-                        </span>
-                        <span className={styles['badge']} title="Cursos publicados">
-                          📚 {user._count?.courses || 0}
-                        </span>
-                        <span className={styles['badge']} title="Aplicaciones enviadas">
-                          📝 {user._count?.applications || 0}
-                        </span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className={styles['action-buttons']}>
-                        <button
-                          onClick={() => openUserDetail(user)}
-                          className={styles['btn-view']}
-                          title="Ver detalles"
-                          aria-label="Ver detalles del usuario"
+                {users.length === 0 ? (
+                  <tr><td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}><EmptyState title="Sin datos" message="No hay elementos para mostrar." /></td></tr>
+                ) : (
+                  users.map(user => (
+                    <tr key={user.id}>
+                      <td>
+                        <div className={styles['user-info']}>
+                          <div className={styles['user-avatar']}>{user.name.charAt(0).toUpperCase()}</div>
+                          <span className={styles['user-name']}>{user.name}</span>
+                        </div>
+                      </td>
+                      <td>{user.email}</td>
+                      <td>
+                        <select
+                          value={user.role}
+                          onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                          disabled={updateLoading}
+                          className={styles['role-select']}
                         >
-                          👁️
-                        </button>
-                        <button
-                          onClick={() => confirmDelete(user)}
-                          className={styles['btn-delete']}
-                          title="Eliminar usuario"
-                          aria-label="Eliminar usuario"
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          {roles.filter(r => r.value).map(role => (
+                            <option key={role.value} value={role.value}>{role.label}</option>
+                          ))}
+                        </select>
+                      </td>
+                      <td>{formatDate(user.createdAt)}</td>
+                      <td>
+                        <div className={styles['activity-badges']}>
+                          <span className={styles['badge']} title="Empleos publicados">
+                            💼 {user._count?.jobs || 0}
+                          </span>
+                          <span className={styles['badge']} title="Cursos publicados">
+                            📚 {user._count?.courses || 0}
+                          </span>
+                          <span className={styles['badge']} title="Aplicaciones enviadas">
+                            📝 {user._count?.applications || 0}
+                          </span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className={styles['action-buttons']}>
+                          <button
+                            onClick={() => openUserDetail(user)}
+                            className={styles['btn-view']}
+                            title="Ver detalles"
+                            aria-label="Ver detalles del usuario"
+                          >
+                            👁️
+                          </button>
+                          <button
+                            onClick={() => confirmDelete(user)}
+                            className={styles['btn-delete']}
+                            title="Eliminar usuario"
+                            aria-label="Eliminar usuario"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

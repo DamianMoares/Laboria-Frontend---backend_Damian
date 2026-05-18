@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
 import AdminNavigation from './AdminNavigation';
+import EmptyState from '../../components/EmptyState';
 import styles from './AdminApplications.module.css';
 
 const AdminApplications = ({ onAdminLogout }) => {
@@ -193,59 +194,63 @@ const AdminApplications = ({ onAdminLogout }) => {
                 </tr>
               </thead>
               <tbody>
-                {applications.map(application => (
-                  <tr key={application.id}>
-                    <td>
-                      <div className={styles['job-info']}>
-                        <strong>{application.job?.title}</strong>
-                        <span className="job-category">{application.job?.category}</span>
-                      </div>
-                    </td>
-                    <td>{application.job?.company}</td>
-                    <td>
-                      <div className={styles['candidate-info']}>
-                        <span className={styles['candidate-name']}>{application.user?.name}</span>
-                        <small>{application.user?.email}</small>
-                      </div>
-                    </td>
-                    <td>
-                      <select
-                        value={application.status}
-                        onChange={(e) => handleStatusChange(application.id, e.target.value)}
-                        disabled={updateLoading}
-                        className={styles['status-select'] + ' ' + styles[getStatusClass(application.status)]}
-                      >
-                        {statuses.filter(s => s.value).map(status => (
-                          <option key={status.value} value={status.value}>
-                            {status.label}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td>
-                      {application.message ? (
-                        <span className={styles['message-preview']} title={application.message}>
-                          {application.message.length > 50
-                            ? application.message.substring(0, 50) + '...'
-                            : application.message}
-                        </span>
-                      ) : (
-                        <span className={styles['no-message']}>-</span>
-                      )}
-                    </td>
-                    <td>{formatDate(application.createdAt)}</td>
-                    <td>
-                      <button
-                        onClick={() => openEditModal(application)}
-                        className={styles['btn-view']}
-                        title="Ver detalles"
-                        aria-label="Ver detalles de la aplicación"
-                      >
-                        👁️
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {applications.length === 0 ? (
+                  <tr><td colSpan={7} style={{ textAlign: 'center', padding: '2rem' }}><EmptyState title="Sin datos" message="No hay elementos para mostrar." /></td></tr>
+                ) : (
+                  applications.map(application => (
+                    <tr key={application.id}>
+                      <td>
+                        <div className={styles['job-info']}>
+                          <strong>{application.job?.title}</strong>
+                          <span className="job-category">{application.job?.category}</span>
+                        </div>
+                      </td>
+                      <td>{application.job?.company}</td>
+                      <td>
+                        <div className={styles['candidate-info']}>
+                          <span className={styles['candidate-name']}>{application.user?.name}</span>
+                          <small>{application.user?.email}</small>
+                        </div>
+                      </td>
+                      <td>
+                        <select
+                          value={application.status}
+                          onChange={(e) => handleStatusChange(application.id, e.target.value)}
+                          disabled={updateLoading}
+                          className={styles['status-select'] + ' ' + styles[getStatusClass(application.status)]}
+                        >
+                          {statuses.filter(s => s.value).map(status => (
+                            <option key={status.value} value={status.value}>
+                              {status.label}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                      <td>
+                        {application.message ? (
+                          <span className={styles['message-preview']} title={application.message}>
+                            {application.message.length > 50
+                              ? application.message.substring(0, 50) + '...'
+                              : application.message}
+                          </span>
+                        ) : (
+                          <span className={styles['no-message']}>-</span>
+                        )}
+                      </td>
+                      <td>{formatDate(application.createdAt)}</td>
+                      <td>
+                        <button
+                          onClick={() => openEditModal(application)}
+                          className={styles['btn-view']}
+                          title="Ver detalles"
+                          aria-label="Ver detalles de la aplicación"
+                        >
+                          👁️
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

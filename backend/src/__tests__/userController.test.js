@@ -8,6 +8,8 @@ const mockDb = {
   application: {},
 };
 
+let originalCache;
+
 const mockReq = (overrides = {}) => ({
   body: {},
   params: {},
@@ -25,10 +27,7 @@ const mockRes = () => {
 const mockNext = vi.fn();
 
 describe('User Controller', () => {
-  let originalCache;
-
   beforeAll(() => {
-    process.env.JWT_SECRET = 'test-secret';
     const dbPath = require.resolve('../config/database');
     originalCache = require.cache[dbPath];
     require.cache[dbPath] = {
@@ -37,16 +36,17 @@ describe('User Controller', () => {
       loaded: true,
       exports: mockDb,
     };
+    process.env.JWT_SECRET = 'test-secret';
   });
 
   afterAll(() => {
-    delete process.env.JWT_SECRET;
     const dbPath = require.resolve('../config/database');
     if (originalCache) {
       require.cache[dbPath] = originalCache;
     } else {
       delete require.cache[dbPath];
     }
+    delete process.env.JWT_SECRET;
   });
 
   beforeEach(() => {

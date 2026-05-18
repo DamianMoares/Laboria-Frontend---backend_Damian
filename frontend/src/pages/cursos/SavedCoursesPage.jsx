@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import { useConfirm } from '../../context/ConfirmContext';
 import coursesData from '../../data/courses.json';
+import EmptyState from '../../components/EmptyState';
 import styles from '../compartidos/MyListingsPage.module.css';
 
 const SavedCoursesPage = () => {
@@ -119,12 +120,11 @@ const SavedCoursesPage = () => {
             ))}
           </div>
         ) : (
-          <div className={styles['no-listings']}>
-            <p>No has guardado ningún curso aún.</p>
-            <Link to="/cursos" className="btn btn-primary">
-              Buscar Cursos y Guardar
-            </Link>
-          </div>
+          <EmptyState
+              title="Sin cursos guardados"
+              message="No has guardado ningún curso aún."
+              action={<Link to="/cursos" className="btn btn-primary">Buscar Cursos y Guardar</Link>}
+            />
         )}
       </div>
     </div>

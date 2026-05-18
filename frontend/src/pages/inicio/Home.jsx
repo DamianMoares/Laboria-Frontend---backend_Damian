@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import logoNegro from '../../assets/img/Laboria_Fondo_Negro.png';
 import { getTotalJobsCount, getTotalCoursesCount } from '../../context/ConexionApi';
+import Spinner from '../../components/Spinner';
 import styles from './Home.module.css';
 
 const Home = () => {
@@ -87,11 +88,11 @@ const Home = () => {
         <div className="container">
           <div className={styles.statsGrid}>
             <div className={styles.statItem}>
-              <span className={styles.statNumber}>{loading ? '...' : `${jobsCount}+`}</span>
+              <span className={styles.statNumber}>{loading ? <Spinner size={24} /> : `${jobsCount}+`}</span>
               <span className={styles.statLabel}>Ofertas de empleo</span>
             </div>
             <div className={styles.statItem}>
-              <span className={styles.statNumber}>{loading ? '...' : `${coursesCount}+`}</span>
+              <span className={styles.statNumber}>{loading ? <Spinner size={24} /> : `${coursesCount}+`}</span>
               <span className={styles.statLabel}>Cursos disponibles</span>
             </div>
             {/* <div className={styles.statItem}>

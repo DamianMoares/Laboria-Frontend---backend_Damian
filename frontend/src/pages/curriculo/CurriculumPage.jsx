@@ -1,472 +1,110 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { curriculumService } from '../../services/curriculumService';
+import { useCurriculumSection } from '../../hooks/useCurriculumSection';
+import SectionEditor from '../../components/curriculum/SectionEditor';
+import EmptyState from '../../components/EmptyState';
 import styles from './CurriculumPage.module.css';
+
+const SECTION_FIELDS = {
+  experience: {
+    title: 'Experiencia Laboral',
+    emptyMsg: 'No hay experiencia agregada. Agrega tu primera experiencia laboral.',
+    fields: [
+      { name: 'company', label: 'Empresa', type: 'text', main: true },
+      { name: 'position', label: 'Puesto', type: 'text', main: true },
+      { name: 'startDate', label: 'Fecha inicio', type: 'date' },
+      { name: 'endDate', label: 'Fecha fin', type: 'date' },
+      { name: 'description', label: 'Descripción', type: 'textarea', fullWidth: true, show: true },
+    ],
+  },
+  education: {
+    title: 'Educación',
+    emptyMsg: 'No hay educación agregada. Agrega tu educación formal.',
+    fields: [
+      { name: 'institution', label: 'Institución', type: 'text', main: true },
+      { name: 'degree', label: 'Título', type: 'text', main: true },
+      { name: 'field', label: 'Campo de estudio', type: 'text' },
+      { name: 'startDate', label: 'Fecha inicio', type: 'date' },
+      { name: 'endDate', label: 'Fecha fin', type: 'date' },
+      { name: 'description', label: 'Descripción', type: 'textarea', fullWidth: true, show: true },
+    ],
+  },
+  skills: {
+    title: 'Habilidades (Skills)',
+    emptyMsg: 'No hay skills agregados. Agrega tus habilidades técnicas.',
+    fields: [
+      { name: 'name', label: 'Skill', type: 'text', main: true },
+      { name: 'level', label: 'Nivel', type: 'select', options: ['básico', 'intermedio', 'avanzado', 'experto'], main: true },
+    ],
+  },
+  projects: {
+    title: 'Proyectos',
+    emptyMsg: 'No hay proyectos agregados. Agrega tus proyectos personales.',
+    fields: [
+      { name: 'name', label: 'Nombre', type: 'text', main: true },
+      { name: 'description', label: 'Descripción', type: 'textarea', fullWidth: true, show: true },
+      { name: 'technologies', label: 'Tecnologías', type: 'text', show: true },
+      { name: 'link', label: 'Link', type: 'text', show: true },
+    ],
+  },
+  languages: {
+    title: 'Idiomas',
+    emptyMsg: 'No hay idiomas agregados. Agrega tus idiomas.',
+    fields: [
+      { name: 'language', label: 'Idioma', type: 'text', main: true },
+      { name: 'level', label: 'Nivel', type: 'select', options: ['básico', 'intermedio', 'avanzado', 'nativo'], main: true },
+    ],
+  },
+};
+
+const SECTIONS = ['experience', 'education', 'skills', 'projects', 'languages'];
 
 const CurriculumPage = () => {
   const { user, isCandidate } = useAuth();
-  const [curriculum, setCurriculum] = useState({
-    experience: [],
-    education: [],
-    skills: [],
-    projects: [],
-    languages: []
-  });
+  const [curriculum, setCurriculum] = useState({ experience: [], education: [], skills: [], projects: [], languages: [] });
   const [editingItems, setEditingItems] = useState({});
   const [expandedItems, setExpandedItems] = useState({});
-  const [validationErrors, setValidationErrors] = useState({});
   const [saving, setSaving] = useState(false);
-  const [newItems, setNewItems] = useState({
-    experience: null,
-    education: null,
-    skills: null,
-    projects: null,
-    languages: null
+
+  const hooks = {};
+  SECTIONS.forEach(key => {
+    hooks[key] = useCurriculumSection(key, curriculum, setCurriculum, persistCurriculum);
   });
+
+  const persistCurriculum = (data) => {
+    if (user) {
+      curriculumService.save(data).catch(() => {});
+      localStorage.setItem(`curriculum_${user.id}`, JSON.stringify(data));
+    }
+  };
 
   useEffect(() => {
     if (user && isCandidate()) {
       curriculumService.get().then(data => {
-        if (data.curriculum) {
-          setCurriculum(data.curriculum);
-        }
-      }).catch((err) => {
-        console.error('Error al cargar curriculum desde servidor:', err);
+        if (data.curriculum) setCurriculum(data.curriculum);
+      }).catch(() => {
         const saved = JSON.parse(localStorage.getItem(`curriculum_${user.id}`) || 'null');
         if (saved) setCurriculum(saved);
       });
     }
   }, [user, isCandidate]);
 
-  const persistCurriculum = async (data) => {
-    if (user) {
-      try {
-        await curriculumService.save(data);
-      } catch {
-        // fallback a localStorage si falla API
-      }
-      localStorage.setItem(`curriculum_${user.id}`, JSON.stringify(data));
-    }
-  };
-
   const saveCurriculum = async () => {
-    if (user) {
-      setSaving(true);
-      try {
-        await curriculumService.save(curriculum);
-        localStorage.setItem(`curriculum_${user.id}`, JSON.stringify(curriculum));
-      } catch {
-        localStorage.setItem(`curriculum_${user.id}`, JSON.stringify(curriculum));
-      }
-      setSaving(false);
+    if (!user) return;
+    setSaving(true);
+    try {
+      await curriculumService.save(curriculum);
+      localStorage.setItem(`curriculum_${user.id}`, JSON.stringify(curriculum));
+    } catch {
+      localStorage.setItem(`curriculum_${user.id}`, JSON.stringify(curriculum));
     }
-  };
-
-  const toggleExpanded = (section, id) => {
-    const key = `${section}_${id}`;
-    setExpandedItems(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
-
-  const validateDates = (startDate, endDate, section, id) => {
-    if (!startDate || !endDate) return true;
-    
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    
-    if (end < start) {
-      setValidationErrors(prev => ({
-        ...prev,
-        [`${section}_${id}`]: 'La fecha de fin no puede ser anterior a la fecha de inicio'
-      }));
-      return false;
-    }
-    
-    setValidationErrors(prev => {
-      const newErrors = { ...prev };
-      delete newErrors[`${section}_${id}`];
-      return newErrors;
-    });
-    return true;
-  };
-
-  const addExperience = () => {
-    setNewItems({
-      ...newItems,
-      experience: {
-        id: Date.now(),
-        company: '',
-        position: '',
-      startDate: '',
-      endDate: '',
-      description: '',
-      sendToApplication: true
-      }
-    });
-  };
-
-  const saveNewExperience = () => {
-    if (newItems.experience) {
-      if (!validateDates(newItems.experience.startDate, newItems.experience.endDate, 'experience', newItems.experience.id)) {
-        return;
-      }
-      const updated = {
-        ...curriculum,
-        experience: [...curriculum.experience, newItems.experience]
-      };
-      setCurriculum(updated);
-      persistCurriculum(updated);
-      setNewItems({ ...newItems, experience: null });
-    }
-  };
-
-  const cancelNewExperience = () => {
-    setNewItems({ ...newItems, experience: null });
-  };
-
-  const updateExperience = (id, field, value) => {
-    if (newItems.experience && newItems.experience.id === id) {
-      const updated = { ...newItems.experience, [field]: value };
-      setNewItems({
-        ...newItems,
-        experience: updated
-      });
-      if (field === 'startDate' || field === 'endDate') {
-        validateDates(updated.startDate, updated.endDate, 'experience', id);
-      }
-    } else {
-      const updated = curriculum.experience.map(exp => 
-        exp.id === id ? { ...exp, [field]: value } : exp
-      );
-      setCurriculum({
-        ...curriculum,
-        experience: updated
-      });
-      if (field === 'startDate' || field === 'endDate') {
-        const exp = updated.find(e => e.id === id);
-        validateDates(exp.startDate, exp.endDate, 'experience', id);
-      }
-    }
-  };
-
-  const startEditingExperience = (id) => {
-    setEditingItems({ ...editingItems, [`experience_${id}`]: true });
-  };
-
-  const saveExperienceEdit = (id) => {
-    setEditingItems({ ...editingItems, [`experience_${id}`]: false });
-    persistCurriculum(curriculum);
-  };
-
-  const cancelExperienceEdit = (id) => {
-    setEditingItems({ ...editingItems, [`experience_${id}`]: false });
-  };
-
-  const removeExperience = (id) => {
-    const updated = {
-      ...curriculum,
-      experience: curriculum.experience.filter(exp => exp.id !== id)
-    };
-    setCurriculum(updated);
-    persistCurriculum(updated);
-  };
-
-  const toggleSendToApplication = (id, section) => {
-    setCurriculum({
-      ...curriculum,
-      [section]: curriculum[section].map(item =>
-        item.id === id ? { ...item, sendToApplication: !item.sendToApplication } : item
-      )
-    });
-  };
-
-  const addEducation = () => {
-    setNewItems({
-      ...newItems,
-      education: {
-        id: Date.now(),
-        institution: '',
-        degree: '',
-        field: '',
-        startDate: '',
-        endDate: '',
-        description: '',
-        sendToApplication: true
-      }
-    });
-  };
-
-  const saveNewEducation = () => {
-    if (newItems.education) {
-      if (!validateDates(newItems.education.startDate, newItems.education.endDate, 'education', newItems.education.id)) {
-        return;
-      }
-      const updated = {
-        ...curriculum,
-        education: [...curriculum.education, newItems.education]
-      };
-      setCurriculum(updated);
-      persistCurriculum(updated);
-      setNewItems({ ...newItems, education: null });
-    }
-  };
-
-  const cancelNewEducation = () => {
-    setNewItems({ ...newItems, education: null });
-  };
-
-  const updateEducation = (id, field, value) => {
-    if (newItems.education && newItems.education.id === id) {
-      const updated = { ...newItems.education, [field]: value };
-      setNewItems({
-        ...newItems,
-        education: updated
-      });
-      if (field === 'startDate' || field === 'endDate') {
-        validateDates(updated.startDate, updated.endDate, 'education', id);
-      }
-    } else {
-      const updated = curriculum.education.map(edu => 
-        edu.id === id ? { ...edu, [field]: value } : edu
-      );
-      setCurriculum({
-        ...curriculum,
-        education: updated
-      });
-      if (field === 'startDate' || field === 'endDate') {
-        const edu = updated.find(e => e.id === id);
-        validateDates(edu.startDate, edu.endDate, 'education', id);
-      }
-    }
-  };
-
-  const startEditingEducation = (id) => {
-    setEditingItems({ ...editingItems, [`education_${id}`]: true });
-  };
-
-  const saveEducationEdit = (id) => {
-    setEditingItems({ ...editingItems, [`education_${id}`]: false });
-    persistCurriculum(curriculum);
-  };
-
-  const cancelEducationEdit = (id) => {
-    setEditingItems({ ...editingItems, [`education_${id}`]: false });
-  };
-
-  const removeEducation = (id) => {
-    const updated = {
-      ...curriculum,
-      education: curriculum.education.filter(edu => edu.id !== id)
-    };
-    setCurriculum(updated);
-    persistCurriculum(updated);
-  };
-
-  const addSkill = () => {
-    setNewItems({
-      ...newItems,
-      skills: {
-        id: Date.now(),
-        name: '',
-        level: 'intermedio',
-        sendToApplication: true
-      }
-    });
-  };
-
-  const saveNewSkill = () => {
-    if (newItems.skills) {
-      const updated = {
-        ...curriculum,
-        skills: [...curriculum.skills, newItems.skills]
-      };
-      setCurriculum(updated);
-      persistCurriculum(updated);
-      setNewItems({ ...newItems, skills: null });
-    }
-  };
-
-  const cancelNewSkill = () => {
-    setNewItems({ ...newItems, skills: null });
-  };
-
-  const updateSkill = (id, field, value) => {
-    if (newItems.skills && newItems.skills.id === id) {
-      setNewItems({
-        ...newItems,
-        skills: { ...newItems.skills, [field]: value }
-      });
-    } else {
-      setCurriculum({
-        ...curriculum,
-        skills: curriculum.skills.map(skill => 
-          skill.id === id ? { ...skill, [field]: value } : skill
-        )
-      });
-    }
-  };
-
-  const startEditingSkill = (id) => {
-    setEditingItems({ ...editingItems, [`skills_${id}`]: true });
-  };
-
-  const saveSkillEdit = (id) => {
-    setEditingItems({ ...editingItems, [`skills_${id}`]: false });
-    persistCurriculum(curriculum);
-  };
-
-  const cancelSkillEdit = (id) => {
-    setEditingItems({ ...editingItems, [`skills_${id}`]: false });
-  };
-
-  const removeSkill = (id) => {
-    const updated = {
-      ...curriculum,
-      skills: curriculum.skills.filter(skill => skill.id !== id)
-    };
-    setCurriculum(updated);
-    persistCurriculum(updated);
-  };
-
-  const addProject = () => {
-    setNewItems({
-      ...newItems,
-      projects: {
-        id: Date.now(),
-        name: '',
-        description: '',
-        technologies: '',
-        link: '',
-        sendToApplication: true
-      }
-    });
-  };
-
-  const saveNewProject = () => {
-    if (newItems.projects) {
-      const updated = {
-        ...curriculum,
-        projects: [...curriculum.projects, newItems.projects]
-      };
-      setCurriculum(updated);
-      persistCurriculum(updated);
-      setNewItems({ ...newItems, projects: null });
-    }
-  };
-
-  const cancelNewProject = () => {
-    setNewItems({ ...newItems, projects: null });
-  };
-
-  const updateProject = (id, field, value) => {
-    if (newItems.projects && newItems.projects.id === id) {
-      setNewItems({
-        ...newItems,
-        projects: { ...newItems.projects, [field]: value }
-      });
-    } else {
-      setCurriculum({
-        ...curriculum,
-        projects: curriculum.projects.map(proj => 
-          proj.id === id ? { ...proj, [field]: value } : proj
-        )
-      });
-    }
-  };
-
-  const startEditingProject = (id) => {
-    setEditingItems({ ...editingItems, [`projects_${id}`]: true });
-  };
-
-  const saveProjectEdit = (id) => {
-    setEditingItems({ ...editingItems, [`projects_${id}`]: false });
-    persistCurriculum(curriculum);
-  };
-
-  const cancelProjectEdit = (id) => {
-    setEditingItems({ ...editingItems, [`projects_${id}`]: false });
-  };
-
-  const removeProject = (id) => {
-    const updated = {
-      ...curriculum,
-      projects: curriculum.projects.filter(proj => proj.id !== id)
-    };
-    setCurriculum(updated);
-    persistCurriculum(updated);
-  };
-
-  const addLanguage = () => {
-    setNewItems({
-      ...newItems,
-      languages: {
-        id: Date.now(),
-        language: '',
-        level: 'intermedio',
-        sendToApplication: true
-      }
-    });
-  };
-
-  const saveNewLanguage = () => {
-    if (newItems.languages) {
-      const updated = {
-        ...curriculum,
-        languages: [...curriculum.languages, newItems.languages]
-      };
-      setCurriculum(updated);
-      persistCurriculum(updated);
-      setNewItems({ ...newItems, languages: null });
-    }
-  };
-
-  const cancelNewLanguage = () => {
-    setNewItems({ ...newItems, languages: null });
-  };
-
-  const updateLanguage = (id, field, value) => {
-    if (newItems.languages && newItems.languages.id === id) {
-      setNewItems({
-        ...newItems,
-        languages: { ...newItems.languages, [field]: value }
-      });
-    } else {
-      setCurriculum({
-        ...curriculum,
-        languages: curriculum.languages.map(lang => 
-          lang.id === id ? { ...lang, [field]: value } : lang
-        )
-      });
-    }
-  };
-
-  const startEditingLanguage = (id) => {
-    setEditingItems({ ...editingItems, [`languages_${id}`]: true });
-  };
-
-  const saveLanguageEdit = (id) => {
-    setEditingItems({ ...editingItems, [`languages_${id}`]: false });
-    persistCurriculum(curriculum);
-  };
-
-  const cancelLanguageEdit = (id) => {
-    setEditingItems({ ...editingItems, [`languages_${id}`]: false });
-  };
-
-  const removeLanguage = (id) => {
-    const updated = {
-      ...curriculum,
-      languages: curriculum.languages.filter(lang => lang.id !== id)
-    };
-    setCurriculum(updated);
-    persistCurriculum(updated);
+    setSaving(false);
   };
 
   if (!user || !isCandidate()) {
     return (
-      <div className={styles['curriculum-page'] + ' ' + styles['not-authorized']}>
+      <div className={`${styles['curriculum-page']} ${styles['not-authorized']}`}>
         <div className="container">
           <h1>No autorizado</h1>
           <p>Esta página es solo para candidatos.</p>
@@ -489,513 +127,28 @@ const CurriculumPage = () => {
         </header>
 
         <div className={styles['curriculum-content']}>
-          {/* Experiencia Laboral */}
-          <section className={styles['curriculum-section']}>
-            <div className={styles['section-header']}>
-              <h2>Experiencia Laboral</h2>
-              <button className="btn btn-secondary" onClick={addExperience}>
-                + Agregar Experiencia
-              </button>
-            </div>
-            
-            {/* Formulario para nueva experiencia */}
-            {newItems.experience && (
-              <div className={styles['curriculum-item'] + ' ' + styles['editing']}>
-                <div className={styles['item-header']}>
-                  <span className={styles['item-status']}>Nueva experiencia</span>
-                </div>
-                <div className={styles['item-content']}>
-                  <div className={styles['form-row']}>
-                    <input
-                      type="text"
-                      placeholder="Empresa"
-                      value={newItems.experience.company}
-                      onChange={(e) => updateExperience(newItems.experience.id, 'company', e.target.value)}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Puesto"
-                      value={newItems.experience.position}
-                      onChange={(e) => updateExperience(newItems.experience.id, 'position', e.target.value)}
-                    />
-                  </div>
-                  <div className={styles['form-row']}>
-                    <input
-                      type="date"
-                      value={newItems.experience.startDate}
-                      onChange={(e) => updateExperience(newItems.experience.id, 'startDate', e.target.value)}
-                    />
-                    <input
-                      type="date"
-                      value={newItems.experience.endDate}
-                      onChange={(e) => updateExperience(newItems.experience.id, 'endDate', e.target.value)}
-                    />
-                  </div>
-                  {validationErrors[`experience_${newItems.experience.id}`] && (
-                    <div className={styles['validation-error']}>{validationErrors[`experience_${newItems.experience.id}`]}</div>
-                  )}
-                  <textarea
-                    placeholder="Descripción del puesto..."
-                    value={newItems.experience.description}
-                    onChange={(e) => updateExperience(newItems.experience.id, 'description', e.target.value)}
-                    rows="3"
-                  />
-                  <div className={styles['form-actions']}>
-                    <button className="btn btn-primary" onClick={saveNewExperience}>
-                      Guardar
-                    </button>
-                    <button className="btn btn-secondary" onClick={cancelNewExperience}>
-                      Cancelar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Lista de experiencias guardadas */}
-            {curriculum.experience.map((exp) => {
-              const isEditing = editingItems[`experience_${exp.id}`];
-              const isExpanded = expandedItems[`experience_${exp.id}`] || isEditing;
-              return (
-                <div key={exp.id} className={styles['curriculum-item'] + ' ' + (isEditing ? styles['editing'] : styles['read-only']) + (!isExpanded ? ' ' + styles['collapsed'] : '')}>
-                  <div className={styles['item-header']} onClick={() => !isEditing && toggleExpanded('experience', exp.id)}>
-                    <input
-                      type="checkbox"
-                      checked={exp.sendToApplication}
-                      onChange={(e) => { e.stopPropagation(); toggleSendToApplication(exp.id, 'experience'); }}
-                      className={styles['send-checkbox']}
-                      title="Enviar en aplicación"
-                    />
-                    <span className={styles['item-title']}>{exp.company || 'Sin empresa'} - {exp.position || 'Sin puesto'}</span>
-                    {isEditing ? (
-                      <button className={styles['btn-delete']} onClick={(e) => { e.stopPropagation(); removeExperience(exp.id); }}>
-                        🗑️ Eliminar
-                      </button>
-                    ) : (
-                      <button className={styles['btn-edit']} onClick={(e) => { e.stopPropagation(); startEditingExperience(exp.id); }}>
-                        ✏️ Editar
-                      </button>
-                    )}
-                  </div>
-                  
-                  {isExpanded && (isEditing ? (
-                    <div className={styles['item-content']}>
-                      <div className={styles['form-row']}>
-                        <input
-                          type="text"
-                          placeholder="Empresa"
-                          value={exp.company}
-                          onChange={(e) => updateExperience(exp.id, 'company', e.target.value)}
-                        />
-                        <input
-                          type="text"
-                          placeholder="Puesto"
-                          value={exp.position}
-                          onChange={(e) => updateExperience(exp.id, 'position', e.target.value)}
-                        />
-                      </div>
-                      <div className={styles['form-row']}>
-                        <input
-                          type="date"
-                          value={exp.startDate}
-                          onChange={(e) => updateExperience(exp.id, 'startDate', e.target.value)}
-                        />
-                        <input
-                          type="date"
-                          value={exp.endDate}
-                          onChange={(e) => updateExperience(exp.id, 'endDate', e.target.value)}
-                        />
-                      </div>
-                      {validationErrors[`experience_${exp.id}`] && (
-                        <div className={styles['validation-error']}>{validationErrors[`experience_${exp.id}`]}</div>
-                      )}
-                      <textarea
-                        placeholder="Descripción del puesto..."
-                        value={exp.description}
-                        onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
-                        rows="3"
-                      />
-                      <div className={styles['form-actions']}>
-                        <button className="btn btn-primary" onClick={() => saveExperienceEdit(exp.id)}>
-                          Guardar cambios
-                        </button>
-                        <button className="btn btn-secondary" onClick={() => cancelExperienceEdit(exp.id)}>
-                          Cancelar
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className={styles['item-content'] + ' ' + styles['read-view']}>
-                      <div className={styles['read-row']}>
-                        <span className={styles['read-label']}>Empresa:</span>
-                        <span className={styles['read-value']}>{exp.company || 'No especificado'}</span>
-                      </div>
-                      <div className={styles['read-row']}>
-                        <span className={styles['read-label']}>Puesto:</span>
-                        <span className={styles['read-value']}>{exp.position || 'No especificado'}</span>
-                      </div>
-                      <div className={styles['read-row']}>
-                        <span className={styles['read-label']}>Periodo:</span>
-                        <span className={styles['read-value']}>
-                          {exp.startDate ? new Date(exp.startDate).toLocaleDateString('es-ES') : 'No especificado'} 
-                          {' - '}
-                          {exp.endDate ? new Date(exp.endDate).toLocaleDateString('es-ES') : 'Presente'}
-                        </span>
-                      </div>
-                      {exp.description && (
-                        <div className={styles['read-row']}>
-                          <span className={styles['read-label']}>Descripción:</span>
-                          <span className={styles['read-value']}>{exp.description}</span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
-            {curriculum.experience.length === 0 && !newItems.experience && (
-              <p className={styles['empty-message']}>No hay experiencia agregada. Agrega tu primera experiencia laboral.</p>
-            )}
-          </section>
-
-          {/* Educación */}
-          <section className={styles['curriculum-section']}>
-            <div className={styles['section-header']}>
-              <h2>Educación</h2>
-              <button className="btn btn-secondary" onClick={addEducation}>
-                + Agregar Educación
-              </button>
-            </div>
-            
-            {newItems.education && (
-              <div className={styles['curriculum-item'] + ' ' + styles['editing']}>
-                <div className={styles['item-header']}>
-                  <span className={styles['item-status']}>Nueva educación</span>
-                </div>
-                <div className={styles['item-content']}>
-                  <div className={styles['form-row']}>
-                    <input
-                      type="text"
-                      placeholder="Institución"
-                      value={newItems.education.institution}
-                      onChange={(e) => updateEducation(newItems.education.id, 'institution', e.target.value)}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Título"
-                      value={newItems.education.degree}
-                      onChange={(e) => updateEducation(newItems.education.id, 'degree', e.target.value)}
-                    />
-                  </div>
-                  <div className={styles['form-row']}>
-                    <input
-                      type="text"
-                      placeholder="Campo de estudio"
-                      value={newItems.education.field}
-                      onChange={(e) => updateEducation(newItems.education.id, 'field', e.target.value)}
-                    />
-                    <input
-                      type="date"
-                      value={newItems.education.startDate}
-                      onChange={(e) => updateEducation(newItems.education.id, 'startDate', e.target.value)}
-                    />
-                    <input
-                      type="date"
-                      value={newItems.education.endDate}
-                      onChange={(e) => updateEducation(newItems.education.id, 'endDate', e.target.value)}
-                    />
-                  </div>
-                  {validationErrors[`education_${newItems.education.id}`] && (
-                    <div className={styles['validation-error']}>{validationErrors[`education_${newItems.education.id}`]}</div>
-                  )}
-                  <textarea
-                    placeholder="Descripción..."
-                    value={newItems.education.description}
-                    onChange={(e) => updateEducation(newItems.education.id, 'description', e.target.value)}
-                    rows="2"
-                  />
-                  <div className={styles['form-actions']}>
-                    <button className="btn btn-primary" onClick={saveNewEducation}>Guardar</button>
-                    <button className="btn btn-secondary" onClick={cancelNewEducation}>Cancelar</button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {curriculum.education.map((edu) => {
-              const isEditing = editingItems[`education_${edu.id}`];
-              const isExpanded = expandedItems[`education_${edu.id}`] || isEditing;
-              return (
-                <div key={edu.id} className={styles['curriculum-item'] + ' ' + (isEditing ? styles['editing'] : styles['read-only']) + (!isExpanded ? ' ' + styles['collapsed'] : '')}>
-                  <div className={styles['item-header']} onClick={() => !isEditing && toggleExpanded('education', edu.id)}>
-                    <input
-                      type="checkbox"
-                      checked={edu.sendToApplication}
-                      onChange={(e) => { e.stopPropagation(); toggleSendToApplication(edu.id, 'education'); }}
-                      className={styles['send-checkbox']}
-                      title="Enviar en aplicación"
-                    />
-                    <span className={styles['item-title']}>{edu.institution || 'Sin institución'} - {edu.degree || 'Sin título'}</span>
-                    {isEditing ? (
-                      <button className={styles['btn-delete']} onClick={(e) => { e.stopPropagation(); removeEducation(edu.id); }}>🗑️ Eliminar</button>
-                    ) : (
-                      <button className={styles['btn-edit']} onClick={(e) => { e.stopPropagation(); startEditingEducation(edu.id); }}>✏️ Editar</button>
-                    )}
-                  </div>
-                  {isExpanded && (isEditing ? (
-                    <div className={styles['item-content']}>
-                      <div className={styles['form-row']}>
-                        <input type="text" placeholder="Institución" value={edu.institution} onChange={(e) => updateEducation(edu.id, 'institution', e.target.value)} />
-                        <input type="text" placeholder="Título" value={edu.degree} onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)} />
-                      </div>
-                      <div className={styles['form-row']}>
-                        <input type="text" placeholder="Campo de estudio" value={edu.field} onChange={(e) => updateEducation(edu.id, 'field', e.target.value)} />
-                        <input type="date" value={edu.startDate} onChange={(e) => updateEducation(edu.id, 'startDate', e.target.value)} />
-                        <input type="date" value={edu.endDate} onChange={(e) => updateEducation(edu.id, 'endDate', e.target.value)} />
-                      </div>
-                      {validationErrors[`education_${edu.id}`] && (
-                        <div className={styles['validation-error']}>{validationErrors[`education_${edu.id}`]}</div>
-                      )}
-                      <textarea placeholder="Descripción..." value={edu.description} onChange={(e) => updateEducation(edu.id, 'description', e.target.value)} rows="2" />
-                      <div className={styles['form-actions']}>
-                        <button className="btn btn-primary" onClick={() => saveEducationEdit(edu.id)}>Guardar cambios</button>
-                        <button className="btn btn-secondary" onClick={() => cancelEducationEdit(edu.id)}>Cancelar</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className={styles['item-content'] + ' ' + styles['read-view']}>
-                      <div className={styles['read-row']}><span className={styles['read-label']}>Institución:</span><span className={styles['read-value']}>{edu.institution || 'No especificado'}</span></div>
-                      <div className={styles['read-row']}><span className={styles['read-label']}>Título:</span><span className={styles['read-value']}>{edu.degree || 'No especificado'}</span></div>
-                      <div className={styles['read-row']}><span className={styles['read-label']}>Campo:</span><span className={styles['read-value']}>{edu.field || 'No especificado'}</span></div>
-                      <div className={styles['read-row']}><span className={styles['read-label']}>Periodo:</span><span className={styles['read-value']}>{edu.startDate ? new Date(edu.startDate).toLocaleDateString('es-ES') : 'No especificado'} - {edu.endDate ? new Date(edu.endDate).toLocaleDateString('es-ES') : 'Presente'}</span></div>
-                      {edu.description && <div className={styles['read-row']}><span className={styles['read-label']}>Descripción:</span><span className={styles['read-value']}>{edu.description}</span></div>}
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
-            {curriculum.education.length === 0 && !newItems.education && (
-              <p className={styles['empty-message']}>No hay educación agregada. Agrega tu educación formal.</p>
-            )}
-          </section>
-
-          {/* Skills */}
-          <section className={styles['curriculum-section']}>
-            <div className={styles['section-header']}>
-              <h2>Habilidades (Skills)</h2>
-              <button className="btn btn-secondary" onClick={addSkill}>
-                + Agregar Skill
-              </button>
-            </div>
-            
-            {newItems.skills && (
-              <div className={styles['curriculum-item'] + ' ' + styles['editing'] + ' ' + styles['skill-item']}>
-                <div className={styles['item-header']}><span className={styles['item-status']}>Nuevo skill</span></div>
-                <div className={styles['item-content']}>
-                  <div className={styles['form-row']}>
-                    <input type="text" placeholder="Skill (ej: React, Python, JavaScript)" value={newItems.skills.name} onChange={(e) => updateSkill(newItems.skills.id, 'name', e.target.value)} />
-                    <select value={newItems.skills.level} onChange={(e) => updateSkill(newItems.skills.id, 'level', e.target.value)}>
-                      <option value="básico">Básico</option>
-                      <option value="intermedio">Intermedio</option>
-                      <option value="avanzado">Avanzado</option>
-                      <option value="experto">Experto</option>
-                    </select>
-                  </div>
-                  <div className={styles['form-actions']}>
-                    <button className="btn btn-primary" onClick={saveNewSkill}>Guardar</button>
-                    <button className="btn btn-secondary" onClick={cancelNewSkill}>Cancelar</button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {curriculum.skills.map((skill) => {
-              const isEditing = editingItems[`skills_${skill.id}`];
-              const isExpanded = expandedItems[`skills_${skill.id}`] || isEditing;
-              return (
-                <div key={skill.id} className={styles['curriculum-item'] + ' ' + styles['skill-item'] + ' ' + (isEditing ? styles['editing'] : styles['read-only']) + (!isExpanded ? ' ' + styles['collapsed'] : '')}>
-                  <div className={styles['item-header']} onClick={() => !isEditing && toggleExpanded('skills', skill.id)}>
-                    <input type="checkbox" checked={skill.sendToApplication} onChange={(e) => { e.stopPropagation(); toggleSendToApplication(skill.id, 'skills'); }} className={styles['send-checkbox']} title="Enviar en aplicación" />
-                    <span className={styles['item-title']}>{skill.name || 'Sin skill'} - {skill.level || 'Sin nivel'}</span>
-                    {isEditing ? (
-                      <button className={styles['btn-delete']} onClick={(e) => { e.stopPropagation(); removeSkill(skill.id); }}>🗑️ Eliminar</button>
-                    ) : (
-                      <button className={styles['btn-edit']} onClick={(e) => { e.stopPropagation(); startEditingSkill(skill.id); }}>✏️ Editar</button>
-                    )}
-                  </div>
-                  {isExpanded && (isEditing ? (
-                    <div className={styles['item-content']}>
-                      <div className={styles['form-row']}>
-                        <input type="text" placeholder="Skill (ej: React, Python, JavaScript)" value={skill.name} onChange={(e) => updateSkill(skill.id, 'name', e.target.value)} />
-                        <select value={skill.level} onChange={(e) => updateSkill(skill.id, 'level', e.target.value)}>
-                          <option value="básico">Básico</option>
-                          <option value="intermedio">Intermedio</option>
-                          <option value="avanzado">Avanzado</option>
-                          <option value="experto">Experto</option>
-                        </select>
-                      </div>
-                      <div className={styles['form-actions']}>
-                        <button className="btn btn-primary" onClick={() => saveSkillEdit(skill.id)}>Guardar cambios</button>
-                        <button className="btn btn-secondary" onClick={() => cancelSkillEdit(skill.id)}>Cancelar</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className={styles['item-content'] + ' ' + styles['read-view']}>
-                      <div className={styles['read-row']}><span className={styles['read-label']}>Skill:</span><span className={styles['read-value']}>{skill.name || 'No especificado'}</span></div>
-                      <div className={styles['read-row']}><span className={styles['read-label']}>Nivel:</span><span className={styles['read-value']}>{skill.level || 'No especificado'}</span></div>
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
-            {curriculum.skills.length === 0 && !newItems.skills && (
-              <p className={styles['empty-message']}>No hay skills agregados. Agrega tus habilidades técnicas.</p>
-            )}
-          </section>
-
-          {/* Proyectos */}
-          <section className={styles['curriculum-section']}>
-            <div className={styles['section-header']}>
-              <h2>Proyectos</h2>
-              <button className="btn btn-secondary" onClick={addProject}>
-                + Agregar Proyecto
-              </button>
-            </div>
-            
-            {newItems.projects && (
-              <div className={styles['curriculum-item'] + ' ' + styles['editing']}>
-                <div className={styles['item-header']}><span className={styles['item-status']}>Nuevo proyecto</span></div>
-                <div className={styles['item-content']}>
-                  <input type="text" placeholder="Nombre del proyecto" value={newItems.projects.name} onChange={(e) => updateProject(newItems.projects.id, 'name', e.target.value)} />
-                  <textarea placeholder="Descripción del proyecto..." value={newItems.projects.description} onChange={(e) => updateProject(newItems.projects.id, 'description', e.target.value)} rows="2" />
-                  <div className={styles['form-row']}>
-                    <input type="text" placeholder="Tecnologías (separadas por coma)" value={newItems.projects.technologies} onChange={(e) => updateProject(newItems.projects.id, 'technologies', e.target.value)} />
-                    <input type="url" placeholder="Link al proyecto (opcional)" value={newItems.projects.link} onChange={(e) => updateProject(newItems.projects.id, 'link', e.target.value)} />
-                  </div>
-                  <div className={styles['form-actions']}>
-                    <button className="btn btn-primary" onClick={saveNewProject}>Guardar</button>
-                    <button className="btn btn-secondary" onClick={cancelNewProject}>Cancelar</button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {curriculum.projects.map((proj) => {
-              const isEditing = editingItems[`projects_${proj.id}`];
-              const isExpanded = expandedItems[`projects_${proj.id}`] || isEditing;
-              return (
-                <div key={proj.id} className={styles['curriculum-item'] + ' ' + (isEditing ? styles['editing'] : styles['read-only']) + (!isExpanded ? ' ' + styles['collapsed'] : '')}>
-                  <div className={styles['item-header']} onClick={() => !isEditing && toggleExpanded('projects', proj.id)}>
-                    <input type="checkbox" checked={proj.sendToApplication} onChange={(e) => { e.stopPropagation(); toggleSendToApplication(proj.id, 'projects'); }} className={styles['send-checkbox']} title="Enviar en aplicación" />
-                    <span className={styles['item-title']}>{proj.name || 'Sin nombre'}</span>
-                    {isEditing ? (
-                      <button className={styles['btn-delete']} onClick={(e) => { e.stopPropagation(); removeProject(proj.id); }}>🗑️ Eliminar</button>
-                    ) : (
-                      <button className={styles['btn-edit']} onClick={(e) => { e.stopPropagation(); startEditingProject(proj.id); }}>✏️ Editar</button>
-                    )}
-                  </div>
-                  {isExpanded && (isEditing ? (
-                    <div className={styles['item-content']}>
-                      <input type="text" placeholder="Nombre del proyecto" value={proj.name} onChange={(e) => updateProject(proj.id, 'name', e.target.value)} />
-                      <textarea placeholder="Descripción del proyecto..." value={proj.description} onChange={(e) => updateProject(proj.id, 'description', e.target.value)} rows="2" />
-                      <div className={styles['form-row']}>
-                        <input type="text" placeholder="Tecnologías (separadas por coma)" value={proj.technologies} onChange={(e) => updateProject(proj.id, 'technologies', e.target.value)} />
-                        <input type="url" placeholder="Link al proyecto (opcional)" value={proj.link} onChange={(e) => updateProject(proj.id, 'link', e.target.value)} />
-                      </div>
-                      <div className={styles['form-actions']}>
-                        <button className="btn btn-primary" onClick={() => saveProjectEdit(proj.id)}>Guardar cambios</button>
-                        <button className="btn btn-secondary" onClick={() => cancelProjectEdit(proj.id)}>Cancelar</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className={styles['item-content'] + ' ' + styles['read-view']}>
-                      <div className={styles['read-row']}><span className={styles['read-label']}>Nombre:</span><span className={styles['read-value']}>{proj.name || 'No especificado'}</span></div>
-                      {proj.description && <div className={styles['read-row']}><span className={styles['read-label']}>Descripción:</span><span className={styles['read-value']}>{proj.description}</span></div>}
-                      <div className={styles['read-row']}><span className={styles['read-label']}>Tecnologías:</span><span className={styles['read-value']}>{proj.technologies || 'No especificado'}</span></div>
-                      {proj.link && <div className={styles['read-row']}><span className={styles['read-label']}>Link:</span><span className={styles['read-value']}><a href={proj.link} target="_blank" rel="noopener noreferrer">{proj.link}</a></span></div>}
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
-            {curriculum.projects.length === 0 && !newItems.projects && (
-              <p className={styles['empty-message']}>No hay proyectos agregados. Agrega tus proyectos personales.</p>
-            )}
-          </section>
-
-          {/* Idiomas */}
-          <section className={styles['curriculum-section']}>
-            <div className={styles['section-header']}>
-              <h2>Idiomas</h2>
-              <button className="btn btn-secondary" onClick={addLanguage}>
-                + Agregar Idioma
-              </button>
-            </div>
-            
-            {newItems.languages && (
-              <div className={styles['curriculum-item'] + ' ' + styles['editing'] + ' ' + styles['language-item']}>
-                <div className={styles['item-header']}><span className={styles['item-status']}>Nuevo idioma</span></div>
-                <div className={styles['item-content']}>
-                  <div className={styles['form-row']}>
-                    <input type="text" placeholder="Idioma (ej: Inglés, Francés)" value={newItems.languages.language} onChange={(e) => updateLanguage(newItems.languages.id, 'language', e.target.value)} />
-                    <select value={newItems.languages.level} onChange={(e) => updateLanguage(newItems.languages.id, 'level', e.target.value)}>
-                      <option value="básico">Básico</option>
-                      <option value="intermedio">Intermedio</option>
-                      <option value="avanzado">Avanzado</option>
-                      <option value="nativo">Nativo</option>
-                    </select>
-                  </div>
-                  <div className={styles['form-actions']}>
-                    <button className="btn btn-primary" onClick={saveNewLanguage}>Guardar</button>
-                    <button className="btn btn-secondary" onClick={cancelNewLanguage}>Cancelar</button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {curriculum.languages.map((lang) => {
-              const isEditing = editingItems[`languages_${lang.id}`];
-              const isExpanded = expandedItems[`languages_${lang.id}`] || isEditing;
-              return (
-                <div key={lang.id} className={styles['curriculum-item'] + ' ' + styles['language-item'] + ' ' + (isEditing ? styles['editing'] : styles['read-only']) + (!isExpanded ? ' ' + styles['collapsed'] : '')}>
-                  <div className={styles['item-header']} onClick={() => !isEditing && toggleExpanded('languages', lang.id)}>
-                    <input type="checkbox" checked={lang.sendToApplication} onChange={(e) => { e.stopPropagation(); toggleSendToApplication(lang.id, 'languages'); }} className={styles['send-checkbox']} title="Enviar en aplicación" />
-                    <span className={styles['item-title']}>{lang.language || 'Sin idioma'} - {lang.level || 'Sin nivel'}</span>
-                    {isEditing ? (
-                      <button className={styles['btn-delete']} onClick={(e) => { e.stopPropagation(); removeLanguage(lang.id); }}>🗑️ Eliminar</button>
-                    ) : (
-                      <button className={styles['btn-edit']} onClick={(e) => { e.stopPropagation(); startEditingLanguage(lang.id); }}>✏️ Editar</button>
-                    )}
-                  </div>
-                  {isExpanded && (isEditing ? (
-                    <div className={styles['item-content']}>
-                      <div className={styles['form-row']}>
-                        <input type="text" placeholder="Idioma (ej: Inglés, Francés)" value={lang.language} onChange={(e) => updateLanguage(lang.id, 'language', e.target.value)} />
-                        <select value={lang.level} onChange={(e) => updateLanguage(lang.id, 'level', e.target.value)}>
-                          <option value="básico">Básico</option>
-                          <option value="intermedio">Intermedio</option>
-                          <option value="avanzado">Avanzado</option>
-                          <option value="nativo">Nativo</option>
-                        </select>
-                      </div>
-                      <div className={styles['form-actions']}>
-                        <button className="btn btn-primary" onClick={() => saveLanguageEdit(lang.id)}>Guardar cambios</button>
-                        <button className="btn btn-secondary" onClick={() => cancelLanguageEdit(lang.id)}>Cancelar</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className={styles['item-content'] + ' ' + styles['read-view']}>
-                      <div className={styles['read-row']}><span className={styles['read-label']}>Idioma:</span><span className={styles['read-value']}>{lang.language || 'No especificado'}</span></div>
-                      <div className={styles['read-row']}><span className={styles['read-label']}>Nivel:</span><span className={styles['read-value']}>{lang.level || 'No especificado'}</span></div>
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
-            {curriculum.languages.length === 0 && !newItems.languages && (
-              <p className={styles['empty-message']}>No hay idiomas agregados. Agrega tus idiomas.</p>
-            )}
-          </section>
+          {SECTIONS.map(key => {
+            const config = SECTION_FIELDS[key];
+            const items = curriculum[key] || [];
+            return (
+              <React.Fragment key={key}>
+                <SectionEditor
+                  title={config.title}
+                  sectionName={key}
+                  items={items}
+                  fields={config.fields}
+                  hook={hooks[key]}
+                  editingItems={editingItems}
+                  setEditingItems={setEditingItems}
+                  expandedItems={expandedItems}
+                  setExpandedItems={setExpandedItems}
+                />
+                {items.length === 0 && !hooks[key].newItem && (
+                  <EmptyState title={config.title} message={config.emptyMsg} />
+                )}
+              </React.Fragment>
+            );
+          })}
         </div>
       </div>
     </div>

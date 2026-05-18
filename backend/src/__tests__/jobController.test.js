@@ -3,12 +3,16 @@ const mockDb = {
     findMany: vi.fn(),
     findUnique: vi.fn(),
     create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
     count: vi.fn(),
   },
   course: {},
   user: {},
   application: {},
 };
+
+let originalCache;
 
 const mockReq = (overrides = {}) => ({
   body: {},
@@ -28,8 +32,6 @@ const mockRes = () => {
 const mockNext = vi.fn();
 
 describe('Job Controller', () => {
-  let originalCache;
-
   beforeAll(() => {
     const dbPath = require.resolve('../config/database');
     originalCache = require.cache[dbPath];

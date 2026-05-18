@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import API_CONFIG from '../config/externalApis';
 import { getHeaders } from './apiUtils';
 import { searchJobs } from './externalJobsApi';
@@ -29,7 +30,7 @@ export const searchLaboriaJobs = async (filters = {}) => {
       url: `#/empleos/${job.id}`, remote: job.mode === 'REMOTE', logo: '', source: 'Laboria',
     }));
   } catch (error) {
-    console.error('[Laboria API] Error:', error);
+    logger.error('[Laboria API] Error:', error);
     return [];
   }
 };
@@ -57,7 +58,7 @@ export const searchLaboriaCourses = async (filters = {}) => {
       source: 'Laboria',
     }));
   } catch (error) {
-    console.error('[Laboria API] Error:', error);
+    logger.error('[Laboria API] Error:', error);
     return [];
   }
 };
@@ -73,7 +74,7 @@ export const searchAllJobs = async (filters = {}) => {
     const newExternal = externalResults.filter(j => !existingIds.has(j.id));
     allResults.push(...newExternal);
   }
-  if (allResults.length < limit / 2) console.warn('[searchAllJobs] Pocos resultados, usando fallback local');
+  if (allResults.length < limit / 2) logger.warn('[searchAllJobs] Pocos resultados, usando fallback local');
   return allResults.slice(0, limit);
 };
 
@@ -181,7 +182,7 @@ export const getTotalJobsCount = async () => {
         else { const jobsArray = data.jobs || data.results || data.data || data.items || data.records || []; totalCount += jobsArray.length; }
       }
     } catch (error) {
-      console.error(`Error al contar ofertas de ${api.name}:`, error);
+      logger.error(`Error al contar ofertas de ${api.name}:`, error);
       continue;
     }
   }
@@ -203,7 +204,7 @@ export const getTotalCoursesCount = async () => {
         else { const coursesArray = data.courses || data.results || data.data || data.items || data.records || []; totalCount += coursesArray.length; }
       }
     } catch (error) {
-      console.error(`Error al contar cursos de ${api.name}:`, error);
+      logger.error(`Error al contar cursos de ${api.name}:`, error);
       continue;
     }
   }

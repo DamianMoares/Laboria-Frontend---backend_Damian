@@ -1,13 +1,14 @@
 const mockDb = {
-  user: {
-    findUnique: vi.fn(),
-  },
+  user: { findUnique: vi.fn() },
   job: {},
   course: {},
   application: {},
 };
 
 const mockVerifyToken = vi.fn();
+
+let originalCache;
+let originalJwtCache;
 
 const mockReq = (overrides = {}) => ({
   headers: {},
@@ -24,12 +25,9 @@ const mockRes = () => {
 const mockNext = vi.fn();
 
 describe('Auth Middleware', () => {
-  let originalDbCache;
-  let originalJwtCache;
-
   beforeAll(() => {
     const dbPath = require.resolve('../config/database');
-    originalDbCache = require.cache[dbPath];
+    originalCache = require.cache[dbPath];
     require.cache[dbPath] = {
       id: dbPath,
       filename: dbPath,
@@ -49,11 +47,12 @@ describe('Auth Middleware', () => {
 
   afterAll(() => {
     const dbPath = require.resolve('../config/database');
-    if (originalDbCache) {
-      require.cache[dbPath] = originalDbCache;
+    if (originalCache) {
+      require.cache[dbPath] = originalCache;
     } else {
       delete require.cache[dbPath];
     }
+
     const jwtPath = require.resolve('../utils/jwt');
     if (originalJwtCache) {
       require.cache[jwtPath] = originalJwtCache;

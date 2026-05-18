@@ -3,6 +3,8 @@ import coursesData from '../../data/courses.json';
 import { spainMunicipalities } from '../../data/searchData';
 import { searchAllCourses } from '../../context/ConexionApi';
 import CourseCard from '../../components/courses/CourseCard';
+import Spinner from '../../components/Spinner';
+import EmptyState from '../../components/EmptyState';
 import styles from './CourseSearchPage.module.css';
 
 const CourseSearchPage = () => {
@@ -439,7 +441,7 @@ const CourseSearchPage = () => {
         <div className={styles['results-container']}>
           {loading && (
             <div className={styles['loading-state']}>
-              <p>Buscando cursos...</p>
+              <Spinner />
             </div>
           )}
 
@@ -514,18 +516,19 @@ const CourseSearchPage = () => {
                   )}
                 </>
               ) : (
-                <div className={styles['no-results']}>
-                  <p>No se encontraron cursos con los filtros seleccionados.</p>
-                  <p>Intenta ajustar tus criterios de búsqueda.</p>
-                </div>
+                <EmptyState
+                  title="Sin resultados"
+                  message="No se encontraron cursos con los filtros seleccionados. Intenta ajustar tus criterios de búsqueda."
+                />
               )}
             </>
           )}
 
           {!hasSearched && !loading && (
-            <div className={styles['search-prompt']}>
-              <p>Usa los filtros y haz clic en "Buscar" para ver cursos.</p>
-            </div>
+            <EmptyState
+              title="Buscar cursos"
+              message="Usa los filtros y haz clic en Buscar para ver cursos."
+            />
           )}
         </div>
       </div>

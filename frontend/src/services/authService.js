@@ -3,6 +3,11 @@ import api from './api';
 export const authService = {
   register: async (userData) => {
     const response = await api.post('/users/register', userData);
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
     return response.data;
   },
 
@@ -10,6 +15,7 @@ export const authService = {
     const response = await api.post('/users/login', credentials);
     if (response.data.token) {
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
       localStorage.setItem('user', JSON.stringify(response.data.user));
     }
     return response.data;
@@ -22,6 +28,7 @@ export const authService = {
       // si falla la API, igual limpiamos localStorage
     }
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
   },
 
@@ -41,6 +48,7 @@ export const authService = {
   deleteAccount: async () => {
     const response = await api.delete('/users/account');
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
     return response.data;
   },
@@ -66,9 +74,8 @@ export const authService = {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       if (payload.exp && Date.now() >= payload.exp * 1000) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        return false;
+        // Try refresh before clearing
+        return !!localStorage.getItem('refreshToken');
       }
       return true;
     } catch {

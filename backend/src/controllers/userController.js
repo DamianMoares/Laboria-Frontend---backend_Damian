@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const prisma = require('../config/database');
-const { generateToken } = require('../utils/jwt');
+const { generateToken, generateRefreshToken, verifyToken } = require('../utils/jwt');
 const emailService = require('../services/emailService');
 
 // REGISTRO
@@ -39,6 +39,7 @@ const register = async (req, res, next) => {
     
     // Generar token JWT
     const token = generateToken(user.id);
+    const refreshToken = generateRefreshToken(user.id);
 
     // Enviar email de bienvenida (no bloqueante)
     emailService.sendWelcome(user.email, user.name).catch(console.error);
@@ -46,7 +47,8 @@ const register = async (req, res, next) => {
     res.status(201).json({ 
       message: 'Usuario creado exitosamente',
       user,
-      token
+      token,
+      refreshToken
     });
     
   } catch (error) {
@@ -86,11 +88,13 @@ const login = async (req, res, next) => {
     // Retornar usuario (sin password) + JWT token
     const { password: _, ...userWithoutPassword } = user;
     const token = generateToken(user.id);
+    const refreshToken = generateRefreshToken(user.id);
     
     res.json({
       message: 'Login exitoso',
       user: userWithoutPassword,
-      token
+      token,
+      refreshToken
     });
     
   } catch (error) {
@@ -309,6 +313,48 @@ const saveCurriculum = async (req, res, next) => {
   }
 };
 
+// REFRESCAR TOKEN
+const refreshToken = async (req, res, next) => {
+  try {
+    const { refreshToken: token } = req.body;
+    if (!token) {
+      const error = new Error('Refresh token requerido');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const decoded = verifyToken(token);
+    if (!decoded || decoded.type !== 'refresh') {
+      const error = new Error('Refresh token inválido o expirado');
+      error.statusCode = 401;
+      throw error;
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { id: true, email: true, name: true, role: true }
+    });
+
+    if (!user) {
+      const error = new Error('Usuario no encontrado');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const newToken = generateToken(user.id);
+    const newRefreshToken = generateRefreshToken(user.id);
+
+    res.json({
+      message: 'Token renovado',
+      token: newToken,
+      refreshToken: newRefreshToken,
+      user
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // CERRAR SESIÓN
 const logout = async (req, res, next) => {
   try {
@@ -357,6 +403,7 @@ const sessionStats = async (req, res, next) => {
 module.exports = {
   register,
   login,
+  refreshToken,
   logout,
   sessionStats,
   getProfile,

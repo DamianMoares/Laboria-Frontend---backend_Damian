@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
 import AdminNavigation from './AdminNavigation';
+import EmptyState from '../../components/EmptyState';
 import styles from './AdminCourses.module.css';
 
 const AdminCourses = ({ onAdminLogout }) => {
@@ -221,60 +222,64 @@ const AdminCourses = ({ onAdminLogout }) => {
                 </tr>
               </thead>
               <tbody>
-                {courses.map(course => (
-                  <tr key={course.id}>
-                    <td>
-                      <div className={styles['course-title']}>
-                        <strong>{course.title}</strong>
-                        {course.url && (
-                          <a href={course.url} target="_blank" rel="noopener noreferrer" className={styles['course-link']}>
-                            🔗 Ver curso
-                          </a>
+                {courses.length === 0 ? (
+                  <tr><td colSpan={9} style={{ textAlign: 'center', padding: '2rem' }}><EmptyState title="Sin datos" message="No hay elementos para mostrar." /></td></tr>
+                ) : (
+                  courses.map(course => (
+                    <tr key={course.id}>
+                      <td>
+                        <div className={styles['course-title']}>
+                          <strong>{course.title}</strong>
+                          {course.url && (
+                            <a href={course.url} target="_blank" rel="noopener noreferrer" className={styles['course-link']}>
+                              🔗 Ver curso
+                            </a>
+                          )}
+                        </div>
+                      </td>
+                      <td>{course.provider}</td>
+                      <td>
+                        <span className={styles['category-badge']}>{course.category}</span>
+                      </td>
+                      <td>{getLevelLabel(course.level)}</td>
+                      <td>{course.duration || '-'}</td>
+                      <td>
+                        {course.price ? (
+                          <span className={styles['price-tag']}>{course.price}</span>
+                        ) : (
+                          <span className={styles['free-tag']}>Gratis</span>
                         )}
-                      </div>
-                    </td>
-                    <td>{course.provider}</td>
-                    <td>
-                      <span className={styles['category-badge']}>{course.category}</span>
-                    </td>
-                    <td>{getLevelLabel(course.level)}</td>
-                    <td>{course.duration || '-'}</td>
-                    <td>
-                      {course.price ? (
-                        <span className={styles['price-tag']}>{course.price}</span>
-                      ) : (
-                        <span className={styles['free-tag']}>Gratis</span>
-                      )}
-                    </td>
-                    <td>
-                      <div className={styles['author-info']}>
-                        <span className={styles['author-name']}>{course.author?.name}</span>
-                        <small>{course.author?.email}</small>
-                      </div>
-                    </td>
-                    <td>{formatDate(course.createdAt)}</td>
-                    <td>
-                      <div className={styles['action-buttons']}>
-                        <button
-                          onClick={() => handleEdit(course)}
-                          className={styles['btn-edit']}
-                          title="Editar curso"
-                          aria-label="Editar curso"
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          onClick={() => confirmDelete(course)}
-                          className={styles['btn-delete']}
-                          title="Eliminar curso"
-                          aria-label="Eliminar curso"
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td>
+                        <div className={styles['author-info']}>
+                          <span className={styles['author-name']}>{course.author?.name}</span>
+                          <small>{course.author?.email}</small>
+                        </div>
+                      </td>
+                      <td>{formatDate(course.createdAt)}</td>
+                      <td>
+                        <div className={styles['action-buttons']}>
+                          <button
+                            onClick={() => handleEdit(course)}
+                            className={styles['btn-edit']}
+                            title="Editar curso"
+                            aria-label="Editar curso"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => confirmDelete(course)}
+                            className={styles['btn-delete']}
+                            title="Eliminar curso"
+                            aria-label="Eliminar curso"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

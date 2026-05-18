@@ -28,6 +28,7 @@ const corsPatterns = corsOrigins.map(o => {
 });
 app.use(cors({
   origin: (origin, callback) => {
+    if (!origin && process.env.NODE_ENV === 'production') return callback(null, false);
     if (!origin) return callback(null, true);
     const match = corsPatterns.some(p => typeof p === 'string' ? p === origin : p.test(origin));
     callback(null, match);

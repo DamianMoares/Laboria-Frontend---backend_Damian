@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
 import AdminNavigation from './AdminNavigation';
+import EmptyState from '../../components/EmptyState';
 import styles from './AdminJobs.module.css';
 
 const AdminJobs = ({ onAdminLogout }) => {
@@ -208,55 +209,59 @@ const AdminJobs = ({ onAdminLogout }) => {
                 </tr>
               </thead>
               <tbody>
-                {jobs.map(job => (
-                  <tr key={job.id}>
-                    <td>
-                      <div className={styles['job-title']}>
-                        <strong>{job.title}</strong>
-                        {job.salary && (
-                          <span className={styles['job-salary']}>💰 {job.salary}</span>
-                        )}
-                      </div>
-                    </td>
-                    <td>{job.company}</td>
-                    <td>
-                      <span className={styles['category-badge']}>{job.category}</span>
-                    </td>
-                    <td>{getModeLabel(job.mode)}</td>
-                    <td>
-                      <div className={styles['author-info']}>
-                        <span className={styles['author-name']}>{job.author?.name}</span>
-                        <small>{job.author?.email}</small>
-                      </div>
-                    </td>
-                    <td>
-                      <span className={styles['applications-count']}>
-                        {job._count?.applications || 0} aplicaciones
-                      </span>
-                    </td>
-                    <td>{formatDate(job.createdAt)}</td>
-                    <td>
-                      <div className={styles['action-buttons']}>
-                        <button
-                          onClick={() => handleEdit(job)}
-                          className={styles['btn-edit']}
-                          title="Editar empleo"
-                          aria-label="Editar empleo"
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          onClick={() => confirmDelete(job)}
-                          className={styles['btn-delete']}
-                          title="Eliminar empleo"
-                          aria-label="Eliminar empleo"
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {jobs.length === 0 ? (
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: '2rem' }}><EmptyState title="Sin datos" message="No hay elementos para mostrar." /></td></tr>
+                ) : (
+                  jobs.map(job => (
+                    <tr key={job.id}>
+                      <td>
+                        <div className={styles['job-title']}>
+                          <strong>{job.title}</strong>
+                          {job.salary && (
+                            <span className={styles['job-salary']}>💰 {job.salary}</span>
+                          )}
+                        </div>
+                      </td>
+                      <td>{job.company}</td>
+                      <td>
+                        <span className={styles['category-badge']}>{job.category}</span>
+                      </td>
+                      <td>{getModeLabel(job.mode)}</td>
+                      <td>
+                        <div className={styles['author-info']}>
+                          <span className={styles['author-name']}>{job.author?.name}</span>
+                          <small>{job.author?.email}</small>
+                        </div>
+                      </td>
+                      <td>
+                        <span className={styles['applications-count']}>
+                          {job._count?.applications || 0} aplicaciones
+                        </span>
+                      </td>
+                      <td>{formatDate(job.createdAt)}</td>
+                      <td>
+                        <div className={styles['action-buttons']}>
+                          <button
+                            onClick={() => handleEdit(job)}
+                            className={styles['btn-edit']}
+                            title="Editar empleo"
+                            aria-label="Editar empleo"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => confirmDelete(job)}
+                            className={styles['btn-delete']}
+                            title="Eliminar empleo"
+                            aria-label="Eliminar empleo"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

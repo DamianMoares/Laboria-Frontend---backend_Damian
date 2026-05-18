@@ -50,7 +50,16 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'dist',
       sourcemap: mode !== 'production',
-      chunkSizeWarningLimit: 800
+      chunkSizeWarningLimit: 800,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) return 'vendor';
+            if (id.includes('node_modules/react-router')) return 'vendor';
+            if (id.includes('node_modules/react-hot-toast')) return 'ui';
+          },
+        },
+      },
     },
     // Base path: Vercel y local usan '/', GitHub Pages necesita VITE_BASE_PATH
     base: env.VITE_BASE_PATH || '/',

@@ -208,7 +208,7 @@ render.yaml  ──Blueprint──>   laboria-db (PostgreSQL)
 ## Notas importantes
 
 - **No necesitas IP Allow List**: La base de datos y el web service están en la misma red de Render, se conectan solos
-- **No uses `prisma migrate deploy` en Render**: Usa `prisma db push` que es más tolerante a errores
+- **Usa `prisma migrate deploy` en Render**: Es el comando recomendado para producción (ya configurado en `render.yaml`)
 - **El seed se corre UNA SOLA VEZ** después del deploy, desde el Shell de Render
 - **CORS con `*.vercel.app`**: Acepta cualquier URL de Vercel (producción y previsualizaciones)
 - **Si algo falla**: Borra DB + servicio y vuelve a crear desde Blueprint. Es más rápido que debuggear

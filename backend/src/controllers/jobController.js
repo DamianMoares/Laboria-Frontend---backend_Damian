@@ -107,21 +107,6 @@ const jobController = {
     try {
       const { id } = req.params;
       
-      // Verificar que existe
-      const existing = await prisma.job.findUnique({ where: { id } });
-      if (!existing) {
-        const error = new Error('Empleo no encontrado');
-        error.statusCode = 404;
-        throw error;
-      }
-      
-      // Verificar que sea el autor o admin
-      if (existing.authorId !== req.user.id && req.user.role !== 'ADMIN') {
-        const error = new Error('No autorizado - Solo el autor puede editar');
-        error.statusCode = 403;
-        throw error;
-      }
-      
       const allowedFields = ['title', 'company', 'location', 'salary', 'description', 'requirements', 'mode', 'category'];
       const data = {};
       for (const field of allowedFields) {
@@ -132,18 +117,38 @@ const jobController = {
         error.statusCode = 400;
         throw error;
       }
+      
+      if (req.user.role === 'ADMIN') {
+        const job = await prisma.job.update({
+          where: { id },
+          data,
+          include: { author: { select: { id: true, name: true } } }
+        });
+        return res.json({ message: 'Empleo actualizado', job });
+      }
+      
+      const existing = await prisma.job.findUnique({
+        where: { id },
+        select: { authorId: true }
+      });
+      if (!existing) {
+        const error = new Error('Empleo no encontrado');
+        error.statusCode = 404;
+        throw error;
+      }
+      if (existing.authorId !== req.user.id) {
+        const error = new Error('No autorizado - Solo el autor puede editar');
+        error.statusCode = 403;
+        throw error;
+      }
+      
       const job = await prisma.job.update({
         where: { id },
         data,
-        include: {
-          author: { select: { id: true, name: true } }
-        }
+        include: { author: { select: { id: true, name: true } } }
       });
       
-      res.json({
-        message: 'Empleo actualizado',
-        job
-      });
+      res.json({ message: 'Empleo actualizado', job });
     } catch (error) {
       next(error);
     }
@@ -154,14 +159,21 @@ const jobController = {
     try {
       const { id } = req.params;
       
-      const existing = await prisma.job.findUnique({ where: { id } });
+      if (req.user.role === 'ADMIN') {
+        await prisma.job.delete({ where: { id } });
+        return res.json({ message: 'Empleo eliminado' });
+      }
+      
+      const existing = await prisma.job.findUnique({
+        where: { id },
+        select: { authorId: true }
+      });
       if (!existing) {
         const error = new Error('Empleo no encontrado');
         error.statusCode = 404;
         throw error;
       }
-      
-      if (existing.authorId !== req.user.id && req.user.role !== 'ADMIN') {
+      if (existing.authorId !== req.user.id) {
         const error = new Error('No autorizado');
         error.statusCode = 403;
         throw error;

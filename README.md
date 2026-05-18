@@ -357,21 +357,22 @@ Ver `ANEXO-A-APIS.md` para documentación detallada.
 
 ## 🚀 Despliegue
 
-### Frontend: GitHub Pages
+### Frontend: Vercel + GitHub Pages
 
-- **URL**: https://damianmoares.github.io/Laboria-Frontend---backend_Damian/
+- **URL (Vercel)**: https://laboria-frontend-backend-damian.vercel.app
+- **URL (GitHub Pages - legacy)**: https://damianmoares.github.io/Laboria-Frontend---backend_Damian/
 - **Router**: HashRouter (para evitar problemas de routing en hosting estático)
-- **Build**: Vite con `VITE_BASE_PATH=/Laboria-Frontend---backend_Damian/`
-- **CI/CD**: GitHub Actions automatizado (push a main → build + deploy)
+- **Build**: Vite
+- **CI/CD**: GitHub Actions automatizado (push a main → test + build + deploy)
 
 ### Backend: Render
 
 - **Plataforma**: Render (Web Service)
 - **Base de datos**: PostgreSQL administrado en Render
-- **URL**: https://laboria-backend.onrender.com (ejemplo, actualizar según deploy)
-- **Variables de entorno**: Configuradas en el dashboard de Render
+- **URL**: https://laboria-backend.onrender.com
+- **Variables de entorno**: Configuradas en Render Blueprint (`render.yaml`)
 
-Ver `doc/volumen-05-despliegue/volumen-05-despliegue.md` para documentación detallada.
+Ver `docs/GUIA_DESPLIEGUE.md` para documentación detallada.
 
 ## 🚧 Estado del Proyecto
 

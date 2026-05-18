@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import API_CONFIG from '../config/externalApis';
 import { buildAuthUrl, getHeaders, fetchFromApi, fetchFromRSS, stripHtml } from './apiUtils';
 
@@ -58,7 +59,7 @@ export const searchJobs = async (filters = {}) => {
       const normalizedData = normalizeJobsData(data);
       return { source: api.name, data: normalizedData };
     } catch (error) {
-      console.error(`Error en API ${api.name}:`, error);
+      logger.error(`Error en API ${api.name}:`, error);
       apiErrors.push({ api: api.name, error: error.message });
       return { source: api.name, data: [] };
     }
@@ -91,7 +92,7 @@ export const searchJobs = async (filters = {}) => {
       }));
       return { source: rss.name, data: normalizedItems };
     } catch (error) {
-      console.error(`Error en RSS ${rss.name}:`, error);
+      logger.error(`Error en RSS ${rss.name}:`, error);
       apiErrors.push({ api: rss.name, error: error.message });
       return { source: rss.name, data: [] };
     }
@@ -102,7 +103,7 @@ export const searchJobs = async (filters = {}) => {
     result.data.forEach(job => { allResults.push(job); });
   });
 
-  if (apiErrors.length > 0) console.warn('Errores en algunas fuentes de empleo:', apiErrors);
+  if (apiErrors.length > 0) logger.warn('Errores en algunas fuentes de empleo:', apiErrors);
 
   const filteredResults = allResults.filter(job => {
     let locationMatch = true;
@@ -167,119 +168,112 @@ const normalizeJobsData = (apiData) => {
   return jobsArray.map(job => normalizeJobDetails(job));
 };
 
-const normalizeJobDetails = (job) => {
-  const workModeMap = { 'remote': 'Remoto', 'hybrid': 'Híbrido', 'on-site': 'Presencial', 'onsite': 'Presencial', 'full-time': 'Tiempo completo', 'part-time': 'Tiempo parcial', 'contractor': 'Autónomo', 'freelance': 'Freelance' };
-  const experienceMap = { 'entry': 'Junior', 'junior': 'Junior', 'mid': 'Intermedio', 'mid-level': 'Intermedio', 'intermediate': 'Intermedio', 'senior': 'Senior', 'lead': 'Liderazgo', 'manager': 'Manager', 'director': 'Director', 'executive': 'Ejecutivo' };
-  const contractMap = { 'full-time': 'Indefinido', 'part-time': 'Parcial', 'contract': 'Temporal', 'temporary': 'Temporal', 'internship': 'Prácticas', 'freelance': 'Freelance', 'volunteer': 'Voluntario', 'indefinido': 'Indefinido', 'temporal': 'Temporal' };
-  const scheduleMap = { 'full-time': 'Completa', 'part-time': 'Parcial', 'flexible': 'Flexible', 'completa': 'Completa', 'parcial': 'Parcial' };
+const workModeMap = { 'remote': 'Remoto', 'hybrid': 'Híbrido', 'on-site': 'Presencial', 'onsite': 'Presencial', 'full-time': 'Tiempo completo', 'part-time': 'Tiempo parcial', 'contractor': 'Autónomo', 'freelance': 'Freelance' };
+const experienceMap = { 'entry': 'Junior', 'junior': 'Junior', 'mid': 'Intermedio', 'mid-level': 'Intermedio', 'intermediate': 'Intermedio', 'senior': 'Senior', 'lead': 'Liderazgo', 'manager': 'Manager', 'director': 'Director', 'executive': 'Ejecutivo' };
+const contractMap = { 'full-time': 'Indefinido', 'part-time': 'Parcial', 'contract': 'Temporal', 'temporary': 'Temporal', 'internship': 'Prácticas', 'freelance': 'Freelance', 'volunteer': 'Voluntario', 'indefinido': 'Indefinido', 'temporal': 'Temporal' };
+const scheduleMap = { 'full-time': 'Completa', 'part-time': 'Parcial', 'flexible': 'Flexible', 'completa': 'Completa', 'parcial': 'Parcial' };
 
+const canHandle = (predicate) => (job) => predicate(job);
+
+const normalizeRemoteOK = (job) => ({
+  id: job.slug || job.id, title: job.position || job.title || 'Sin título',
+  company: job.company || 'Empresa no especificada', location: job.location || 'Remoto',
+  workMode: 'Remoto', schedule: scheduleMap[job.time?.toLowerCase()] || job.time || 'Completa',
+  experienceLevel: experienceMap[job.seniority?.toLowerCase()] || job.seniority || 'No especificado',
+  salary: job.salary_min || job.salary_max ? `${job.salary_min || ''} - ${job.salary_max || ''}` : 'No especificado',
+  contractType: contractMap[job.job_type?.toLowerCase()] || job.job_type || 'No especificado',
+  sector: job.tags?.[0] || 'No especificado', technology: job.tags?.join(', ') || 'No especificado',
+  description: stripHtml(job.description) || 'Sin descripción disponible', requirements: job.tags || [], benefits: [],
+  postedDate: job.epoch ? new Date(job.epoch * 1000).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+  url: job.url || job.apply_url || '#', remote: true, logo: job.company_logo || '',
+});
+
+const normalizeRemotive = (job) => ({
+  id: job.id || job.slug, title: job.title || 'Sin título', company: job.company_name || 'Empresa no especificada',
+  location: job.candidate_required_location || 'Remoto', workMode: 'Remoto',
+  schedule: scheduleMap[job.job_type?.toLowerCase()] || job.job_type || 'Completa',
+  experienceLevel: experienceMap[job.experience?.toLowerCase()] || job.experience || 'No especificado',
+  salary: job.salary || 'No especificado',
+  contractType: contractMap[job.job_type?.toLowerCase()] || job.job_type || 'No especificado',
+  sector: job.categories?.[0]?.name || 'No especificado', technology: job.tags?.join(', ') || 'No especificado',
+  description: stripHtml(job.description) || 'Sin descripción disponible', requirements: job.tags || [], benefits: [],
+  postedDate: job.publication_date || new Date().toISOString().split('T')[0],
+  url: job.url || '#', remote: true, logo: job.company_logo || '',
+});
+
+const normalizeSerpApi = (job) => {
+  const scheduleType = job.detected_extensions?.schedule_type || 'No especificado';
+  const postedAt = job.detected_extensions?.posted_at || job.extensions?.[0] || '';
+  let workMode = 'Presencial';
+  if (job.detected_extensions?.schedule_type?.toLowerCase().includes('remote') || job.location?.toLowerCase().includes('remote')) workMode = 'Remoto';
+  else if (job.location?.toLowerCase().includes('hybrid')) workMode = 'Híbrido';
+  let salary = 'No especificado';
+  if (job.detected_extensions?.salary) salary = job.detected_extensions.salary;
+  else { const salaryExt = job.extensions?.find(ext => ext.includes('$') || ext.includes('€') || ext.includes('hour') || ext.includes('year')); if (salaryExt) salary = salaryExt; }
+  return {
+    id: job.job_id || job.share_link, title: job.title || 'Sin título',
+    company: job.company_name || 'Empresa no especificada', location: job.location || 'No especificado',
+    workMode, schedule: scheduleMap[scheduleType?.toLowerCase()] || scheduleType || 'Completa',
+    experienceLevel: job.detected_extensions?.qualifications || 'No especificado', salary,
+    contractType: 'No especificado', sector: job.via || 'No especificado', technology: 'No especificado',
+    description: stripHtml(job.description) || 'Sin descripción disponible',
+    requirements: job.extensions || [], benefits: job.extensions?.filter(ext => ext.includes('insurance') || ext.includes('benefit') || ext.includes('paid')) || [],
+    postedDate: postedAt || new Date().toISOString().split('T')[0], url: job.source_link || job.share_link || '#',
+    remote: workMode === 'Remoto', logo: job.thumbnail || '',
+  };
+};
+
+const normalizeJCYL = (job) => {
+  const f = job.fields;
+  return {
+    id: f.identificador || job.recordid, title: f.titulo || 'Sin título',
+    company: 'Servicio Público de Empleo Castilla y León',
+    location: f.localidad ? `${f.localidad}, ${f.provincia}` : f.provincia || 'Castilla y León',
+    workMode: 'Presencial', schedule: 'Completa', experienceLevel: 'No especificado', salary: 'No especificado',
+    contractType: contractMap[f.tipo_contrato?.toLowerCase()] || f.tipo_contrato || 'No especificado',
+    sector: 'Empleo Público', technology: 'No especificado',
+    description: stripHtml(f.descripcion) || 'Sin descripción disponible',
+    requirements: [], benefits: [], postedDate: f.fecha_publicacion || new Date().toISOString().split('T')[0],
+    url: f.enlace_al_contenido || '#', remote: false, logo: '',
+  };
+};
+
+const normalizeArbeitnow = (job) => ({
+  id: job.job_id, title: job.title || 'Sin título', company: job.company_name || 'Empresa no especificada',
+  location: job.location || 'No especificado',
+  workMode: job.detected_extensions.schedule_type === 'REMOTE' ? 'Remoto' : job.detected_extensions.schedule_type === 'HYBRID' ? 'Híbrido' : 'Presencial',
+  schedule: job.detected_extensions.schedule_type || 'Completa',
+  experienceLevel: job.detected_extensions.experience_level || 'No especificado',
+  salary: job.detected_extensions.salary || 'No especificado',
+  contractType: job.detected_extensions.contract_type || 'No especificado',
+  sector: job.detected_extensions.industry || 'No especificado',
+  technology: job.detected_extensions.qualifications?.join(', ') || 'No especificado',
+  description: stripHtml(job.description) || 'Sin descripción disponible',
+  requirements: job.detected_extensions.qualifications || [], benefits: job.detected_extensions.benefits || [],
+  postedDate: job.detected_extensions.posted_at || new Date().toISOString().split('T')[0],
+  url: job.apply_options?.[0]?.link || job.share_link || '#',
+  remote: job.detected_extensions.schedule_type === 'REMOTE', logo: job.company_logo || '',
+});
+
+const normalizeJobicy = (job) => ({
+  id: job.codigo, title: job.puesto || 'Sin título', company: job.empresa || 'Empresa no especificada',
+  location: job.provincia || 'No especificado',
+  workMode: workModeMap[job.modalidad?.toLowerCase()] || job.modalidad || 'No especificado',
+  schedule: job.jornada || 'Completa', experienceLevel: job.experiencia || 'No especificado',
+  salary: job.salario || 'No especificado',
+  contractType: contractMap[job.tipo_contrato?.toLowerCase()] || job.tipo_contrato || 'No especificado',
+  sector: job.categoria || 'No especificado', technology: job.requisitos || 'No especificado',
+  description: stripHtml(job.descripcion) || 'Sin descripción disponible',
+  requirements: job.requisitos_minimos || [], benefits: job.prestaciones || [],
+  postedDate: job.fecha_publicacion || new Date().toISOString().split('T')[0], url: job.url || '#',
+  remote: job.teletrabajo || false, logo: job.logo_empresa || '',
+});
+
+const normalizeFallback = (job) => {
   const rawWorkMode = job.work_mode || job.workMode || job.employment_type || job.type || '';
   const rawExperience = job.experience_level || job.level || job.seniority || '';
   const rawContract = job.contract_type || job.employment_type || job.type || '';
   const rawSchedule = job.schedule || job.hours || '';
-
-  if (job.slug && job.company && job.tags) {
-    return {
-      id: job.slug || job.id, title: job.position || job.title || 'Sin título',
-      company: job.company || 'Empresa no especificada', location: job.location || 'Remoto',
-      workMode: 'Remoto', schedule: scheduleMap[job.time?.toLowerCase()] || job.time || 'Completa',
-      experienceLevel: experienceMap[job.seniority?.toLowerCase()] || job.seniority || 'No especificado',
-      salary: job.salary_min || job.salary_max ? `${job.salary_min || ''} - ${job.salary_max || ''}` : 'No especificado',
-      contractType: contractMap[job.job_type?.toLowerCase()] || job.job_type || 'No especificado',
-      sector: job.tags?.[0] || 'No especificado', technology: job.tags?.join(', ') || 'No especificado',
-      description: stripHtml(job.description) || 'Sin descripción disponible', requirements: job.tags || [], benefits: [],
-      postedDate: job.epoch ? new Date(job.epoch * 1000).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-      url: job.url || job.apply_url || '#', remote: true, logo: job.company_logo || '',
-    };
-  }
-
-  if (job.url && job.company_name && job.categories) {
-    return {
-      id: job.id || job.slug, title: job.title || 'Sin título', company: job.company_name || 'Empresa no especificada',
-      location: job.candidate_required_location || 'Remoto', workMode: 'Remoto',
-      schedule: scheduleMap[job.job_type?.toLowerCase()] || job.job_type || 'Completa',
-      experienceLevel: experienceMap[job.experience?.toLowerCase()] || job.experience || 'No especificado',
-      salary: job.salary || 'No especificado',
-      contractType: contractMap[job.job_type?.toLowerCase()] || job.job_type || 'No especificado',
-      sector: job.categories?.[0]?.name || 'No especificado', technology: job.tags?.join(', ') || 'No especificado',
-      description: stripHtml(job.description) || 'Sin descripción disponible', requirements: job.tags || [], benefits: [],
-      postedDate: job.publication_date || new Date().toISOString().split('T')[0],
-      url: job.url || '#', remote: true, logo: job.company_logo || '',
-    };
-  }
-
-  if (job.title && job.company_name && job.location) {
-    const scheduleType = job.detected_extensions?.schedule_type || 'No especificado';
-    const postedAt = job.detected_extensions?.posted_at || job.extensions?.[0] || '';
-    let workMode = 'Presencial';
-    if (job.detected_extensions?.schedule_type?.toLowerCase().includes('remote') || job.location?.toLowerCase().includes('remote')) workMode = 'Remoto';
-    else if (job.location?.toLowerCase().includes('hybrid')) workMode = 'Híbrido';
-    let salary = 'No especificado';
-    if (job.detected_extensions?.salary) salary = job.detected_extensions.salary;
-    else { const salaryExt = job.extensions?.find(ext => ext.includes('$') || ext.includes('€') || ext.includes('hour') || ext.includes('year')); if (salaryExt) salary = salaryExt; }
-    return {
-      id: job.job_id || job.share_link, title: job.title || 'Sin título',
-      company: job.company_name || 'Empresa no especificada', location: job.location || 'No especificado',
-      workMode, schedule: scheduleMap[scheduleType?.toLowerCase()] || scheduleType || 'Completa',
-      experienceLevel: job.detected_extensions?.qualifications || 'No especificado', salary,
-      contractType: 'No especificado', sector: job.via || 'No especificado', technology: 'No especificado',
-      description: stripHtml(job.description) || 'Sin descripción disponible',
-      requirements: job.extensions || [], benefits: job.extensions?.filter(ext => ext.includes('insurance') || ext.includes('benefit') || ext.includes('paid')) || [],
-      postedDate: postedAt || new Date().toISOString().split('T')[0], url: job.source_link || job.share_link || '#',
-      remote: workMode === 'Remoto', logo: job.thumbnail || '',
-    };
-  }
-
-  if (job.fields) {
-    const fields = job.fields;
-    return {
-      id: fields.identificador || job.recordid, title: fields.titulo || 'Sin título',
-      company: 'Servicio Público de Empleo Castilla y León',
-      location: fields.localidad ? `${fields.localidad}, ${fields.provincia}` : fields.provincia || 'Castilla y León',
-      workMode: 'Presencial', schedule: 'Completa', experienceLevel: 'No especificado', salary: 'No especificado',
-      contractType: contractMap[fields.tipo_contrato?.toLowerCase()] || fields.tipo_contrato || 'No especificado',
-      sector: 'Empleo Público', technology: 'No especificado',
-      description: stripHtml(fields.descripcion) || 'Sin descripción disponible',
-      requirements: [], benefits: [], postedDate: fields.fecha_publicacion || new Date().toISOString().split('T')[0],
-      url: fields.enlace_al_contenido || '#', remote: false, logo: '',
-    };
-  }
-
-  if (job.job_id && job.detected_extensions) {
-    return {
-      id: job.job_id, title: job.title || 'Sin título', company: job.company_name || 'Empresa no especificada',
-      location: job.location || 'No especificado',
-      workMode: job.detected_extensions.schedule_type === 'REMOTE' ? 'Remoto' : job.detected_extensions.schedule_type === 'HYBRID' ? 'Híbrido' : 'Presencial',
-      schedule: job.detected_extensions.schedule_type || 'Completa',
-      experienceLevel: job.detected_extensions.experience_level || 'No especificado',
-      salary: job.detected_extensions.salary || 'No especificado',
-      contractType: job.detected_extensions.contract_type || 'No especificado',
-      sector: job.detected_extensions.industry || 'No especificado',
-      technology: job.detected_extensions.qualifications?.join(', ') || 'No especificado',
-      description: stripHtml(job.description) || 'Sin descripción disponible',
-      requirements: job.detected_extensions.qualifications || [], benefits: job.detected_extensions.benefits || [],
-      postedDate: job.detected_extensions.posted_at || new Date().toISOString().split('T')[0],
-      url: job.apply_options?.[0]?.link || job.share_link || '#',
-      remote: job.detected_extensions.schedule_type === 'REMOTE', logo: job.company_logo || '',
-    };
-  }
-
-  if (job.codigo && job.puesto) {
-    return {
-      id: job.codigo, title: job.puesto || 'Sin título', company: job.empresa || 'Empresa no especificada',
-      location: job.provincia || 'No especificado',
-      workMode: workModeMap[job.modalidad?.toLowerCase()] || job.modalidad || 'No especificado',
-      schedule: job.jornada || 'Completa', experienceLevel: job.experiencia || 'No especificado',
-      salary: job.salario || 'No especificado',
-      contractType: contractMap[job.tipo_contrato?.toLowerCase()] || job.tipo_contrato || 'No especificado',
-      sector: job.categoria || 'No especificado', technology: job.requisitos || 'No especificado',
-      description: stripHtml(job.descripcion) || 'Sin descripción disponible',
-      requirements: job.requisitos_minimos || [], benefits: job.prestaciones || [],
-      postedDate: job.fecha_publicacion || new Date().toISOString().split('T')[0], url: job.url || '#',
-      remote: job.teletrabajo || false, logo: job.logo_empresa || '',
-    };
-  }
-
   return {
     id: job.id || job.job_id || job._id || Math.random().toString(36).substr(2, 9),
     title: job.title || job.job_title || job.position || job.role || 'Sin título',
@@ -300,4 +294,19 @@ const normalizeJobDetails = (job) => {
     remote: job.remote || job.is_remote || (rawWorkMode && rawWorkMode.toLowerCase().includes('remote')) || false,
     logo: job.logo || job.company_logo || job.company_logo_url || '',
   };
+};
+
+const normalizers = [
+  { canHandle: (job) => job.slug && job.company && job.tags, normalize: normalizeRemoteOK },
+  { canHandle: (job) => job.url && job.company_name && job.categories, normalize: normalizeRemotive },
+  { canHandle: (job) => job.title && job.company_name && job.location, normalize: normalizeSerpApi },
+  { canHandle: (job) => job.fields, normalize: normalizeJCYL },
+  { canHandle: (job) => job.job_id && job.detected_extensions, normalize: normalizeArbeitnow },
+  { canHandle: (job) => job.codigo && job.puesto, normalize: normalizeJobicy },
+];
+
+const normalizeJobDetails = (job) => {
+  const normalizer = normalizers.find(n => n.canHandle(job));
+  if (normalizer) return normalizer.normalize(job);
+  return normalizeFallback(job);
 };

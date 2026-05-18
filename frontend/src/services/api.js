@@ -2,8 +2,38 @@ import API_URL from '../config/api';
 import toast from 'react-hot-toast';
 
 const BASE_URL = `${API_URL}/api`;
+let isRefreshing = false;
+let refreshSubscribers = [];
 
-const handleResponse = async (response) => {
+const onRefreshed = (newToken) => {
+  refreshSubscribers.forEach(cb => cb(newToken));
+  refreshSubscribers = [];
+};
+
+const addRefreshSubscriber = (cb) => {
+  refreshSubscribers.push(cb);
+};
+
+const refreshAccessToken = async () => {
+  const refreshToken = localStorage.getItem('refreshToken');
+  if (!refreshToken) return null;
+  try {
+    const response = await fetch(`${BASE_URL}/users/refresh-token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken })
+    });
+    if (!response.ok) return null;
+    const data = await response.json();
+    localStorage.setItem('token', data.token);
+    if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+    return data.token;
+  } catch {
+    return null;
+  }
+};
+
+const handleResponse = async (response, endpoint, options) => {
   if (!response.ok) {
     let message = `HTTP ${response.status}`;
     try {
@@ -12,9 +42,28 @@ const handleResponse = async (response) => {
       else if (errorData?.message) message = errorData.message;
     } catch (e) {}
 
+    if (response.status === 401 && localStorage.getItem('refreshToken')) {
+      if (!isRefreshing) {
+        isRefreshing = true;
+        const newToken = await refreshAccessToken();
+        isRefreshing = false;
+        if (newToken) {
+          onRefreshed(newToken);
+          return request(endpoint, options, true);
+        }
+      } else {
+        return new Promise(resolve => {
+          addRefreshSubscriber((token) => {
+            resolve(request(endpoint, options, true));
+          });
+        });
+      }
+    }
+
     if (response.status === 401 && localStorage.getItem('token')) {
       toast.error('Sesión expirada. Redirigiendo al inicio de sesión...');
       localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
       setTimeout(() => { window.location.href = '/login'; }, 2000);
     }
@@ -24,7 +73,7 @@ const handleResponse = async (response) => {
   return { data: await response.json() };
 };
 
-const request = async (endpoint, options = {}) => {
+const request = async (endpoint, options = {}, isRetry = false) => {
   const token = localStorage.getItem('token');
   const { headers: extraHeaders, ...fetchOptions } = options;
   const response = await fetch(`${BASE_URL}${endpoint}`, {
@@ -35,7 +84,7 @@ const request = async (endpoint, options = {}) => {
     },
     ...fetchOptions
   });
-  return handleResponse(response);
+  return handleResponse(response, endpoint, options);
 };
 
 const api = {

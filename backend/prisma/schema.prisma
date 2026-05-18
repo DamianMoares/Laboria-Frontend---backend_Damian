@@ -23,6 +23,7 @@ model User {
   jobs                 Job[]
   curriculum           Curriculum?
   loginSessions        LoginSession[]
+  auditLogs            AuditLog[]
 }
 
 model Job {
@@ -96,6 +97,7 @@ model Application {
   user      User              @relation(fields: [userId], references: [id])
 
   @@unique([userId, jobId])
+  @@index([status])
 }
 
 model Curriculum {
@@ -119,6 +121,7 @@ model CourseApplication {
   user      User              @relation(fields: [userId], references: [id])
 
   @@unique([userId, courseId])
+  @@index([status])
 }
 
 model AuditLog {
@@ -128,6 +131,7 @@ model AuditLog {
   entityId  String?
   details   String?
   adminId   String
+  admin     User     @relation(fields: [adminId], references: [id])
   adminName String?
   createdAt DateTime @default(now())
 

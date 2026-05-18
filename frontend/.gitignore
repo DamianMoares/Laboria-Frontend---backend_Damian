@@ -11,6 +11,8 @@ node_modules
 # DOC - Uncomment to exclude from git
 doc
 .env
+.emv.production
+.env.example
 dist
 dist-ssr
 *.local

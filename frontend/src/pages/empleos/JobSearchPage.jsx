@@ -3,6 +3,8 @@ import jobsData from '../../data/jobs.json';
 import { spainMunicipalities, jobCategories, experienceLevels, contractTypes, workModes, salaryRanges } from '../../data/searchData';
 import { searchAllJobs } from '../../context/ConexionApi';
 import JobCard from '../../components/jobs/JobCard';
+import Spinner from '../../components/Spinner';
+import EmptyState from '../../components/EmptyState';
 import styles from './JobSearchPage.module.css';
 
 const JobSearchPage = () => {
@@ -379,7 +381,7 @@ const JobSearchPage = () => {
         <div className={styles['results-container']}>
           {loading && (
             <div className={styles['loading-state']}>
-              <p>Buscando ofertas de empleo...</p>
+              <Spinner />
             </div>
           )}
 
@@ -454,18 +456,19 @@ const JobSearchPage = () => {
                   )}
                 </>
               ) : (
-                <div className={styles['no-results']}>
-                  <p>No se encontraron ofertas con los filtros seleccionados.</p>
-                  <p>Intenta ajustar tus criterios de búsqueda.</p>
-                </div>
+                <EmptyState
+                  title="Sin resultados"
+                  message="No se encontraron ofertas con los filtros seleccionados. Intenta ajustar tus criterios de búsqueda."
+                />
               )}
             </>
           )}
 
           {!hasSearched && !loading && (
-            <div className={styles['search-prompt']}>
-              <p>Usa los filtros y haz clic en "Buscar" para ver ofertas de empleo.</p>
-            </div>
+            <EmptyState
+              title="Buscar ofertas"
+              message="Usa los filtros y haz clic en Buscar para ver ofertas de empleo."
+            />
           )}
         </div>
       </div>

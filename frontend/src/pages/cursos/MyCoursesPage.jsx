@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import { useConfirm } from '../../context/ConfirmContext';
 import { courseService } from '../../services/courseService';
+import Spinner from '../../components/Spinner';
+import EmptyState from '../../components/EmptyState';
 import styles from '../compartidos/MyListingsPage.module.css';
 
 const MyCoursesPage = () => {
@@ -66,7 +68,7 @@ const MyCoursesPage = () => {
         </header>
 
         {loading ? (
-          <div className="loading">Cargando cursos...</div>
+          <div className="loading"><Spinner /></div>
         ) : postedCourses.length > 0 ? (
           <div className={styles['listings-grid']}>
             {postedCourses.map(course => (
@@ -108,12 +110,11 @@ const MyCoursesPage = () => {
             ))}
           </div>
         ) : (
-          <div className={styles['no-listings']}>
-            <p>No has publicado ningún curso aún.</p>
-            <Link to="/publicar-curso" className="btn btn-primary">
-              Publicar Tu Primer Curso
-            </Link>
-          </div>
+          <EmptyState
+              title="Sin cursos publicados"
+              message="No has publicado ningún curso aún."
+              action={<Link to="/publicar-curso" className="btn btn-primary">Publicar Tu Primer Curso</Link>}
+            />
         )}
       </div>
     </div>

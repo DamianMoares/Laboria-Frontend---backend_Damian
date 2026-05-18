@@ -17,6 +17,9 @@ router.post('/register', authLimiter, registerRules, userController.register);
 // POST /api/users/login (con rate limiting + validación)
 router.post('/login', authLimiter, loginRules, userController.login);
 
+// POST /api/users/refresh-token - Renovar JWT
+router.post('/refresh-token', authLimiter, userController.refreshToken);
+
 // POST /api/users/forgot-password - Solicitar restablecimiento (con rate limiting + validación)
 router.post('/forgot-password', authLimiter, forgotPasswordRules, userController.forgotPassword);
 

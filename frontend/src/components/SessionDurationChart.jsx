@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 import { sessionService } from '../services/sessionService';
+import Spinner from './Spinner';
 import styles from './SessionDurationChart.module.css';
 
 const SessionDurationChart = () => {
@@ -35,7 +36,7 @@ const SessionDurationChart = () => {
     <div className={styles.card}>
       <h3 className={styles.title}>Duración media de sesión</h3>
       {loading ? (
-        <p className={styles.loading}>Cargando...</p>
+        <div className={styles.loading}><Spinner /></div>
       ) : (
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={data} margin={{ top: 20, right: 20, left: 0, bottom: 5 }}>

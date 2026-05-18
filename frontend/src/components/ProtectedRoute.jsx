@@ -1,12 +1,13 @@
 import React from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Spinner from './Spinner';
 
 const ProtectedRoute = ({ children, roles }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div className="loading">Cargando...</div>;
+    return <div className="loading"><Spinner /></div>;
   }
 
   if (!user) {

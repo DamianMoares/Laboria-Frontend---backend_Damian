@@ -107,21 +107,6 @@ const courseController = {
     try {
       const { id } = req.params;
       
-      // Verificar que existe
-      const existing = await prisma.course.findUnique({ where: { id } });
-      if (!existing) {
-        const error = new Error('Curso no encontrado');
-        error.statusCode = 404;
-        throw error;
-      }
-      
-      // Verificar que sea el autor o admin
-      if (existing.authorId !== req.user.id && req.user.role !== 'ADMIN') {
-        const error = new Error('No autorizado - Solo el autor puede editar');
-        error.statusCode = 403;
-        throw error;
-      }
-      
       const allowedFields = ['title', 'provider', 'description', 'category', 'level', 'duration', 'price', 'url', 'image'];
       const data = {};
       for (const field of allowedFields) {
@@ -132,18 +117,38 @@ const courseController = {
         error.statusCode = 400;
         throw error;
       }
+      
+      if (req.user.role === 'ADMIN') {
+        const course = await prisma.course.update({
+          where: { id },
+          data,
+          include: { author: { select: { id: true, name: true } } }
+        });
+        return res.json({ message: 'Curso actualizado', course });
+      }
+      
+      const existing = await prisma.course.findUnique({
+        where: { id },
+        select: { authorId: true }
+      });
+      if (!existing) {
+        const error = new Error('Curso no encontrado');
+        error.statusCode = 404;
+        throw error;
+      }
+      if (existing.authorId !== req.user.id) {
+        const error = new Error('No autorizado - Solo el autor puede editar');
+        error.statusCode = 403;
+        throw error;
+      }
+      
       const course = await prisma.course.update({
         where: { id },
         data,
-        include: {
-          author: { select: { id: true, name: true } }
-        }
+        include: { author: { select: { id: true, name: true } } }
       });
       
-      res.json({
-        message: 'Curso actualizado',
-        course
-      });
+      res.json({ message: 'Curso actualizado', course });
     } catch (error) {
       next(error);
     }
@@ -154,14 +159,21 @@ const courseController = {
     try {
       const { id } = req.params;
       
-      const existing = await prisma.course.findUnique({ where: { id } });
+      if (req.user.role === 'ADMIN') {
+        await prisma.course.delete({ where: { id } });
+        return res.json({ message: 'Curso eliminado' });
+      }
+      
+      const existing = await prisma.course.findUnique({
+        where: { id },
+        select: { authorId: true }
+      });
       if (!existing) {
         const error = new Error('Curso no encontrado');
         error.statusCode = 404;
         throw error;
       }
-      
-      if (existing.authorId !== req.user.id && req.user.role !== 'ADMIN') {
+      if (existing.authorId !== req.user.id) {
         const error = new Error('No autorizado');
         error.statusCode = 403;
         throw error;
