@@ -6,4 +6,4 @@
 */
 -- AlterTable
 ALTER TABLE "LoginSession" DROP COLUMN "userRole",
-ADD COLUMN     "userRole" "Role" NOT NULL;
+ADD COLUMN     "userRole" "Role" NOT NULL DEFAULT 'CANDIDATE';
