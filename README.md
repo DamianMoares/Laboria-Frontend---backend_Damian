@@ -20,8 +20,8 @@ Laboria es un metabuscador que integra ofertas laborales y cursos educativos de 
 - **Filtros Avanzados**: Jornada, salario, certificación, precio, duración
 - **Consentimiento de Cookies**: Banner granular con categorías
 - **Cumplimiento Legal**: RGPD/LOPDGDD 2026 y LSSI-CE
-- **Testing**: 75 tests automatizados (57 frontend + 18 backend) con Vitest
-- **Despliegue**: Frontend en GitHub Pages + Backend en Render, CI/CD automatizado
+- **Testing**: 86 tests automatizados (57 frontend + 29 backend) con Vitest
+- **Despliegue**: Frontend en Vercel + Backend en Render, CI/CD automatizado
 
 ## ✨ Características
 
@@ -62,7 +62,7 @@ Laboria es un metabuscador que integra ofertas laborales y cursos educativos de 
 - **Validación**: express-validator en todos los endpoints
 - **Email**: Resend para recuperación de contraseña
 - **Seguridad**: Helmet, CORS configurable
-- **Pruebas**: 18 tests con Vitest y supertest
+- **Pruebas**: 29 tests con Vitest y supertest
 
 ### Cookies y Cumplimiento Legal
 - Banner de consentimiento granular
@@ -72,10 +72,9 @@ Laboria es un metabuscador que integra ofertas laborales y cursos educativos de 
 - Cumplimiento con RGPD/LOPDGDD 2026 y LSSI-CE
 
 ### Testing
-- **75 tests total** (57 frontend + 18 backend)
+- **86 tests total** (57 frontend + 29 backend)
 - Frontend: Vitest + React Testing Library (componentes y páginas)
-- Backend: Vitest + supertest (controladores y rutas)
-- Mock de APIs externas y base de datos para testing aislado
+- Backend: Vitest + supertest (controladores y rutas) con manipulación de `require.cache` para mocking
 
 ## � Ejecución Rápida
 
@@ -124,44 +123,21 @@ npm run test:backend      # Solo backend
 
 #### **🚀 Despliegue**
 ```bash
-npm run deploy             # Build frontend para GitHub Pages
-npm run deploy:frontend    # Build frontend para GitHub Pages
+npm run deploy             # Build frontend para Vercel
+npm run deploy:frontend    # Build frontend para Vercel
 ```
 
 ## 🛠 Stack Tecnológico
 
 - **Frontend**: React 18.3.1
 - **Bundler**: Vite 5.2.11
-- **Enrutamiento**: React Router DOM 6.22.3 (HashRouter para GitHub Pages)
-- **Backend**: Node.js + Express 4.18
-- **Base de Datos**: PostgreSQL + Prisma ORM 5.14
-- **Autenticación**: JWT (jsonwebtoken + bcryptjs)
-- **Email**: Resend API
+- **Enrutamiento**: React Router DOM 6.22.3 (BrowserRouter en Vercel)
+- **Backend**: Node.js + Express 5.2.1
+- **Base de Datos**: PostgreSQL + Prisma ORM 6.19.3
 - **Testing**: Vitest + React Testing Library + supertest
 - **Estilos**: CSS Variables (paleta negro + dorado), CSS Modules
 - **Lenguaje**: JavaScript (sin TypeScript)
-- **Despliegue**: GitHub Pages (frontend) + Render (backend) + GitHub Actions CI/CD
-
-npm install
-
-# Crear archivo .env (opcional - ver sección Variables de Entorno)
-cp .env.example .env
-
-# Iniciar servidor de desarrollo
-npm run dev
-
-# Build para producción
-npm run build
-
-# Preview de producción
-npm run preview
-
-# Ejecutar tests
-npm test
-
-# Ejecutar tests con UI
-npm run test:ui
-```
+- **Despliegue**: Vercel (frontend) + Render (backend) + GitHub Actions CI/CD
 
 ## 🔐 Variables de Entorno
 
@@ -191,9 +167,10 @@ Proyecto-Laboria-Damián/
 │   ├── public/
 │   │   └── legal/               # Documentos legales
 │   ├── src/
+│   │   ├── __tests__/            # Tests de frontend (57 tests)
 │   │   ├── components/           # Componentes reutilizables
 │   │   ├── config/               # Configuración de APIs, roles
-│   │   ├── context/              # AuthContext, ConexionApi
+│   │   ├── context/              # AuthContext, ConfirmContext
 │   │   ├── data/                 # Datos locales (jobs.json, courses.json)
 │   │   ├── hooks/                # Hooks personalizados
 │   │   ├── pages/                # Páginas (autenticación, cursos, empleos, panel, etc.)
@@ -202,23 +179,27 @@ Proyecto-Laboria-Damián/
 │   └── vite.config.js
 ├── backend/                      # API REST (Express + Prisma)
 │   ├── prisma/
-│   │   └── schema.prisma        # Modelos de base de datos
+│   │   ├── schema.prisma        # Modelos de base de datos
+│   │   └── migrations/          # Migraciones de base de datos
 │   ├── src/
+│   │   ├── __tests__/            # Tests de backend (29 tests, 6 archivos)
 │   │   ├── config/              # Conexión Prisma
 │   │   ├── controllers/         # Lógica de negocio
 │   │   ├── middleware/          # Auth, validación, rate limiting, errores
 │   │   └── routes/              # Definición de rutas
-│   ├── tests/                   # Tests del backend (Vitest + supertest)
 │   ├── server.js                # Punto de entrada
+│   ├── render.yaml              # Render Blueprint
 │   └── .env / .env.example
-├── doc/                          # Documentación del proyecto (10 volúmenes)
+├── doc/                          # Documentación del proyecto (ensayos)
 ├── docs/
 │   ├── db-api-guide.md
 │   ├── backend-summary.md
 │   ├── auditoria-completa.md
 │   └── auditoria-full.md
+├── Documentacion/                # Documentación completa (11 archivos)
 ├── .github/workflows/deploy.yml  # CI/CD GitHub Actions
 ├── package.json                  # Scripts raíz (dev, test, build)
+├── specs/                        # Especificaciones técnicas
 └── README.md
 ```
 
@@ -278,18 +259,24 @@ Paleta de colores consistente (negro + dorado):
 
 ## 📚 Documentación
 
-La documentación completa del proyecto está en la carpeta `DOC/`:
+La documentación del proyecto se divide en dos carpetas:
 
+### `doc/` — Ensayos y cronología del desarrollo
 - **README.md**: Índice general de documentación
 - **01-INTRODUCCION.md**: Visión general, contexto, objetivos, alcance, requisitos
 - **02-ARQUITECTURA-TECNICA.md**: Patrones de diseño, estructura, componentes, flujo de datos
 - **03-DESARROLLO-CRONOLOGICO.md**: Cronología de desarrollo con tiempos, dificultades, soluciones
 - **04-DECISIONES-TECNICAS.md**: Decisiones técnicas tomadas y justificación
 - **ANEXO-A-APIS.md**: Documentación detallada de 20 APIs integradas
-- **ANEXO-B-TESTING.md**: Stack de testing, 18 tests implementados, estrategia
+- **ANEXO-B-TESTING.md**: Stack de testing, 75 tests implementados, estrategia
 - **ANEXO-C-DESPLIEGUE.md**: GitHub Pages, CI/CD, troubleshooting
 - **ANEXO-D-CUMPLIMIENTO-LEGAL.md**: RGPD/LOPDGDD 2026, documentos legales
 - **05-CRONOGRAMA-TAREAS.md**: Cronograma detallado de tareas con tiempos
+
+### `Documentacion/` — Documentación técnica completa (11 archivos, en git)
+- **README.md**: Índice
+- **01-VISION-ALCANCE.md** a **10-GLOSARIO.md**: Visión, arquitectura, modelo datos, API, manuales, pruebas, seguridad, roadmap, glosario
+- **especifico-backend.md**: Especificación técnica de backend (1556 líneas, 45 funciones, 40 endpoints)
 
 ## 🧪 Testing
 
@@ -307,7 +294,7 @@ npm test -- --watch
 npm run test:coverage
 ```
 
-**Tests implementados (75 total):**
+**Tests implementados (86 total):**
 - Frontend (57):
   - Home Page: 6 tests
   - JobSearchPage: 6 tests
@@ -318,10 +305,13 @@ npm run test:coverage
   - RegisterPage: 5 tests
   - DashboardPage: 4 tests
   - CurriculumPage: 4 tests
-- Backend (18):
-  - userController: 12 tests (registro, login, perfil, curriculum, cambio contraseña)
-  - auth middleware: 3 tests
-  - applicationController: 3 tests
+- Backend (29):
+  - userController: 6 tests (registro, login, perfil, cambio contraseña, baja)
+  - authMiddleware: 4 tests
+  - applicationController: 6 tests (crear, listar, cancelar, actualizar estado)
+  - courseController: 4 tests (listar, crear, detalle)
+  - jobController: 4 tests (listar, crear, detalle)
+  - adminController: 5 tests (dashboard, usuarios, auditoría, tests)
 
 ## 📊 APIs Integradas
 
@@ -357,20 +347,20 @@ Ver `ANEXO-A-APIS.md` para documentación detallada.
 
 ## 🚀 Despliegue
 
-### Frontend: Vercel + GitHub Pages
+### Frontend: Vercel
 
-- **URL (Vercel)**: https://laboria-frontend-backend-damian.vercel.app
-- **URL (GitHub Pages - legacy)**: https://damianmoares.github.io/Laboria-Frontend---backend_Damian/
-- **Router**: HashRouter (para evitar problemas de routing en hosting estático)
-- **Build**: Vite
+- **URL**: https://laboria-frontend-backend-damian.vercel.app
+- **Router**: BrowserRouter (compatible con Vercel)
+- **Build**: Vite (838 módulos, ~5s con code splitting + vendor chunks)
 - **CI/CD**: GitHub Actions automatizado (push a main → test + build + deploy)
 
 ### Backend: Render
 
-- **Plataforma**: Render (Web Service)
+- **Plataforma**: Render (Web Service + Blueprint)
 - **Base de datos**: PostgreSQL administrado en Render
 - **URL**: https://laboria-backend.onrender.com
-- **Variables de entorno**: Configuradas en Render Blueprint (`render.yaml`)
+- **Variables de entorno**: Configuradas en `render.yaml`
+- **Migraciones**: Prisma migrate deploy automático en build con resolución de conflictos
 
 Ver `docs/GUIA_DESPLIEGUE.md` para documentación detallada.
 
@@ -385,18 +375,21 @@ Ver `docs/GUIA_DESPLIEGUE.md` para documentación detallada.
 - Gestión de perfiles (candidatos y empresas) con campos extendidos
 - Sistema de currículum completo con persistencia vía API
 - Postulaciones a empleos y cursos con seguimiento de estado
-- Panel de administración completo
+- Panel de administración completo (dashboard, usuarios, auditoría)
 - Dashboard con estadísticas y gráficos de sesiones
 - Tracking de sesiones de usuario con LoginSession
-- 57 tests de frontend + 18 tests de backend (75 total)
-- Despliegue frontend en GitHub Pages + backend en Render
+- 57 tests de frontend + 29 tests de backend (86 total)
+- Controladores: user, auth, application, course, job, admin (6 controllers, 40 endpoints)
+- Despliegue frontend en Vercel + backend en Render
 - CI/CD automatizado con GitHub Actions
-- Documentación técnica completa (10 volúmenes)
+- Documentación técnica completa (11 archivos en Documentacion/)
+- Especificación técnica backend (1556 líneas)
+- Auditoría: ~90/95 hallazgos corregidos (~95%)
 
 ### 🔄 Limitaciones Conocidas
 - 6 APIs externas deshabilitadas por problemas de CORS o autenticación
 - Los cursos se cargan desde archivos JSON estáticos (no desde BD)
-- HashRouter en lugar de BrowserRouter (URLs con #)
+- Despliegue en Render con error P3018 en migración de userRole (require.cache pendiente)
 
 ### 📋 Futuras Mejoras
 Ver `03-DESARROLLO-CRONOLOGICO.md` para roadmap de mejoras futuras.
@@ -438,5 +431,5 @@ Este es un proyecto personal/educativo. Las contribuciones son bienvenidas a tra
 
 ---
 
-**Última actualización**: 17 de mayo de 2026  
-**Versión**: 2.0.0 (full-stack)
+**Última actualización**: 18 de mayo de 2026  
+**Versión**: 2.1.0 (full-stack)

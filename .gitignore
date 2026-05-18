@@ -1,9 +1,7 @@
-node_modules/
-dist/
+node_modules
+dist
 .env
 *.db
 .DS_Store
 *.log
-docs
-package-lock.json
-Documentacion
+docs_v2/

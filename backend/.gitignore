@@ -1,7 +1,7 @@
 
 node_modules
+packager-lock.json
 .env
-.env.example
 /generated/prisma
 *.db
 *.db-journal
